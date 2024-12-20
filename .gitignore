@@ -4,4 +4,77 @@ obj/
 riderModule.iml
 /_ReSharper.Caches/
 
+# Rider-specific
+.idea/
+.idea_modules/
+*.sln.iml
+*.iml
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build files
+/bin/
+/obj/
+/build/
+
+# Logs
+*.log
+*.tlog
+
+# Rider workspace
+*.Rider*
+
+# Crashlytics, Firebase, etc.
+crashlytics-build.properties
+
+# NuGet
+*.nupkg
+packages/
+project.lock.json
+project.fragment.lock.json
+*.nuget.props
+*.nuget.targets
+
+# VSCode settings (if shared workspace)
+.vscode/
+
+# Resharper files
+_ReSharper*/
+*.DotSettings.user
+
+# macOS system files
 .DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows system files
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*.swo
+*.swn
+
+# Rider cache and index
+.idea/
+.idea_modules/
+.idea/*
+
+# Runtime-specific
+*.pidb
+*.mdb
+*.ilk
+*.pdb
+*.idb
+
+# C# config and logs
+*.log
+*.csproj.user
