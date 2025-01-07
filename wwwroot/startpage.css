@@ -73,7 +73,6 @@ main {
 .enterNameSection {
     display: flex;
     align-items: center;
-
 }
 
 #acceptButton {
@@ -93,6 +92,9 @@ main {
     color: white;
 }
 
+#buttonsJoinCreate{
+    display: flex;
+}
 
 #createLobbyButton {
     margin-left: 20px;
