@@ -22,7 +22,7 @@ h1 {
     color: white;
 }
 
-#gamerules, #acceptButton {
+#gamerules, #acceptButton, #joinButton {
    appearance: none;
    background-color: white;
    border: 2px solid #1A1A1A;
@@ -54,7 +54,7 @@ h1 {
     pointer-events: none;
 }
 
-#gamerules:hover {
+#gamerules:hover , #acceptButton:hover, #joinButton:hover {
     box-shadow: rgba(0, 0, 0, 0.25) 0 8px 15px;
     transform: translateY(-2px);
 }
@@ -80,6 +80,14 @@ main {
     margin-left: 20px; 
     padding-block: 10px;
     background-color: #54AD24;
+    border: none;
+    color: white;
+}
+
+#joinButton {
+    margin-top: 2rem;
+    padding-block: 10px;
+    background-color: #177eaa;
     border: none;
     color: white;
 }
@@ -130,5 +138,65 @@ input[type="text"]{
     margin: 5rem;
     padding-left: 5rem;
     padding-right: 5rem;
+}
+
+#lobby{
+    color: black;
+    font-family: sans-serif;
+
+}
+
+#lobbyMain{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+/*Pin code CSS */
+
+.pin-code{ 
+    padding: 0; 
+    margin: 0 auto; 
+    display: flex;
+    justify-content:center;
+    
+  } 
+   
+  .pin-code input { 
+    border: none; 
+    text-align: center; 
+    width: 7rem;
+    height:7rem;
+    font-size: 6rem; 
+    background-color: #F3F3F3;
+    margin-right:5px;
+  } 
+  
+  
+  
+  .pin-code input:focus { 
+    border: 1px solid #573D8B;
+    outline:none;
+  } 
+  
+  
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+  }
+
+
+  /* Hides arrows, Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
 }
     
