@@ -114,4 +114,21 @@ input[type="text"]{
     font-size: 3rem;
     border-bottom: 1px solid #ccc;
 }
+
+
+.rulestext {
+    font-size: 2rem;
+    margin: 5rem;
+    padding-left: 5rem;
+    padding-right: 5rem;
+}
+
+#title {
+    font-family: sans-serif;
+    font-size: 3rem;
+    color: black;
+    margin: 5rem;
+    padding-left: 5rem;
+    padding-right: 5rem;
+}
     
