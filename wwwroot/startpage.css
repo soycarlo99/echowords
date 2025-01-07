@@ -85,6 +85,27 @@ main {
 }
 
 
+#joinLobbyButton {
+    margin-left: 20px;
+    padding-block: 10px;
+    background-color: #54AD24;
+    border: none;
+    color: white;
+}
+
+
+#createLobbyButton {
+    margin-left: 20px;
+    padding-block: 10px;
+    background-color: #54AD24;
+    border: none;
+    color: white;
+}
+
+
+
+
+
 /* Style for input below */
 
 input[type="submit"]{
