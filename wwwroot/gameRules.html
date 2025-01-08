@@ -2,7 +2,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Document</title>
+    <title>Game Rules</title>
     <link rel="stylesheet" href="startpage.css">
 </head>
 <body>
@@ -12,15 +12,20 @@
     </div>
 </nav>
 <main>
-    <h1 id="title">Game rules 📏</h1>
+    <h1 id="title">Game Rules 📏</h1>
     <div class="rulesText">
-    <p>Player one is asked to input a word and writes the first word, press Enter when finished and a timer will start (2-3 seconds) before the word disappear
-
-        Player 2 first enters S1 word, then own word. First letter of S2 letter must match S1 last letter (and database of swedish dictionary)
-        
-        All players have iterated the array and entered new word.
-        
-        A countdown is started at every "input from user" 10 sec</p>
+        <ul>
+            <li>Player 1 starts by entering a word and presses "Enter" to submit.</li>
+            <li>Once Player 1 submits their word, a timer (2-3 seconds) will start, and the word will disappear.</li>
+            <li>Player 2 must:
+                <ul>
+                    <li>Re-enter Player 1's word.</li>
+                    <li>Add their own word, ensuring the first letter of their word matches the last letter of Player 1's word.</li>
+                </ul>
+            </li>
+            <li>The game continues as each player iterates through the array and enters a new word.</li>
+            <li>A 10-second countdown starts for every player's input.</li>
+        </ul>
     </div>
 </main>
 </body>
