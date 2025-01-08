@@ -278,5 +278,35 @@ input[type=number] {
       flex-wrap: wrap;
       padding-bottom: 2rem;
   }
-
-    
+  /*
+  .playerHolder{
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      padding-bottom: 2rem;
+  }*/
+  
+  .grid-container {
+      display: grid;
+      grid-template-columns: 80% auto;
+      grid-gap: 20px;
+      height: auto;
+      max-height: 100vh;
+  }
+    .grid-child-game{
+        border: 1px solid black;
+        height: auto;
+        width: auto;
+        max-height: 100vh;
+    }
+    .grid-child-players {
+        display: grid; /* Use grid layout */
+        gap: 1rem; /* Space between cards */
+        flex-wrap: wrap;
+        padding: 1rem;
+        border: 2px solid #ccc; /* Optional border for visual clarity */
+        max-height: 80vh;
+        overflow: auto; /* Add scroll if content exceeds height */
+    }
+        
