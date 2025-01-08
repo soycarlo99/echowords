@@ -248,7 +248,7 @@ input[type=number] {
 }
 
 
-/* Carts CSS */
+/* Cards CSS */
 
 .card {
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
@@ -277,6 +277,25 @@ input[type=number] {
       align-items: center;
       flex-wrap: wrap;
       padding-bottom: 2rem;
+      
   }
 
+  #roomID {
+      color: white
+  }
     
+  .preGameText {
+      display: flex;
+      flex-direction: column;
+      justify-content: start;
+      margin: 0;
+  }
+  
+  #inviteFriendsText {
+      font-size: 3rem;
+      margin: 0
+  }
+  
+  #instructionsText {
+      font-size: 1rem;
+  }
