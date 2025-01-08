@@ -22,7 +22,7 @@ h1 {
     color: white;
 }
 
-#gamerules, #acceptButton, #joinButton {
+#gamerules, #acceptButton, #createLobbyButton, #joinLobbyButton, #joinButton {
    appearance: none;
    background-color: white;
    border: 2px solid #1A1A1A;
@@ -73,7 +73,6 @@ main {
 .enterNameSection {
     display: flex;
     align-items: center;
-
 }
 
 #acceptButton {
@@ -91,6 +90,30 @@ main {
     border: none;
     color: white;
 }
+
+
+#joinLobbyButton {
+    margin-left: 20px;
+    padding-block: 10px;
+    background-color: #177EAA;
+    border: none;
+    color: white;
+}
+
+#buttonsJoinCreate{
+    display: flex;
+}
+
+#createLobbyButton {
+    margin-left: 20px;
+    padding-block: 10px;
+    background-color: #54AD24;
+    border: none;
+    color: white;
+}
+
+
+
 
 
 /* Style for input below */
@@ -199,4 +222,19 @@ input::-webkit-inner-spin-button {
 input[type=number] {
   -moz-appearance: textfield;
 }
+
+.joinGameInstruction{
+    font-family: sans-serif;
+    font-size: 1rem;
+    color: black;
+    text-align: center;
+}
+
+.joinGameTitle{
+    font-family: sans-serif;
+    font-size: 3rem;
+    font-weight: bold;
+    text-align: center;
+}
+
     
