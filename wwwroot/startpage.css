@@ -56,7 +56,10 @@ h1 {
     pointer-events: none;
 }
 
-#gamerules:hover, #acceptButton:hover, #joinButton:hover {
+#gamerules:hover,
+#acceptButton:hover,
+#joinButton:hover,
+#createLobbyButton:hover {
     box-shadow: rgba(0, 0, 0, 0.25) 0 8px 15px;
     transform: translateY(-2px);
 }
@@ -123,7 +126,20 @@ main {
     display: flex;
 }
 
-/* Input Styles */
+#createLobbyButton {
+    margin-left: 20px;
+    padding-block: 10px;
+    background-color: #54AD24;
+    border: none;
+    color: white;
+}
+
+
+
+
+
+/* Style for input below */
+
 input[type="submit"] {
     margin-top: 10px;
     -webkit-appearance: none;
@@ -308,4 +324,18 @@ input[type=number] {
 
 .instructions {
     font-size: 2rem;
+}
+/* Match Result CSS*/
+#matchResultText {
+    color: black;
+    font-family: "sans-serif";
+}
+
+.redBtn {
+    background-color: #cc2323 !important;
+
+}
+
+.score {
+    font-size: 1.5rem;
 }
