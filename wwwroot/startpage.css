@@ -1,60 +1,62 @@
 @import url('https://fonts.googleapis.com/css2?family=Italiana&family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Oswald:wght@200..700&display=swap');
 
-
 body {
     background-color: #FFFFFF;
     margin: 0;
+    min-height: 100vh;
 }
-
 
 nav {
     background-color: black;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-
+    padding: 1rem 1.5rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
+
 h1 {
-   font-family: Italiana, sans-serif; 
+    font-family: 'Italiana', sans-serif;
     font-size: 3rem;
     color: white;
+    margin: 0;
 }
 
 #gamerules, #acceptButton, #createLobbyButton, #joinLobbyButton, #joinButton {
-   appearance: none;
-   background-color: white;
-   border: 2px solid #1A1A1A;
-   border-radius: 15px;
-   box-sizing: border-box;
-   color: black;
-   cursor: pointer;
-   display: inline-block;
-   font-family: Roobert,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
-   font-size: 1.5rem;
-   font-weight: 600;
-   line-height: normal;
-   margin: 0;
-   min-height: 60px;
-   min-width: 0;
-   outline: none;
-   padding: 16px 24px;
-   text-align: center;
-   text-decoration: none;
-   transition: all 300ms cubic-bezier(.23, 1, 0.32, 1);
-   user-select: none;
-   -webkit-user-select: none;
-   touch-action: manipulation;
-   width: auto;
-   will-change: transform;
+    appearance: none;
+    background-color: white;
+    border: 2px solid #1A1A1A;
+    border-radius: 15px;
+    box-sizing: border-box;
+    color: black;
+    cursor: pointer;
+    display: inline-block;
+    font-family: Roobert,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+    font-size: 1.5rem;
+    font-weight: 600;
+    line-height: normal;
+    margin: 0;
+    min-height: 60px;
+    min-width: 0;
+    outline: none;
+    padding: 16px 24px;
+    text-align: center;
+    text-decoration: none;
+    transition: all 300ms cubic-bezier(.23, 1, 0.32, 1);
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    width: auto;
+    will-change: transform;
 }
 
 #gamerules:disabled {
     pointer-events: none;
 }
 
-#gamerules:hover , #acceptButton:hover, #joinButton:hover {
+#gamerules:hover, #acceptButton:hover, #joinButton:hover {
     box-shadow: rgba(0, 0, 0, 0.25) 0 8px 15px;
     transform: translateY(-2px);
 }
@@ -65,18 +67,18 @@ h1 {
 }
 
 main {
-    padding-left: 4rem;
-    padding: 10rem;
-    font-size: 3rem;
+    padding: 2rem;
+    height: calc(100vh - 6rem);
 }
 
 .enterNameSection {
     display: flex;
     align-items: center;
+    font-size: 1.5rem;
 }
 
 #acceptButton {
-    margin-left: 20px; 
+    margin-left: 20px;
     padding-block: 10px;
     background-color: #54AD24;
     border: none;
@@ -91,27 +93,12 @@ main {
     color: white;
 }
 
-
 #joinLobbyButton {
     margin-left: 20px;
     padding-block: 10px;
     background-color: #177EAA;
     border: none;
     color: white;
-}
-
-.joinButtonDiv{
-    display: flex;
-    justify-content: center;
-}
-
-.centerCardBtn{
-    display: flex;
-    justify-content: center;
-}
-
-#buttonsJoinCreate{
-    display: flex;
 }
 
 #createLobbyButton {
@@ -122,19 +109,26 @@ main {
     color: white;
 }
 
+.joinButtonDiv {
+    display: flex;
+    justify-content: center;
+}
 
+.centerCardBtn {
+    display: flex;
+    justify-content: center;
+}
 
+#buttonsJoinCreate {
+    display: flex;
+}
 
-
-/* Style for input below */
-
-input[type="submit"]{
+/* Input Styles */
+input[type="submit"] {
     margin-top: 10px;
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
     border-radius: 4px;
     border: none;
     padding: 10px 20px;
@@ -144,19 +138,49 @@ input[type="submit"]{
     cursor: pointer;
 }
 
-input[type="text"]{
-
-
-
+input[type="text"] {
     border: none;
     padding: 10px;
-
     color: #444;
     font-size: 3rem;
     border-bottom: 1px solid #ccc;
 }
 
+/* Pin Code Styles */
+.pin-code {
+    padding: 0;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+}
 
+.pin-code input {
+    border: none;
+    text-align: center;
+    width: 7rem;
+    height: 7rem;
+    font-size: 6rem;
+    background-color: #F3F3F3;
+    margin-right: 5px;
+}
+
+.pin-code input:focus {
+    border: 1px solid #573D8B;
+    outline: none;
+}
+
+/* Hide number input spinners */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
+/* Text Styles */
 .rulestext {
     font-size: 2rem;
     margin: 5rem;
@@ -173,129 +197,115 @@ input[type="text"]{
     padding-right: 5rem;
 }
 
-#lobby{
-    color: black;
-    font-family: sans-serif;
-
-}
-
-#lobbyMain{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-}
-
-/*Pin code CSS */
-
-.pin-code{ 
-    padding: 0; 
-    margin: 0 auto; 
-    display: flex;
-    justify-content:center;
-    
-  } 
-   
-  .pin-code input { 
-    border: none; 
-    text-align: center; 
-    width: 7rem;
-    height:7rem;
-    font-size: 6rem; 
-    background-color: #F3F3F3;
-    margin-right:5px;
-  } 
-  
-  
-  
-  .pin-code input:focus { 
-    border: 1px solid #573D8B;
-    outline:none;
-  } 
-  
-  
-  input::-webkit-outer-spin-button,
-  input::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-  }
-
-
-  /* Hides arrows, Chrome, Safari, Edge, Opera */
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-/* Firefox */
-input[type=number] {
-  -moz-appearance: textfield;
-}
-
-.joinGameInstruction{
+.joinGameInstruction {
     font-family: sans-serif;
     font-size: 1rem;
     color: black;
     text-align: center;
 }
 
-.joinGameTitle{
+.joinGameTitle {
     font-family: sans-serif;
     font-size: 3rem;
     font-weight: bold;
     text-align: center;
 }
 
+/* Layout Styles */
+#lobby {
+    color: black;
+    font-family: sans-serif;
+}
 
-/* Cards CSS */
+#lobbyMain {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+/* Grid and Card Styles */
+.grid-container {
+    display: grid;
+    grid-template-columns: 80% auto;
+    gap: 2rem;
+    height: 100%;
+}
+
+.grid-child-game {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 1rem;
+    background: #f9f9f9;
+    height: auto;
+    width: auto;
+    max-height: 100vh;
+}
+
+.grid-child-players {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 1rem;
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 1rem;
+    align-content: start;
+    max-height: calc(100vh - 10rem);
+}
 
 .card {
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
-    transition: 0.3s;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+    overflow: hidden;
     width: 8rem;
-    border-radius: 5px;
+}
 
-  }
-  
-  .card:hover {
-    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
-  }
-  
-  img {
-    border-radius: 5px 5px 0 0;
-  }
-  
-  .container {
-    padding: 2px 16px;
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.card img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 8px 8px 0 0;
+}
+
+.card .container {
+    padding: 0.8rem;
     font-size: 1rem;
-  }
+}
 
-  .cardHolder{
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      padding-bottom: 2rem;
-      
-  }
+.card h4 {
+    margin: 0;
+    font-size: 0.9rem;
+    text-align: center;
+    color: #333;
+    font-family: 'Open Sans', sans-serif;
+}
 
-  #roomID {
-      color: white
-  }
-    
-  .preGameText {
-      display: flex;
-      flex-direction: column;
-      justify-content: start;
-      margin: 0;
-  }
-  
-  #inviteFriendsText {
-      font-size: 3rem;
-      margin: 0
-  }
-  
-  #instructionsText {
-      font-size: 1rem;
-  }
+.cardHolder {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    padding-bottom: 2rem;
+}
+
+@media (max-width: 768px) {
+    .grid-container {
+        grid-template-columns: 1fr;
+    }
+
+    .grid-child-players {
+        max-height: 300px;
+    }
+}
+
+.instructions {
+    font-size: 2rem;
+}
