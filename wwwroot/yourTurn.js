@@ -1,10 +1,12 @@
 
-
+import {playerlist} from './usernamePreGame.js';
 
 // antal spelare kommer från annan data
 //deras data kan vara "player" och antal
 
+
 const listActivePlayer= ["Patrik", "Edvin", "Kasper", "Carlo", "Albin", "Hugo"];
+
 
 function shuffledPlayers() {
    listActivePlayer.sort((a, b) => 0.5 - Math.random())
@@ -17,7 +19,7 @@ shuffledPlayers()
 
 
 
-
+console.log(playerlist)
 
 
 

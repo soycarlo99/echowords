@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     const playerCount = parseInt(localStorage.getItem('playerCount')) || 0;
-    const playerlist = [];
+    export const playerlist = [];
   
     for (let i = 0; i < playerCount; i++) {
       const username = localStorage.getItem(`username${i}`);
