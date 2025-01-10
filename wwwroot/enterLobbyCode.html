@@ -5,6 +5,7 @@
     <title>Document</title>
     <link rel="stylesheet" href="startpage.css">
     <script src="enterLobbyCode.js" defer></script>
+    <script src="pinCodeGen.js" defer></script>
 </head>
 <body>
 <nav class="nav">
@@ -17,17 +18,19 @@
         </a>
 
     </div>
+    <div>
+        <p id="roomID">Room ID: XXXX</p>
+    </div>
 </nav>
 <main id="lobbyMain">
     <div class="instructions">
     <h1 id="lobby">Enter lobby code</h1>
-    </div>
-    <div class="pin-code">
-        <input type="number" maxlength="1" autofocus>
-        <input type="number" maxlength="1">
-        <input type="number" maxlength="1">
-        <input type="number" maxlength="1">
-    </div>
+        <div class="pin-code">
+            <input type="number" maxlength="1" autofocus oninput="moveToNext(this, 1)">
+            <input type="number" maxlength="1" oninput="moveToNext(this, 1)">
+            <input type="number" maxlength="1" oninput="moveToNext(this, 1)">
+            <input type="number" maxlength="1" oninput="moveToNext(this, 0)">
+        </div>
     <div>
     <button class="button" id="joinButton">Join lobby</button>
     </div>
