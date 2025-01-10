@@ -110,6 +110,16 @@ main {
     background-color: #54AD24;
     border: none;
     color: white;
+    margin-top: 1.5rem;
+}
+
+.preGameText {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    padding-top: 1.5rem;
+    margin: 0;
+    font-size: 1.5rem;
 }
 
 .joinButtonDiv {
@@ -293,7 +303,13 @@ input[type=number] {
 
 .card .container {
     padding: 0.8rem;
+    padding-bottom: 0.8rem;
     font-size: 1rem;
+}
+
+.container {
+    padding-bottom: 0.8rem;
+    gap: 10px 20px; 
 }
 
 .card h4 {
@@ -310,6 +326,7 @@ input[type=number] {
     align-items: center;
     flex-wrap: wrap;
     padding-bottom: 2rem;
+    gap: 1.5rem;
 }
 
 @media (max-width: 768px) {
