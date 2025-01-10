@@ -1,5 +1,4 @@
-
-import { playerlist } from './usernamePreGame.js';
+import { playerlist } from './usernamePreGame.js'
 
 // antal spelare kommer från annan data
 //deras data kan vara "player" och antal
@@ -16,7 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // shuffledPlayers()
 
     console.log(playerlist);
-    
+
 
   });
 

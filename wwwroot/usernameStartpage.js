@@ -18,7 +18,6 @@ document.addEventListener("DOMContentLoaded", () => {
       playerCount++;
       localStorage.setItem('playerCount', playerCount);
   
-      //alert(`Username "${username}" has been saved!`);
       errorMessage.style.display = "none";
   
       window.location.href = "preGame.html";
