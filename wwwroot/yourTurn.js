@@ -1,25 +1,25 @@
 
-import {playerlist} from './usernamePreGame.js';
+import { playerlist } from './usernamePreGame.js';
 
 // antal spelare kommer från annan data
 //deras data kan vara "player" och antal
 
 
-const listActivePlayer= ["Patrik", "Edvin", "Kasper", "Carlo", "Albin", "Hugo"];
 
+document.addEventListener("DOMContentLoaded", () => {
 
-function shuffledPlayers() {
-   listActivePlayer.sort((a, b) => 0.5 - Math.random())
-    console.log(listActivePlayer)
-}
+    // const listActivePlayer= ["Patrik", "Edvin", "Kasper", "Carlo", "Albin", "Hugo"];
+    // function shuffledPlayers() {
+    // listActivePlayer.sort((a, b) => 0.5 - Math.random())
+    //     console.log(listActivePlayer)
+    // }
+    // shuffledPlayers()
 
-shuffledPlayers()
+    console.log(playerlist);
+    
 
+  });
 
-
-
-
-console.log(playerlist)
 
 
 
