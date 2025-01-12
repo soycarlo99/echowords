@@ -1,16 +1,33 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const card = document.createElement('div');
-    const cardContainer = document.querySelector('.grid-container');
+    const addWordCard = document.getElementById('timerButton');
+
     function addWordBox() {
-        
-        card.classList.add("grid-child-game");
-        card.innerHTML = `<div>
-<h2>It's your turn!</h2>
-<input type="text" id="gameInput" placeholder="Enter word...">
-<button id="timerButton" onload="restartClock()">TEST</button>
-<p id="timer">10</p>
-          </div>  
+        const cardContainer = document.querySelector('.grid-child-game');
+        const card = document.createElement('div');
+        card.innerHTML = `
+        <div>
+            <input class="wordInput" type="text" id="gameInput" placeholder="Enter word...">
+            <p class="timer">10</p>
+        </div>  
       `;
         cardContainer.appendChild(card);
+
+        const inputField = card.querySelector('.wordInput');
+
+        inputField.focus();
+        restartClock();
+
+        inputField.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                console.log(`User entered: ${event.target.value}`);
+                addWordBox();
+            }
+        });
     }
-})
+
+    addWordCard.addEventListener("click", function (e) {
+        e.preventDefault();
+        addWordBox();
+    });
+});

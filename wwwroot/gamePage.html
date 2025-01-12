@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Echo Words</title>
     <link rel="stylesheet" href="startpage.css">
-    <script src="gamePageTimer.js"></script>
+    <script src="gamePageTimer.js" defer></script>
     <script src="addInputBox.js" defer></script>
 </head>
-<body onload="restartClock()">
+<body >
 <nav>
     <h1>Echo Words</h1>
     <button id="gamerules">Game Rules</button>
@@ -16,10 +16,12 @@
 <main>
     <div class="grid-container">
         <div class="grid-child-game">
-            <h2>It's your turn!</h2>
-                <input type="text" id="gameInput" placeholder="Enter word...">
-            <button id="timerButton" onload="restartClock()" onclick="addWordBox()">TEST</button>
+            <div class="wordCard">
+                <h2>It's your turn!</h2>
+                <input class="wordInput" type="text" id="gameInput" placeholder="Enter word...">
+            <button id="timerButton">TEST</button>
             <p id="timer">10</p>
+            </div>
         </div>
         <div class="grid-child-players">
             <div class="card">
