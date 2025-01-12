@@ -1,4 +1,8 @@
- 
+window.onload = function () {
+    let input = document.getElementById('gameInput');
+    input.focus();
+    input.select();
+}
 function restartClock(){
     var c = setInterval(showclock,1000)
     function showclock(){
