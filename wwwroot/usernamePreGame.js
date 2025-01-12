@@ -1,12 +1,14 @@
-export const playerlist = [];
+export const playerlistEx = [];
 
 document.addEventListener("DOMContentLoaded", () => {
     const playerCount = parseInt(localStorage.getItem('playerCount')) || 0;
     for (let i = 0; i < playerCount; i++) {
       const username = localStorage.getItem(`username${i}`);
       const playerElement = document.getElementById(`player${i}`);
+      const playerlist = [];
 
       playerlist.push(localStorage.getItem(`username${i}`));
+      playerlistEx.push(localStorage.getItem(`username${i}`));
       console.log(playerlist);
 
       if (playerElement) {
