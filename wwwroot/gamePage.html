@@ -6,8 +6,9 @@
     <title>Echo Words</title>
     <link rel="stylesheet" href="startpage.css">
     <script src="gamePageTimer.js"></script>
+    <script src="addInputBox.js" defer></script>
 </head>
-<body>
+<body onload="restartClock()">
 <nav>
     <h1>Echo Words</h1>
     <button id="gamerules">Game Rules</button>
@@ -17,7 +18,7 @@
         <div class="grid-child-game">
             <h2>It's your turn!</h2>
                 <input type="text" id="gameInput" placeholder="Enter word...">
-            <button id="timerButton" onclick="restartClock()">TEST</button>
+            <button id="timerButton" onload="restartClock()" onclick="addWordBox()">TEST</button>
             <p id="timer">10</p>
         </div>
         <div class="grid-child-players">
