@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
-
+    //this handels the first card
     function enterHandeler(){
         firstWordCard.addEventListener('keydown', (event) =>{
             if (event.key === 'Enter') {
