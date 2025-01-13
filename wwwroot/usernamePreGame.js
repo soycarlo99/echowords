@@ -1,20 +1,18 @@
 //export const playerlistEx = [];
 
 document.addEventListener("DOMContentLoaded", () => {
-    const playerCount = parseInt(localStorage.getItem('playerCount')) || 0;
-    for (let i = 0; i < playerCount; i++) {
+  const playerCount = parseInt(localStorage.getItem('playerCount')) || 0;
+
+  const playerlist = [];
+  for (let i = 0; i < playerCount; i++) {
       const username = localStorage.getItem(`username${i}`);
-      const playerElement = document.getElementById(`player${i}`);
-      const playerlist = [];
-
-      playerlist.push(localStorage.getItem(`username${i}`));
-      //playerlistEx.push(localStorage.getItem(`username${i}`));
-      console.log(playerlist);
-
-      if (playerElement) {
-        playerElement.textContent = username;
-      } else {
-        console.error(`Element with ID player${i} not found`);
+      if (!username) {
+          console.warn(`No username found for player index ${i}`);
+          continue;
       }
-    }
-  });
+
+      const playerElement = document.getElementById(`username${i}`);
+      playerlist.push(username);
+  }
+  console.log(playerlist);
+});

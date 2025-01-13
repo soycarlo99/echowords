@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // }
     // shuffledPlayers()
 
-    console.log(playerlistEx);
+    //console.log(playerlistEx);
 
 
   });

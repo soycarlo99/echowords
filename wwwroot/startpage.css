@@ -329,7 +329,7 @@ input[type=number] {
 
 .cardHolder {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
     align-items: center;
     flex-wrap: wrap;
     padding-bottom: 2rem;
