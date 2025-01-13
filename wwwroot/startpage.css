@@ -24,7 +24,7 @@ h1 {
     margin: 0;
 }
 
-#gamerules, #acceptButton, #createLobbyButton, #joinLobbyButton, #joinButton {
+#gamerules, #acceptButton, #createLobbyButton, #joinLobbyButton, #joinButton, #gameInput {
     appearance: none;
     background-color: white;
     border: 2px solid #1A1A1A;
@@ -355,4 +355,19 @@ input[type=number] {
 
 .score {
     font-size: 1.5rem;
+}
+
+#gameInput {
+    margin-left: 20px;
+    padding-block: 10px;
+    background-color: #54AD24;
+    border: none;
+    color: white;
+
+
+}
+
+#gameInput::placeholder {
+    color: white;
+    opacity: 1; /* Firefox */
 }
