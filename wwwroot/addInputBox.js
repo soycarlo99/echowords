@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     const addWordCard = document.getElementById('timerButton');
     const firstWordCard = document.getElementById('#gameInput');
-
+    
     function addWordBox() {
         const cardContainer = document.querySelector('.grid-child-game');
         const card = document.createElement('div');
