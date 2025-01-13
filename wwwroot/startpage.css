@@ -259,6 +259,7 @@ input[type=number] {
 }
 
 .grid-child-game {
+    display: flexbox;
     border: 1px solid #ccc;
     border-radius: 8px;
     padding: 1rem;
@@ -266,6 +267,7 @@ input[type=number] {
     height: auto;
     width: auto;
     max-height: 100vh;
+    
 }
 
 .grid-child-players {
@@ -367,11 +369,15 @@ input[type=number] {
     background-color: #54AD24;
     border: none;
     color: white;
-
+    width: auto;
 
 }
 
 #gameInput::placeholder {
     color: white;
     opacity: 1; /* Firefox */
+}
+
+#timerButton {
+    display: none;
 }

@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     const addWordCard = document.getElementById('timerButton');
-    const firstWordCard = document.getElementById('#gameInput');
+    const firstWordCard = document.getElementById('gameInput');
 
     function addWordBox() {
         const cardContainer = document.querySelector('.grid-child-game');
@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
     //this handels the first card
-    function enterHandeler(){
+    function enterHandeler(event){
         firstWordCard.addEventListener('keydown', (event) =>{
             if (event.key === 'Enter') {
                 event.preventDefault();
