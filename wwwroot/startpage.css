@@ -255,19 +255,24 @@ input[type=number] {
     display: grid;
     grid-template-columns: 80% auto;
     gap: 2rem;
-    height: 100%;
 }
 
 .grid-child-game {
-    display: flexbox;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 1rem;
-    background: #f9f9f9;
-    height: auto;
-    width: auto;
-    max-height: 100vh;
-    
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    justify-content: flex-start;
+    align-items: flex-start; 
+}
+
+.wordInput {
+    margin: 0.5rem; 
+    padding: 10px; 
+}
+
+.wordCard {
+    margin: 0.5rem; 
+    padding: 0;
 }
 
 .grid-child-players {
@@ -387,4 +392,93 @@ input[type=number] {
     align-items: center;
     margin-top: 2rem;
     width: auto;
+}
+
+
+
+#gameInput {
+    background-color: green;
+    border: none;
+    color: white;
+    width: auto;
+    padding: 10px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    border-radius: 10px;
+    transition: background-color 0.5s ease-in-out;
+}
+
+#gameInput.startAnimation {
+    animation: changeBackground 5s linear forwards, fadeText 6s linear forwards, pulsate 1s infinite alternate;
+}
+
+@keyframes changeBackground {
+    0% {
+        background-color: green;
+    }
+    100% {
+        background-color: red;
+    }
+}
+
+@keyframes pulsate {
+    0% {
+        box-shadow: 0 0 10px 2px rgba(255, 0, 0, 0.5);
+    }
+    100% {
+        box-shadow: 0 0 20px 5px rgba(255, 0, 0, 0.8);
+    }
+}
+
+@keyframes fadeText {
+    0% {
+        filter: none;
+        opacity: 1;
+    }
+    83% {
+        filter: none;
+        opacity: 1;
+    }
+    100% {
+        filter: blur(5px);
+        opacity: 0.1;
+    }
+}
+
+
+
+#timer {
+    position: fixed;
+    top: 0rem;
+    right: 50%;
+    font-size: 2.5rem;
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    color: #FFFFFF;
+    background: radial-gradient(circle, #ff4e50, #ff6e7f);
+    border: 2px solid rgba(255, 255, 255, 0.7);
+    border-radius: 50px;
+    padding: 10px 25px;
+    box-shadow: 0 0 20px rgba(255, 110, 127, 0.9);
+    text-align: center;
+    z-index: 1000;
+    animation: fadePulse 1.5s infinite ease-in-out;
+}
+
+@keyframes fadePulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 10px rgba(255, 110, 127, 0.7);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.1);
+        box-shadow: 0 0 25px rgba(255, 110, 127, 1);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 10px rgba(255, 110, 127, 0.7);
+        opacity: 1;
+    }
 }

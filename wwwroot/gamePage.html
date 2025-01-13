@@ -11,16 +11,17 @@
 <body >
 <nav>
     <h1>Echo Words</h1>
-    <button id="gamerules">Game Rules</button>
+    <a href="gameRules.html">
+        <button id="gamerules">Game Rules</button>
+    </a>
 </nav>
 <main>
+    <p id="timer">10</p>
     <div class="grid-container">
         <div class="grid-child-game">
             <div class="wordCard">
-                <h2>It's your turn!</h2>
                 <input class="wordInput" type="text" onkeydown="enterHandeler()" id="gameInput" placeholder="Enter word...">
-            <button id="timerButton">TEST</button>
-            <p id="timer">10</p>
+                <button id="timerButton"></button>
             </div>
         </div>
         <div class="grid-child-players">

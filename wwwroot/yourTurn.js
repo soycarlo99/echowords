@@ -1,4 +1,4 @@
-import { playerlistEx } from './usernamePreGame.js'
+//import { playerlistEx } from './usernamePreGame.js'
 
 // antal spelare kommer från annan data
 //deras data kan vara "player" och antal
