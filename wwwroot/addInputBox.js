@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     const addWordCard = document.getElementById('timerButton');
-    const firstWordCard = document.getElementById('#gameInput');
+    const firstWordCard = document.getElementById('gameInput');
 
     function addWordBox() {
         const cardContainer = document.querySelector('.grid-child-game');
@@ -22,12 +22,13 @@ document.addEventListener("DOMContentLoaded", () => {
             if (event.key === 'Enter') {
                 event.preventDefault();
                 console.log(`User entered: ${event.target.value}`);
+
                 addWordBox();
             }
         });
     }
 
-    function enterHandeler(event){
+    function enterHandeler(){
         firstWordCard.addEventListener('keydown', (event) =>{
             if (event.key === 'Enter') {
                 event.preventDefault();
@@ -43,4 +44,6 @@ document.addEventListener("DOMContentLoaded", () => {
         e.preventDefault();
         addWordBox();
     });
+
+    enterHandeler();
 });
