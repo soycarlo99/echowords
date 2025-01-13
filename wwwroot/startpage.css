@@ -381,3 +381,10 @@ input[type=number] {
 #timerButton {
     display: none;
 }
+
+.wordInput {
+    justify-content: center;
+    align-items: center;
+    margin-top: 2rem;
+    width: auto;
+}

@@ -17,6 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         inputField.focus();
         restartClock();
+        
 
         inputField.addEventListener('keydown', (event) => {
             if (event.key === 'Enter') {
@@ -39,11 +40,23 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-
     addWordCard.addEventListener("click", function (e) {
         e.preventDefault();
         addWordBox();
     });
 
     enterHandeler();
+
+
+
+    const wordInput = document.querySelector('.wordInput');
+    const maxChars = 20;
+
+    function updateSize() {
+        let desiredSize = Math.max(wordInput.value.length, wordInput.placeholder.length, 1);
+        desiredSize = Math.min(desiredSize, maxChars);
+        wordInput.size = desiredSize;
+    }
+    updateSize();
+    wordInput.addEventListener('input', updateSize);
 });
