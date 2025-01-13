@@ -17,7 +17,7 @@ function restartClock(){
         if(seconds==0)
         {
             clearInterval(c);
-            document.getElementById('timer').innerHTML="Finished";
+            document.getElementById('timer').innerHTML="You failed to enter the word in time.";
         }
     }
 }
