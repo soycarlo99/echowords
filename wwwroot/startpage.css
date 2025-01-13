@@ -353,6 +353,10 @@ input[type=number] {
 
 }
 
+#roomID {
+    color: white;
+}
+
 .score {
     font-size: 1.5rem;
 }
