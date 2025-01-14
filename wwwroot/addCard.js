@@ -29,7 +29,15 @@ document.addEventListener("DOMContentLoaded", () => {
           console.warn("Maximum 8 players allowed in a lobby!");
           return;
       }
-  }
 
+    for (let i = 0; i < playerCount; i++) {
+      const storedUsername = localStorage.getItem(`username${i}`);
+      if (storedUsername) {
+        addPlayerCard(storedUsername);
+      } else {
+        console.error(`No username found for username${i} in localStorage`);
+      }
+    }
+  }
   populatePlayers();
 });
