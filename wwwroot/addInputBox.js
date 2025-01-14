@@ -2,18 +2,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const addWordCard = document.getElementById('timerButton');
     const firstWordCard = document.getElementById('gameInput');
     const maxChars = 20;
-    let lastWord = ''; //Fösta ordet
+    let lastWord = '';
 
     function checkWord(word) {
         if (!word) return false;
 
-        // första ordet ska godkännas auto
         if (!lastWord) {
             lastWord = word;
             return true;
         }
 
-        // Kontrollera om första bokstaven matchar sista bokstaven i förra ordet
         const lastLetterOfPrevious = lastWord.slice(-1).toLowerCase();
         const firstLetterOfNew = word.charAt(0).toLowerCase();
 
@@ -30,7 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const card = document.createElement('div');
         card.innerHTML = `
         <div class="wordCard">
-            <input id="gameInput" class="gameInput wordInput" type="text" placeholder="Enter word...">
+            <input id="gameInput" class="wordInput" type="text" onkeydown="enterHandeler()" placeholder="Enter word...">
         </div>
         `;
         cardContainer.appendChild(card);
@@ -46,11 +44,13 @@ document.addEventListener("DOMContentLoaded", () => {
         inputField.addEventListener('keydown', (event) => {
             if (event.key === 'Enter') {
                 event.preventDefault();
-                const word = event.target.value.trim();
+                const word = event.target.value.trim().toLowerCase();
+                $('#gameInput').on(saveWord)
 
                 if (checkWord(word)) {
                     console.log(`User entered: ${word}`);
                     addWordBox();
+                    saveWord();
                     inputField.classList.add('startAnimation');
                 } else {
                     inputField.focus();
@@ -70,6 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (checkWord(word)) {
                     console.log(`User entered: ${word}`);
                     addWordBox();
+                    saveWord();
                     firstWordCard.classList.add('startAnimation');
                 } else {
                     inputField.focus();
@@ -80,6 +81,8 @@ document.addEventListener("DOMContentLoaded", () => {
         firstWordCard.addEventListener('input', () => updateSize(firstWordCard));
         updateSize(firstWordCard);
     }
+
+    enterHandeler();
 
     function updateSize(inputField) {
         let desiredSize = Math.max(inputField.value.length, inputField.placeholder.length, 1);
@@ -92,5 +95,22 @@ document.addEventListener("DOMContentLoaded", () => {
         addWordBox();
     });
 
-    enterHandeler();
+    $('#gameInput').on('Enter', saveWord)
+
+    async function saveWord(e) {
+    const newWord = $('[class="wordInput"]').val();
+    console.log('newWord', newWord);
+    const response = await fetch('/new-word/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ word: newWord })
+    
+    });
+
+    console.log('response', response);
+    const data = await response.json();
+    console.log('data', data);
+    $('#message').text(newWord + ' lades till i databasen')
+    }
 });
+

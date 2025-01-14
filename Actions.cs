@@ -24,7 +24,8 @@ public class Actions
             {
                 return Results.BadRequest("Word is required.");
             }
-            bool success = await NewWord(requestBody.Word, context.Request.Cookies["ClientId"]);
+            string word = requestBody.Word.ToLower();
+            bool success = await NewWord(word, context.Request.Cookies["ClientId"]);
             return success ? Results.Ok("Word added successfully.") : Results.StatusCode(500);
         });
     }
