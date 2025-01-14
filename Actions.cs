@@ -42,7 +42,7 @@ public class Actions
     // Process incomming NewWord  from client
     async Task<bool> NewWord(string word, string clientId)
     {
-        await using var cmd = db.CreateCommand("INSERT INTO words (word, clientid) VALUES ($1, $2)");
+        await using var cmd = db.CreateCommand("INSERT INTO testtable (wordinput, clientid) VALUES ($1, $2)");
         cmd.Parameters.AddWithValue(word);
         cmd.Parameters.AddWithValue(clientId);
         int rowsAffected = await cmd.ExecuteNonQueryAsync(); // Returns the number of rows affected
