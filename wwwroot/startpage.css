@@ -482,3 +482,42 @@ input[type=number] {
         opacity: 1;
     }
 }
+
+
+
+
+
+.tooltip-container{
+    position: relative;
+    display: inline-block;
+  }
+  
+  .tooltip-content {
+    position: absolute;
+    top: 120%;
+    left: 0%;
+    transform: translateX(-85%);
+    width: 70rem;
+    max-height: 20rem;
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 1rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    z-index: 100;
+    border-radius: 4px;
+    font-size: 1.5rem;
+    line-height: 1.4;
+  }
+
+  .tooltip-container:hover .tooltip-content{
+    opacity: 1;
+    visibility: visible;
+  }
+
+
+  #Pregame{
+    left: 210%;
+  }

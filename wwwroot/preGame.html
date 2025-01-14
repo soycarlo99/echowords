@@ -1,37 +1,57 @@
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Document</title>
-    <link rel="stylesheet" href="startpage.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Document</title>
+  <link rel="stylesheet" href="startpage.css">
 </head>
 <body>
-<nav class="nav">
+  <nav class="nav">
     <div>
-        <h1>Echo Words</h1>
+      <h1>Echo Words</h1>
     </div>
     <div>
+      <div class="tooltip-container" >
         <button class="button" id="gamerules">Game Rules</button>
+        <div class="tooltip-content" id="Pregame">
+          <main>
+            <div>
+              <ul>
+                <li>Player 1 starts by entering a word and presses "Enter" to submit.</li>
+                <li>Once Player 1 submits their word, a timer (2-3 seconds) will start, and the word will disappear.</li>
+                <li>Player 2 must:
+                  <ul>
+                    <li>Re-enter Player 1's word.</li>
+                    <li>Add their own word, ensuring the first letter of their word matches the last letter of Player 1's word.</li>
+                  </ul>
+                </li>
+                <li>The game continues as each player iterates through the array and enters a new word.</li>
+                <li>A 10-second countdown starts for every player's input.</li>
+              </ul>
+            </div>
+          </main>
+        </div>
+      </div>
     </div>
     <div>
-        <p id="roomID">Room ID: XXXX</p>
+      <p id="roomID">Room ID: XXXX</p>
     </div>
-</nav>
-<main>
+  </nav>
+  <main>
     <div class="preGameText">
-        <p id="inviteFriendsText">Invite friends to start 🎉</p>
-        <p id="instructionsText">Need <span style="color: red">minimum 2 </span>players and max 8 players in each lobby</p>
+      <p id="inviteFriendsText">Invite friends to start 🎉</p>
+      <p id="instructionsText">Need <span style="color: red">minimum 2 </span>players and max 8 players in each lobby</p>
     </div>
     <div class="cardHolder"></div>
     <div class="joinGameInstruction">
-        <div class="centerCardBtn" id="buttonsJoinCreate">
-            <a href="gamePage.html">
-                <button class="button" id="createLobbyButton">Start game</button>
-            </a>
-        </div>
+      <div class="centerCardBtn" id="buttonsJoinCreate">
+        <a href="gamePage.html">
+          <button class="button" id="createLobbyButton">Start game</button>
+        </a>
+      </div>
     </div>
-</main>
-<script src="usernamePreGame.js"></script>
-<script src="addCard.js" defer></script>
+  </main>
+  <script src="usernamePreGame.js"></script>
+  <script src="addCard.js" defer></script>
 </body>
 </html>

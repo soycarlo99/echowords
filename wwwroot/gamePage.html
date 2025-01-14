@@ -1,40 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Echo Words</title>
-    <link rel="stylesheet" href="startpage.css">
-    <script src="gamePageTimer.js" defer></script>
-    <script src="addInputBox.js" defer></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Echo Words</title>
+  <link rel="stylesheet" href="startpage.css" />
+  <script src="gamePageTimer.js" defer></script>
+  <script src="addInputBox.js" defer></script>
 </head>
-<body >
-<nav>
+<body>
+  <nav>
     <h1>Echo Words</h1>
-    <a href="gameRules.html">
+    <div class="tooltip-container">
+      <a href="gameRules.html">
         <button id="gamerules">Game Rules</button>
-    </a>
-</nav>
-<main>
+      </a>
+      <div class="tooltip-content">
+        <main>
+          <div class="rulesText">
+            <ul>
+              <li>Player 1 starts by entering a word and presses "Enter" to submit.</li>
+              <li>Once Player 1 submits their word, a timer (2-3 seconds) will start, and the word will disappear.</li>
+              <li>Player 2 must:
+                <ul>
+                  <li>Re-enter Player 1's word.</li>
+                  <li>Add their own word, ensuring the first letter of their word matches the last letter of Player 1's word.</li>
+                </ul>
+              </li>
+              <li>The game continues as each player iterates through the array and enters a new word.</li>
+              <li>A 10-second countdown starts for every player's input.</li>
+            </ul>
+          </div>
+        </main>
+      </div>
+    </div>
+  </nav>
+  <main>
     <p id="timer">10</p>
     <div class="grid-container">
-        <div class="grid-child-game">
-            <div class="wordCard">
-                <input class="wordInput" type="text" onkeydown="enterHandeler()" id="gameInput" placeholder="Enter word...">
-                <button id="timerButton"></button>
-            </div>
+      <div class="grid-child-game">
+        <div class="wordCard">
+          <input
+            class="wordInput"
+            type="text"
+            onkeydown="enterHandeler()"
+            id="gameInput"
+            placeholder="Enter word..."
+          />
+          <button id="timerButton"></button>
         </div>
-        <div class="grid-child-players"></div>
-        </div>
+      </div>
+      <div class="grid-child-players"></div>
     </div>
-</main>
+  </main>
 
-
-<script src="usernamePreGame.js"></script>
-<script type="module" src="yourTurn.js"></script>
-<script src="gamePagePlayerCards.js"></script>
-<script src="wordCheck.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-
+  <script src="usernamePreGame.js"></script>
+  <script type="module" src="yourTurn.js"></script>
+  <script src="gamePagePlayerCards.js"></script>
+  <script src="wordCheck.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 </body>
 </html>
