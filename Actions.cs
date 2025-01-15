@@ -28,6 +28,19 @@ public class Actions
             bool success = await NewWord(word, context.Request.Cookies["ClientId"]);
             return success ? Results.Ok("Word added successfully.") : Results.StatusCode(500);
         });
+
+
+        app.MapPost("/new-player", async (HttpContext context) =>
+        {
+            var requestBody = await context.Request.ReadFromJsonAsync<WordRequest>();
+            if (requestBody?.Word is null)
+            {
+                return Results.BadRequest("Word is required.");
+            }
+            string newPlayer = requestBody.Word.ToLower();
+            bool success = await playerName(newPlayer, context.Request.Cookies["ClientId"]);
+            return success ? Results.Ok("New palyer added successfully.") : Results.StatusCode(500);
+        });
     }
     
     // Process incomming TestWord from client
@@ -45,6 +58,15 @@ public class Actions
     {
         await using var cmd = db.CreateCommand("INSERT INTO testtable (wordinput, clientid) VALUES ($1, $2)");
         cmd.Parameters.AddWithValue(word);
+        cmd.Parameters.AddWithValue(clientId);
+        int rowsAffected = await cmd.ExecuteNonQueryAsync(); // Returns the number of rows affected
+        return rowsAffected > 0; // Return true if the insert was successful
+    }
+
+    async Task<bool> playerName(string newPlayer, string clientId)
+    {
+        await using var cmd = db.CreateCommand("INSERT INTO playername (username, clientid) VALUES ($1, $2)");
+        cmd.Parameters.AddWithValue(newPlayer);
         cmd.Parameters.AddWithValue(clientId);
         int rowsAffected = await cmd.ExecuteNonQueryAsync(); // Returns the number of rows affected
         return rowsAffected > 0; // Return true if the insert was successful

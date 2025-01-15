@@ -4,4 +4,5 @@ namespace Wordapp;
 public class WordRequest
 {
     public string Word { get; set; }
+    public string newPlayer { get; set; }
 }
