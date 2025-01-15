@@ -473,14 +473,14 @@ input[type=number] {
     font-family: 'Oswald', sans-serif;
     font-weight: 700;
     color: #FFFFFF;
-    background: radial-gradient(circle, #ff4e50, #ff6e7f);
+    background: radial-gradient(circle, #54AD24, #54AD24);
     border: 2px solid rgba(255, 255, 255, 0.7);
     border-radius: 50px;
     padding: 10px 25px;
     box-shadow: 0 0 20px rgba(255, 110, 127, 0.9);
     text-align: center;
     z-index: 1000;
-    animation: fadePulse 1.5s infinite ease-in-out;
+    /*animation: fadePulse 1.5s infinite ease-in-out; */
 }
 
 @keyframes fadePulse {
