@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     const addWordCard = document.getElementById('timerButton');
     const firstWordCard = document.getElementById('gameInput');
+    
     const maxChars = 20;
     let lastWord = '';
 
@@ -52,6 +53,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     addWordBox();
                     saveWord();
                     inputField.classList.add('startAnimation');
+                    inputField.disabled = true;
+
                 } else {
                     inputField.focus();
                     inputField.value = '';
@@ -66,6 +69,8 @@ document.addEventListener("DOMContentLoaded", () => {
             if (event.key === 'Enter') {
                 event.preventDefault();
                 const word = event.target.value.trim();
+                firstWordCard.disabled = true;
+
 
                 if (checkWord(word)) {
                     console.log(`User entered: ${word}`);
