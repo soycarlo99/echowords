@@ -24,12 +24,17 @@ document.addEventListener("DOMContentLoaded", () => {
         return false;
     }
 
+    //Saves list of words
+    const wordList = [];
+
     function addWordBox() {
         const cardContainer = document.querySelector('.grid-child-game');
         const card = document.createElement('div');
+        
         card.innerHTML = `
         <div class="wordCard">
             <input id="gameInput" class="wordInput" type="text" onkeydown="enterHandeler()" placeholder="Enter word...">
+            <p class="doubleWarning">the word already been taken</p>
         </div>
         `;
         cardContainer.appendChild(card);
@@ -48,21 +53,30 @@ document.addEventListener("DOMContentLoaded", () => {
                 const word = event.target.value.trim().toLowerCase();
                 $('#gameInput').on(saveWord)
 
-                if (checkWord(word)) {
+                if (checkWord(word) && doubleAvoider(word)) {
                     console.log(`User entered: ${word}`);
+                    wordList.push(`${word}`);
                     addWordBox();
                     saveWord();
                     inputField.classList.add('startAnimation');
                     inputField.disabled = true;
-
+                    
                 } else {
                     inputField.focus();
                     inputField.value = '';
                     updateSize(inputField);
                 }
+                console.log(wordList);
             }
+
+ 
         });
+
+
     }
+    console.log(wordList);
+
+
 
     function enterHandeler() {
         firstWordCard.addEventListener('keydown', (event) => {
@@ -72,13 +86,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 firstWordCard.disabled = true;
 
 
-                if (checkWord(word)) {
-                    console.log(`User entered: ${word}`);
+                if (checkWord(word) && doubleAvoider(word)) {
                     addWordBox();
                     saveWord();
                     firstWordCard.classList.add('startAnimation');
+                    wordList.push(`${word}`);
+                    console.log(wordList);
+
                 } else {
                     inputField.focus();
+
                 }
             }
         });
@@ -99,6 +116,17 @@ document.addEventListener("DOMContentLoaded", () => {
         e.preventDefault();
         addWordBox();
     });
+
+
+    function doubleAvoider(word){
+        if(wordList.includes(`${word}`)){
+            console.log(`The word ${word} already has been written`);
+            return false;
+        } else {
+            return true;
+        }
+    }
+
 
     $('#gameInput').on('Enter', saveWord)
 

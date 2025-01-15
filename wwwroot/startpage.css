@@ -487,6 +487,7 @@ input[type=number] {
 
 
 
+
 .tooltip-container{
     position: relative;
     display: inline-block;
@@ -520,4 +521,16 @@ input[type=number] {
 
   #Pregame{
     left: 210%;
+  }
+
+  .doubleWarning {
+    display: none;
+    color: red;
+    font-size: 1.5rem;
+  }
+  
+  .doubleWarningShow {
+    display: block;
+    color: red;
+    font-size: 1.5rem;
   }
