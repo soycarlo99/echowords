@@ -3,6 +3,9 @@ window.onload = function () {
     input.focus();
     input.select();
 }
+
+let gameActive = true;
+
  let c; 
 function restartClock(){
     if (c){
@@ -17,7 +20,18 @@ function restartClock(){
         if(seconds==0)
         {
             clearInterval(c);
-            document.getElementById('timer').innerHTML="Finished";
+            document.getElementById('timer').innerHTML = "Finished";
+            
+            gameActive = false; 
+
+            const inputs = document.querySelectorAll('.gameInput');
+            inputs.forEach(input => {
+                input.disabled = true;
+            });
+
+            const addWordButton = document.getElementById('timerButton');
+            addWordButton.disabled = true;
+            
         }
     }
 }
