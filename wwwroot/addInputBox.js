@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     const addWordCard = document.getElementById('timerButton');
     const firstWordCard = document.getElementById('gameInput');
-    
+    let score = 0;
     const maxChars = 20;
     let lastWord = '';
 
@@ -52,6 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     console.log(`User entered: ${word}`);
                     addWordBox();
                     saveWord();
+                    
                     inputField.classList.add('startAnimation');
                     inputField.disabled = true;
 
@@ -62,6 +63,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             }
         });
+    }
+    
+    
+    function scoreCounter() {
+        let scoreCounterElement = document.getElementById("counter")
+        scoreCounterElement.textContent = `Score: ${score}`
+        score++
     }
 
     function enterHandeler() {
@@ -76,7 +84,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     console.log(`User entered: ${word}`);
                     addWordBox();
                     saveWord();
-                    firstWordCard.classList.add('startAnimation');
+                    firstWordCard.classList.add('startAnimation')
+                    scoreCounter()
+                    console.log(score)
                 } else {
                     inputField.focus();
                 }
