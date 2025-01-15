@@ -25,6 +25,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function addWordBox() {
+        scoreCounter()
+        score++
         const cardContainer = document.querySelector('.grid-child-game');
         const card = document.createElement('div');
         card.innerHTML = `
@@ -65,15 +67,14 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
     
-    
     function scoreCounter() {
         let scoreCounterElement = document.getElementById("counter")
         scoreCounterElement.textContent = `Score: ${score}`
-        score++
     }
 
     function enterHandeler() {
         firstWordCard.addEventListener('keydown', (event) => {
+            
             if (event.key === 'Enter') {
                 event.preventDefault();
                 const word = event.target.value.trim();
@@ -84,9 +85,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     console.log(`User entered: ${word}`);
                     addWordBox();
                     saveWord();
-                    firstWordCard.classList.add('startAnimation')
                     scoreCounter()
-                    console.log(score)
+                    score++
+                    firstWordCard.classList.add('startAnimation')
                 } else {
                     inputField.focus();
                 }
