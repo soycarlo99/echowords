@@ -116,7 +116,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         
                     } else {
                         input.style.backgroundColor = 'green';
-                        addTimeToClock(0.5);
+                        
                         let next = input.parentElement.nextElementSibling?.querySelector('.wordInput');
                         if(next) {
                             next.focus();
@@ -167,5 +167,5 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    addWordBox([]);
+    addWordBox();
 });
