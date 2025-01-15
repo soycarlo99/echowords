@@ -1,12 +1,12 @@
-window.onload = function () {
-    let input = document.getElementById('gameInput');
-    input.focus();
-    input.select();
-}
+// window.onload = function () {
+//     let input = document.getElementById('gameInput');
+//     input.focus();
+//     input.select();
+// }
 
 let gameActive = true;
 
- let c; 
+let c; 
 function restartClock(){
     if (c){
         clearInterval(c)

@@ -395,6 +395,17 @@ input[type=number] {
 }
 
 
+@keyframes shake {
+0% { transform: translateX(0); }
+25% { transform: translateX(-5px); }
+50% { transform: translateX(5px); }
+75% { transform: translateX(-5px); }
+100% { transform: translateX(0); }
+}
+
+.wordCard.shake {
+    animation: shake 0.5s ease;
+}
 
 #gameInput {
     background-color: green;
@@ -406,15 +417,16 @@ input[type=number] {
     font-weight: bold;
     border-radius: 10px;
     transition: background-color 0.5s ease-in-out;
+    border-radius: 15px;
 }
 
 #gameInput.startAnimation {
-    animation: changeBackground 5s linear forwards, fadeText 6s linear forwards, pulsate 1s infinite alternate;
+    animation: changeBackground 4s linear forwards, fadeText 5s linear forwards, pulsate 1s infinite alternate;
 }
 
 @keyframes changeBackground {
     0% {
-        background-color: green;
+        background-color: rgb(191, 103, 27);
     }
     100% {
         background-color: red;
@@ -441,7 +453,7 @@ input[type=number] {
     }
     100% {
         filter: blur(5px);
-        opacity: 0.1;
+        opacity: 0.2;
     }
 }
 
