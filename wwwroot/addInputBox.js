@@ -70,8 +70,11 @@ document.addEventListener("DOMContentLoaded", () => {
             if (remainingSeconds <= 0) {
                 clearInterval(c);
                 document.getElementById('timer').textContent = "Finished";
+                const allInputs = document.querySelectorAll('input.wordInput');
+                allInputs.forEach(input => input.disabled = true);
             } else {
                 document.getElementById('timer').textContent = remainingSeconds.toFixed(1);
+
             }
         }
     }
@@ -130,6 +133,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         input.style.animation = 'shake 0.1s';
                     } else {
                         input.style.backgroundColor = 'green';
+                        input.disabled = true;
                         let next = input.parentElement.nextElementSibling?.querySelector('.wordInput');
                         if(next) {
                             input.classList.add('startAnimation');
