@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
             console.warn(`Player "${username}" already exists.`);
             return;
         }
-  
+
 
         const card = document.createElement('div');
         card.classList.add('card');

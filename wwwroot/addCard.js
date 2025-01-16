@@ -1,4 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
+
+//#region Carlo
   const cardHolder = document.querySelector('.cardHolder');
 
   function addPlayerCard(username, playerIndex) {
@@ -40,4 +42,5 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
   populatePlayers();
+//#endregion
 });

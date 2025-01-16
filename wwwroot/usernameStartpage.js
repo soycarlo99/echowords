@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
   let playerCount = parseInt(localStorage.getItem('playerCount')) || 0;
   
+
   acceptButton.addEventListener("click", () => {
     const username = playerNameInput.value.trim();
   
@@ -32,6 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
   //   }
   // });
   
+  //#region Carlo 
   async function addPlayerName() {
     const playerName = $('[id="playerNameInput"]').val();
     console.log('PlayerName:', playerName);
@@ -50,4 +52,5 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error('Error adding player:', error);
     }
   }
+  //#endregion
 });

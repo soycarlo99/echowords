@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-
+    //#region Carlo / CSS animation
     function highlightNextPlayer() {
         const players = document.querySelectorAll('.grid-child-players .card');
         if (players.length === 0) return;
@@ -20,8 +20,9 @@ document.addEventListener("DOMContentLoaded", () => {
         players[currentPlayerIndex].classList.add('green-shadow');
         currentPlayerIndex++;
     }
+    //#endregion
 
-
+    //#region Edvin
     function checkWord(word) {
         if (!word) return false;
         if (!lastWord) {
@@ -36,11 +37,16 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         return false;
     }
+    //#endregion
 
+    //#region Hugo
     function scoreCounter() {
         let scoreCounterElement = document.getElementById("counter")
         scoreCounterElement.textContent = `Score: ${score}`
     }
+    //#endregion
+
+
 
     function updateSize(inputField) {
         let desiredSize = Math.max(inputField.value.length, inputField.placeholder.length, 1);
@@ -48,6 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
         inputField.size = desiredSize;
     }
 
+    //#region Patrik
     function doubleAvoider(word) {
         if(wordList.includes(word)){
             console.log(`The word ${word} already has been written`);
@@ -55,7 +62,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         return true;
     }
+    //#endregion 
 
+    //#region Carlo
     async function saveWord(word) {
         console.log('Saving word:', word);
         try {
@@ -70,7 +79,9 @@ document.addEventListener("DOMContentLoaded", () => {
             console.error('Error saving word:', error);
         }
     }
+    //#endregion
 
+    //#region Kasper
     function restartClock() {
         if (c) {
             clearInterval(c);
@@ -94,11 +105,14 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
     
+    
     function addTime() {
         remainingSeconds += 1.5;
         document.getElementById('timer').textContent = remainingSeconds.toFixed(1);
     }
+    //#endregion
 
+    //#region Hugo
     function addWordBox(preFilledWords = []) {
         const cardContainer = document.querySelector('.grid-child-game');
         cardContainer.innerHTML = '';
@@ -115,7 +129,8 @@ document.addEventListener("DOMContentLoaded", () => {
             inputField.addEventListener('input', () => updateSize(inputField));
             updateSize(inputField);
         });
-
+    //#endregion
+        //#region Carlo
         const newCard = document.createElement('div');
         newCard.classList.add('wordCard');
         // Spelet börjar här!
@@ -135,7 +150,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if (firstInput) {
             firstInput.focus();
         }
+        //#endregion
 
+        //#region Albin
         const recallInputs = cardContainer.querySelectorAll('input[data-correct]');
         recallInputs.forEach((input) => {
             input.addEventListener('keydown', (e) => {
@@ -166,6 +183,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         restartClock();
 
+        
         newInput.addEventListener('keydown', async (event) => {
             if (event.key === 'Enter') {
                 event.preventDefault();
@@ -185,6 +203,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             }
         });
+        //#endregion
     }
 
     addWordBox();

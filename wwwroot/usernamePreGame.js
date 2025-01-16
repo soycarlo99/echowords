@@ -1,5 +1,4 @@
 //export const playerlistEx = [];
-
 document.addEventListener("DOMContentLoaded", () => {
   const playerCount = parseInt(localStorage.getItem('playerCount')) || 0;
 
