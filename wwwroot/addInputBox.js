@@ -179,7 +179,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 } else {
                     input.style.backgroundColor = 'green';
                     input.disabled = true;
-                    input.classList.add('completed', 'startAnimation');
+                    input.classList.add('startAnimation');
                     score++;
                     addTime();
 
@@ -190,8 +190,8 @@ document.addEventListener("DOMContentLoaded", () => {
                             if (nextCard) {
                                 const next = nextCard.querySelector('.wordInput');
                                 if (next) {
+                                    input.classList.add('startAnimation');
                                     next.focus();
-                                    next.classList.add('startAnimation');
                                 }
                             }
                         }, 0); // Delay before moving to next word
@@ -214,7 +214,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     score++;
                     addTime();
                     input.disabled = true;
-                    input.classList.add('completed', 'startAnimation');
+                    input.classList.add('startAnimation');
 
                     setTimeout(() => {
                         broadcastGameState();

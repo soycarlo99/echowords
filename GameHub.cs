@@ -7,17 +7,17 @@ namespace Wordapp
     {
         public async Task BroadcastHtml(string htmlContent)
         {
-            await Clients.All.SendAsync("ReceiveHtml", htmlContent);
+            await Clients.Others.SendAsync("ReceiveHtml", htmlContent);
         }
         
         public async Task BroadcastNewWord(string word, List<string> wordList)
         {
-            await Clients.All.SendAsync("ReceiveNewWord", word, wordList);
+            await Clients.Others.SendAsync("ReceiveNewWord", word, wordList);
         }
 
         public async Task BroadcastGameState(object gameState)
         {
-            await Clients.All.SendAsync("ReceiveGameState", gameState);
+            await Clients.Others.SendAsync("ReceiveGameState", gameState);
         }
 
         public async Task BroadcastUserInput(int playerIndex, string input)
