@@ -1,8 +1,10 @@
 document.addEventListener("DOMContentLoaded", () => {
     const maxChars = 20;
-    let lastWord = '';
     const wordList = [];
+    let remainingSeconds = 10;
+    let lastWord = '';
     let score = 0;
+    let c;
 
 
     function checkWord(word) {
@@ -54,23 +56,29 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    function restartClock(){
-        if (c){
-            clearInterval(c)
+    function restartClock() {
+        if (c) {
+            clearInterval(c);
         }
-        document.getElementById('timer').innerHTML="10"
-        c = setInterval(showClock,1000)
-        function showClock(){
-            var seconds = document.getElementById('timer').textContent;
-            seconds--;
-            document.getElementById('timer').innerHTML=seconds;
-            if(seconds==0)
-            {
+        remainingSeconds = 10;
+        document.getElementById('timer').textContent = remainingSeconds.toFixed(1);
+    
+        c = setInterval(showClock, 100);
+    
+        function showClock() {
+            remainingSeconds -= 0.1;
+            if (remainingSeconds <= 0) {
                 clearInterval(c);
-                document.getElementById('timer').innerHTML = "Finished";
-                // Vi kanske kan ha mer grejer här
+                document.getElementById('timer').textContent = "Finished";
+            } else {
+                document.getElementById('timer').textContent = remainingSeconds.toFixed(1);
             }
         }
+    }
+    
+    function addTime() {
+        remainingSeconds += 1.5;
+        document.getElementById('timer').textContent = remainingSeconds.toFixed(1);
     }
 
     function addWordBox(preFilledWords = []) {
@@ -120,15 +128,15 @@ document.addEventListener("DOMContentLoaded", () => {
                     if(entered !== correct) {
                         input.style.backgroundColor = 'red';
                         input.style.animation = 'shake 0.1s';
-                        
                     } else {
                         input.style.backgroundColor = 'green';
                         let next = input.parentElement.nextElementSibling?.querySelector('.wordInput');
                         if(next) {
-                            next.focus();
                             input.classList.add('startAnimation');
-                            scoreCounter()
+                            next.focus();
+                            scoreCounter();
                             score++
+                            addTime();
                         } else {
                             newInput.focus();
 
@@ -145,23 +153,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 event.preventDefault();
                 const newWord = newInput.value.trim().toLowerCase();
                 if (!newWord) return;
-
-                const inputs = document.querySelectorAll('.wordCard input');
-                let validRecall = true;
-                inputs.forEach((input, index) => {
-                    if (index < preFilledWords.length) {
-                        const correct = input.dataset.correct;
-                        if (input.value.trim().toLowerCase() !== correct.toLowerCase()) {
-                            validRecall = false;
-                        }
-                    }
-                });
-
-                if (!validRecall) {
-                    console.warn("Please correctly re-enter previous words.");
-                    return;
-                }
-
+        
                 if (checkWord(newWord) && doubleAvoider(newWord)) {
                     wordList.push(newWord);
                     await saveWord(newWord);
