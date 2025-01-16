@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     //#endregion
 
-    //#region Edvin
+    //#region Patrick
     function checkWord(word) {
         if (!word) return false;
         if (!lastWord) {
@@ -64,7 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     //#endregion 
 
-    //#region Carlo
+    //#region Carlo / sends to database
     async function saveWord(word) {
         console.log('Saving word:', word);
         try {
@@ -130,7 +130,7 @@ document.addEventListener("DOMContentLoaded", () => {
             updateSize(inputField);
         });
     //#endregion
-        //#region Carlo
+        //#region Edvin
         const newCard = document.createElement('div');
         newCard.classList.add('wordCard');
         // Spelet börjar här!
@@ -182,14 +182,15 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
         restartClock();
-
         
         newInput.addEventListener('keydown', async (event) => {
             if (event.key === 'Enter') {
                 event.preventDefault();
                 const newWord = newInput.value.trim().toLowerCase();
                 if (!newWord) return;
-        
+                //#endregion
+                
+            //#region Patrik
                 if (checkWord(newWord) && doubleAvoider(newWord)) {
                     wordList.push(newWord);
                     await saveWord(newWord);
@@ -201,9 +202,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     updateSize(newInput);
                     newInput.focus();
                 }
+            //#endregion
             }
         });
-        //#endregion
+        
     }
 
     addWordBox();
