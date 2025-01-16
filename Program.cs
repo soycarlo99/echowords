@@ -1,41 +1,40 @@
 using System.Security.Cryptography;
 using Wordapp;
-using Npgsql;
+using Microsoft.AspNetCore.SignalR;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddSignalR();  // Register SignalR
 
 var app = builder.Build();
 
-// Use Swagger during development
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-// Serve static files from wwwroot
-app.UseDefaultFiles(); // Serving index.html as the default file
-app.UseStaticFiles(); // Serves other static files like CSS, JS, images, etc.
+app.UseDefaultFiles();
+app.UseStaticFiles();
 
-// Middleware to set or retrieve the client identifier cookie
+app.UseRouting();
+
+app.MapHub<GameHub>("/gameHub");  // Map SignalR hub
+
 app.Use(async (context, next) =>
 {
     const string clientIdCookieName = "ClientId";
-
     if (!context.Request.Cookies.TryGetValue(clientIdCookieName, out var clientId))
     {
-        // Generate a new unique client ID
         clientId = GenerateUniqueClientId();
         context.Response.Cookies.Append(clientIdCookieName, clientId, new CookieOptions
         {
-            HttpOnly = true, // Prevent client-side JavaScript from accessing the cookie
-            Secure = false,   // Use only over HTTPS (false for dev)
+            HttpOnly = true,
+            Secure = false,
             SameSite = SameSiteMode.Strict,
-            MaxAge = TimeSpan.FromDays(365) // Cookie expiration
+            MaxAge = TimeSpan.FromDays(365)
         });
         Console.WriteLine($"New client ID generated and set: {clientId}");
     }
@@ -43,12 +42,9 @@ app.Use(async (context, next) =>
     {
         Console.WriteLine($"Existing client ID found: {clientId}");
     }
-
-    // Pass to the next middleware
     await next();
 });
 
-// Helper function to generate a unique client ID
 static string GenerateUniqueClientId()
 {
     using var rng = RandomNumberGenerator.Create();
@@ -57,7 +53,15 @@ static string GenerateUniqueClientId()
     return Convert.ToBase64String(bytes);
 }
 
-// Methods for processing routes from Actions class
-Actions actions = new(app);
+// Retrieve SignalR Hub context and instantiate Actions
+var hubContext = app.Services.GetRequiredService<IHubContext<GameHub>>();
+var actions = new Actions(app, hubContext);
 
-app.Run();
+try
+{
+    app.Run();
+}
+catch(Exception ex)
+{
+    Console.WriteLine("Unhandled exception: " + ex.ToString());
+}

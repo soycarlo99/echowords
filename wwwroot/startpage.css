@@ -424,6 +424,10 @@ input[type=number] {
     animation: changeBackground 4s linear forwards, fadeText 5s linear forwards, pulsate 1s infinite alternate;
 }
 
+.startAnimation {
+    animation: changeBackground 4s linear forwards, fadeText 5s linear forwards, pulsate 1s infinite alternate;
+}
+
 @keyframes changeBackground {
     0% {
         background-color: rgb(191, 103, 27);
