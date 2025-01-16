@@ -475,6 +475,7 @@ input[type=number] {
     text-align: center;
     z-index: 1000;
     animation: fadePulse 1.5s infinite ease-in-out;
+    min-width: 4rem;
 }
 
 #counter {
@@ -567,3 +568,27 @@ input[type=number] {
     color: red;
     font-size: 1.5rem;
   }
+
+
+  .green-shadow {
+    box-shadow: 0 0 10px 5px green;
+    transition: box-shadow 0.3s ease, transform 0.3s ease-in-out;
+    transform: scale(1.1);
+    animation: namePulse 1.5s infinite ease-in-out;
+  }
+
+
+  @keyframes namePulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.9;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}

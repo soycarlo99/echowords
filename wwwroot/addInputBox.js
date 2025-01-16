@@ -1,10 +1,25 @@
 document.addEventListener("DOMContentLoaded", () => {
     const maxChars = 20;
     const wordList = [];
+    let currentPlayerIndex = 0;
     let remainingSeconds = 10;
     let lastWord = '';
     let score = 0;
     let c;
+
+
+
+
+    function highlightNextPlayer() {
+        const players = document.querySelectorAll('.grid-child-players .card');
+        if (players.length === 0) return;
+        players.forEach(player => player.classList.remove('green-shadow'));
+        if (currentPlayerIndex >= players.length) {
+          currentPlayerIndex = 0;
+        }
+        players[currentPlayerIndex].classList.add('green-shadow');
+        currentPlayerIndex++;
+    }
 
 
     function checkWord(word) {
@@ -149,7 +164,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             });
         });
-
         restartClock();
 
         newInput.addEventListener('keydown', async (event) => {
@@ -162,6 +176,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     wordList.push(newWord);
                     await saveWord(newWord);
                     addWordBox([...wordList]);
+                    highlightNextPlayer();
                 } else {
                     console.warn("Invalid or duplicate word. Try again.");
                     newInput.value = '';
