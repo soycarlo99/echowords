@@ -1,6 +1,6 @@
+using Microsoft.AspNetCore.SignalR;
 using System.Security.Cryptography;
 using Wordapp;
-using Microsoft.AspNetCore.SignalR;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +18,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
-
 app.UseRouting();
 
 app.MapHub<GameHub>("/gameHub");  // Map SignalR hub

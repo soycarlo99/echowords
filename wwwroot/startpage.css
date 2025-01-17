@@ -424,7 +424,7 @@ input[type=number] {
     animation: changeBackground 4s linear forwards, fadeText 5s linear forwards, pulsate 1s infinite alternate;
 }
 
-.startAnimation {
+.wordInput.startAnimation {
     animation: changeBackground 4s linear forwards, fadeText 5s linear forwards, pulsate 1s infinite alternate;
 }
 
