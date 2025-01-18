@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
             .catch(err => console.error("Error broadcasting user input:", err));
     }
 
-    function updateUI(preserveCompleted = false) {
+    function updateUI(preserveCompleted = true) {
         addWordBox([...wordList], preserveCompleted);
         highlightNextPlayer();
         scoreCounter();
@@ -175,7 +175,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (entered !== correct) {
                     input.style.backgroundColor = 'red';
                     input.classList.add('shake');
-                    setTimeout(() => input.classList.remove('shake'), 500);
+                    input.textContent = '';
                 } else {
                     input.style.backgroundColor = 'green';
                     input.disabled = true;

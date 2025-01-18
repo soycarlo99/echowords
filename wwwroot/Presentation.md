@@ -8,4 +8,4 @@
 # 6- Hugo -> go thru the code sections
 # 7- Kasper -> go thru the code sections
 # 8- Albin -> go thru the code sections
-# 9- Edvin -> go thru the code sections
+# 9- Edvin -> go thru the code sections / outro

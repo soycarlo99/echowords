@@ -5,7 +5,7 @@
     <title>Document</title>
     <link rel="stylesheet" href="startpage.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
-    
+    <script src="darkmode.JS" defer></script>
 </head>
 <body>
 <nav class="nav">
@@ -16,26 +16,18 @@
         <a href="gameRules.html">
             <button class="button" id="gamerules" >Game Rules</button>
         </a>
+        <button id="darkModeToggle">Toggle Dark Mode</button>
     </div>
 </nav>
-<main>
-    <div class="instructions">
-    <p>You need to pick a player name before you can enter or create a lobby</p>
+<main class="startPageMain">
+    <div>
+        <h3>You need to pick a player name before you can enter or create a lobby</h3>
+        <input class="playerName" type="text" id="playerNameInput" placeholder="Enter your name">
+        <button class="button idxacpt" id="acceptButton">Accept</button>
+    <div>
     </div>
-
-    <div class="enterNameSection">
-        <p>Choose player name: &nbsp;</p>
-        <input class="playerName" type="text" id="playerNameInput" placeholder="Enter your username">
-        <div>
-            <a>
-                <button class="button" id="acceptButton">Accept</button>
-            </a>
-           
-        </div>
         <p id="errorMessage" style="color: red; display: none;">Please enter a username.</p>
     </div>
-
-
 </main>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script src="usernameStartpage.js"></script>

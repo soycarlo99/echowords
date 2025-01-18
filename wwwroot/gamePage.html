@@ -10,6 +10,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js" defer></script>
 
   <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+  <script src="darkmode.JS" defer></script>
+  <script src="addCard.js" defer></script>
   <script src="gamePageTimer.js" defer></script>
   <script src="addInputBox.js" defer></script>
   <script src="usernamePreGame.js" defer></script>
@@ -21,10 +23,12 @@
 <body>
   <nav>
     <h1>Echo Words</h1>
+    
+    <p id="timer">10</p>
     <div class="tooltip-container">
-      <a href="gameRules.html">
-        <button id="gamerules">Game Rules</button>
-      </a>
+      <button id="gamerules">Game Rules</button>
+      <div class="timerAndCounter">
+      </div>
       <div class="tooltip-content">
         <main>
           <div class="rulesText">
@@ -44,12 +48,10 @@
         </main>
       </div>
     </div>
+    <button id="darkModeToggle">Toggle Dark Mode</button>
   </nav>
   <main>
-    <div class="timerAndCounter">
-    <p id="timer">10</p>
-    <p id="counter">Score: 0</p>
-    </div>
+    
     <div class="grid-container">
       <div class="grid-child-game"></div>
       <div class="grid-child-players"></div>
