@@ -65,25 +65,33 @@ document.addEventListener("DOMContentLoaded", () => {
         const gameContainer = document.querySelector('.grid-child-game');
         gameContainer.innerHTML = '';
 
+        // Render filled word boxes
         gameState.wordList.forEach((word, index) => {
-            const wordBox = createWordBox('', false, index);
+            const wordBox = createWordBox(word, true, index);
             gameContainer.appendChild(wordBox);
         });
 
+        // Render empty box for new word
         const newWordBox = createWordBox('', false, gameState.wordList.length);
         gameContainer.appendChild(newWordBox);
 
+        // Focus on the first empty input
         const firstEmptyInput = gameContainer.querySelector('.wordInput:not(:disabled)');
         if (firstEmptyInput) firstEmptyInput.focus();
     }
 
-    function createWordBox(word, isPrefilled, index) {
+
+    function createWordBox(word = '', isPrefilled = false, index) {
         const box = document.createElement('div');
         box.classList.add('wordCard');
         box.innerHTML = `
-            <input class="wordInput" id="gameInput" type="text" placeholder="${isPrefilled ? 'Re-enter word...' : 'Enter new word...'}" ${isPrefilled ? `value="${word}" data-correct="${word}"` : ''}>
-            <p class="doubleWarning" style="display: none;">Word already used</p>
-        `;
+        <input class="wordInput" id="gameInput" type="text" 
+               placeholder="${isPrefilled ? 'Re-enter word...' : 'Enter new word...'}" 
+               value="${isPrefilled ? word : ''}" 
+               ${isPrefilled ? `data-correct="${word}"` : ''} 
+               ${isPrefilled ? 'disabled' : ''}>
+        <p class="doubleWarning" style="display: none;">Word already used</p>
+    `;
 
         const input = box.querySelector('.wordInput');
         updateInputSize(input);
@@ -93,15 +101,18 @@ document.addEventListener("DOMContentLoaded", () => {
             broadcastUserInput(e.target.value);
         });
 
-        input.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                handleWordSubmission(input, index);
-            }
-        });
+        if (!isPrefilled) {
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleWordSubmission(input, index);
+                }
+            });
+        }
 
         return box;
     }
+
 
     function handleWordSubmission(input, index) {
         const enteredWord = input.value.trim().toLowerCase();
