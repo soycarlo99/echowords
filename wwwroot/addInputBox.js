@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
         gameContainer.innerHTML = '';
 
         gameState.wordList.forEach((word, index) => {
-            const wordBox = createWordBox(word, true, index);
+            const wordBox = createWordBox('', false, index);
             gameContainer.appendChild(wordBox);
         });
 
