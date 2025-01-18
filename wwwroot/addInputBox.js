@@ -4,72 +4,218 @@ document.addEventListener("DOMContentLoaded", () => {
         .withAutomaticReconnect()
         .build();
 
-    let wordList = [];
-    let currentPlayerIndex = 0;
-    let remainingSeconds = 10;
-    let lastWord = '';
-    let score = 0;
+    let gameState = {
+        wordList: [],
+        currentPlayerIndex: 0,
+        remainingSeconds: 1000,
+        lastWord: '',
+        score: 0
+    };
+
     let timerInterval;
 
     connection.start().then(() => {
         console.log("Connected to SignalR hub.");
     }).catch(err => console.error("SignalR Connection Error:", err));
 
-    connection.on("ReceiveGameState", (gameState) => {
-        setTimeout(() => {
-            wordList = gameState.wordList;
-            currentPlayerIndex = gameState.currentPlayerIndex;
-            remainingSeconds = gameState.remainingSeconds;
-            lastWord = gameState.lastWord;
-            score = gameState.score;
-            updateUI(true);
-        }, 0); // Delay to allow word memorization
+    connection.on("ReceiveGameState", (newState) => {
+        gameState = { ...newState };
+        updateUI();
     });
 
     connection.on("ReceiveUserInput", (playerIndex, input) => {
         const inputs = document.querySelectorAll('.wordInput');
         if (inputs[playerIndex]) {
             inputs[playerIndex].value = input;
-            updateSize(inputs[playerIndex]);
+            updateInputSize(inputs[playerIndex]);
+        }
+    });
+
+    connection.on("ReceiveAnimation", (index, animationType) => {
+        const inputs = document.querySelectorAll('.wordInput');
+        if (inputs[index]) {
+            inputs[index].classList.add(animationType);
+            //setTimeout(() => inputs[index].classList.remove(animationType), 9999);
         }
     });
 
     function broadcastGameState() {
-        const gameState = { wordList, currentPlayerIndex, remainingSeconds, lastWord, score };
         connection.invoke("BroadcastGameState", gameState)
             .catch(err => console.error("Error broadcasting game state:", err));
     }
 
     function broadcastUserInput(input) {
-        connection.invoke("BroadcastUserInput", currentPlayerIndex, input)
+        connection.invoke("BroadcastUserInput", gameState.currentPlayerIndex, input)
             .catch(err => console.error("Error broadcasting user input:", err));
     }
 
-    function updateUI(preserveCompleted = true) {
-        addWordBox([...wordList], preserveCompleted);
-        highlightNextPlayer();
-        scoreCounter();
+    function broadcastAnimation(index, animationType) {
+        connection.invoke("BroadcastAnimation", index, animationType)
+            .catch(err => console.error("Error broadcasting animation:", err));
+    }
+
+    function updateUI() {
+        renderWordBoxes();
+        highlightCurrentPlayer();
+        updateScore();
         updateTimer();
     }
 
-    function highlightNextPlayer() {
+    function renderWordBoxes() {
+        const gameContainer = document.querySelector('.grid-child-game');
+        gameContainer.innerHTML = '';
+
+        gameState.wordList.forEach((word, index) => {
+            const wordBox = createWordBox(word, true, index);
+            gameContainer.appendChild(wordBox);
+        });
+
+        const newWordBox = createWordBox('', false, gameState.wordList.length);
+        gameContainer.appendChild(newWordBox);
+
+        const firstEmptyInput = gameContainer.querySelector('.wordInput:not(:disabled)');
+        if (firstEmptyInput) firstEmptyInput.focus();
+    }
+
+    function createWordBox(word, isPrefilled, index) {
+        const box = document.createElement('div');
+        box.classList.add('wordCard');
+        box.innerHTML = `
+            <input class="wordInput" id="gameInput" type="text" placeholder="${isPrefilled ? 'Re-enter word...' : 'Enter new word...'}" ${isPrefilled ? `value="${word}" data-correct="${word}"` : ''}>
+            <p class="doubleWarning" style="display: none;">Word already used</p>
+        `;
+
+        const input = box.querySelector('.wordInput');
+        updateInputSize(input);
+
+        input.addEventListener('input', (e) => {
+            updateInputSize(input);
+            broadcastUserInput(e.target.value);
+        });
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                handleWordSubmission(input, index);
+            }
+        });
+
+        return box;
+    }
+
+    function handleWordSubmission(input, index) {
+        const enteredWord = input.value.trim().toLowerCase();
+        const isNewWord = !input.dataset.correct;
+
+        if (isNewWord) {
+            if (isValidNewWord(enteredWord)) {
+                submitNewWord(enteredWord, input, index);
+            } else {
+                showInvalidWordAnimation(input, index);
+            }
+        } else {
+            const correctWord = input.dataset.correct.toLowerCase();
+            if (enteredWord === correctWord) {
+                markWordAsCorrect(input, index);
+            } else {
+                showIncorrectWordAnimation(input, index);
+            }
+        }
+    }
+
+    function isValidNewWord(word) {
+        return word && checkWordStart(word) && !isWordDuplicate(word);
+    }
+
+    function checkWordStart(word) {
+        return !gameState.lastWord || word.charAt(0).toLowerCase() === gameState.lastWord.slice(-1).toLowerCase();
+    }
+
+    function isWordDuplicate(word) {
+        return gameState.wordList.includes(word);
+    }
+
+    function submitNewWord(word, input, index) {
+        gameState.wordList.push(word);
+        //gameState.lastWord = word;
+        gameState.currentPlayerIndex++;
+        gameState.score++;
+        saveWord(word);
+        input.disabled = true;
+        broadcastGameState();
+        showCorrectAnimation(input, index);
+    }
+
+    function markWordAsCorrect(input, index) {
+        input.disabled = true;
+        gameState.score++;
+        input.classList.add('startAnimation');
+        showCorrectAnimation(input, index);
+        broadcastGameState();
+        broadcastAnimation(index, 'startAnimation');
+    }
+
+    function showCorrectAnimation(input, index) {
+        input.classList.add('startAnimation');
+        input.disabled = true;
+        broadcastAnimation(index, 'startAnimation');
+        
+        //input.classList.remove('startAnimation');
+    }
+
+    function showInvalidWordAnimation(input, index) {
+        input.classList.add('shake');
+        broadcastAnimation(index, 'shake');
+        setTimeout(() => {
+            input.classList.remove('shake');
+            input.value = '';
+            updateInputSize(input);
+        }, 500);
+    }
+
+    function showIncorrectWordAnimation(input, index) {
+        input.classList.add('shake');
+        broadcastAnimation(index, 'shake');
+        setTimeout(() => {
+            input.value = '';
+            updateInputSize(input);
+        }, 0);
+    }
+
+    function updateInputSize(input) {
+        const maxChars = 20;
+        input.size = Math.min(Math.max(input.value.length, input.placeholder.length, 1), maxChars);
+    }
+
+    function highlightCurrentPlayer() {
         const players = document.querySelectorAll('.grid-child-players .card');
         players.forEach(player => player.classList.remove('green-shadow'));
-        players[currentPlayerIndex % players.length].classList.add('green-shadow');
+        players[gameState.currentPlayerIndex % players.length].classList.add('green-shadow');
     }
 
-    function checkWord(word) {
-        if (!word) return false;
-        if (!lastWord) return true;
-        return lastWord.slice(-1).toLowerCase() === word.charAt(0).toLowerCase();
+    function updateScore() {
+        document.getElementById("counter").textContent = `Score: ${gameState.score}`;
     }
 
-    function scoreCounter() {
-        document.getElementById("counter").textContent = `Score: ${score}`;
+    function updateTimer() {
+        if (gameState.remainingSeconds <= 0) {
+            clearInterval(timerInterval);
+            document.getElementById('timer').textContent = "Finished";
+            document.querySelectorAll('.wordInput').forEach(input => input.disabled = true);
+        } else {
+            document.getElementById('timer').textContent = gameState.remainingSeconds.toFixed(1);
+        }
     }
 
-    function doubleAvoider(word) {
-        return !wordList.includes(word);
+    function startTimer() {
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            gameState.remainingSeconds -= 0.1;
+            if (gameState.remainingSeconds <= 0) {
+                clearInterval(timerInterval);
+            }
+            updateTimer();
+        }, 100);
     }
 
     async function saveWord(word) {
@@ -86,151 +232,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    function restartClock() {
-        clearInterval(timerInterval);
-        remainingSeconds = 10;
-        updateTimer();
-        timerInterval = setInterval(updateTimer, 100);
-    }
-
-    function updateTimer() {
-        if (remainingSeconds <= 0) {
-            clearInterval(timerInterval);
-            document.getElementById('timer').textContent = "Finished";
-            document.querySelectorAll('input.wordInput').forEach(input => input.disabled = true);
-        } else {
-            document.getElementById('timer').textContent = remainingSeconds.toFixed(1);
-            remainingSeconds -= 0.1;
-        }
-    }
-
-    function addTime() {
-        remainingSeconds += 1.5;
-        updateTimer();
-    }
-
-    function addWordBox(preFilledWords = [], preserveCompleted = false) {
-        const cardContainer = document.querySelector('.grid-child-game');
-        const completedInputs = preserveCompleted ? Array.from(cardContainer.querySelectorAll('.wordInput.completed')) : [];
-        cardContainer.innerHTML = '';
-
-        preFilledWords.forEach((word, index) => {
-            const card = createWordCard(word, true);
-            cardContainer.appendChild(card);
-            if (preserveCompleted && completedInputs[index]) {
-                const input = card.querySelector('.wordInput');
-                input.value = completedInputs[index].value;
-                input.disabled = true;
-                input.classList.add('completed');
-            }
-        });
-
-        const newCard = createWordCard();
-        cardContainer.appendChild(newCard);
-
-        const firstIncompleteInput = cardContainer.querySelector('.wordInput:not(.completed)');
-        if (firstIncompleteInput) firstIncompleteInput.focus();
-
-        restartClock();
-    }
-
-    function createWordCard(word = '', isPrefilled = false) {
-        const card = document.createElement('div');
-        card.classList.add('wordCard');
-        if (!isPrefilled && wordList.length === 0) {
-            card.classList.add('shake');
-        }
-        card.innerHTML = `
-            <input class="wordInput" id="gameInput" type="text" placeholder="${isPrefilled ? 'Re-enter word...' : 'Enter new word...'}" ${isPrefilled ? `data-correct="${word}"` : ''}>
-            <p class="doubleWarning">The word has already been taken</p>
-        `;
-        const input = card.querySelector('.wordInput');
-        input.addEventListener('input', (e) => {
-            updateSize(input);
-            broadcastUserInput(e.target.value);
-        });
-        updateSize(input);
-
-        if (isPrefilled) {
-            setupPrefilledInput(input);
-        } else {
-            setupNewInput(input);
-        }
-
-        return card;
-    }
-
-    function updateSize(input) {
-        const maxChars = 20;
-        let size = Math.max(input.value.length, input.placeholder.length, 1);
-        input.size = Math.min(size, maxChars);
-    }
-
-    function setupPrefilledInput(input) {
-        input.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                const entered = input.value.trim().toLowerCase();
-                const correct = input.dataset.correct.toLowerCase();
-                if (entered !== correct) {
-                    input.style.backgroundColor = 'red';
-                    input.classList.add('shake');
-                    input.textContent = '';
-                } else {
-                    input.style.backgroundColor = 'green';
-                    input.disabled = true;
-                    input.classList.add('startAnimation');
-                    score++;
-                    addTime();
-
-                    setTimeout(() => {
-                        broadcastGameState();
-                        setTimeout(() => {
-                            const nextCard = input.closest('.wordCard').nextElementSibling;
-                            if (nextCard) {
-                                const next = nextCard.querySelector('.wordInput');
-                                if (next) {
-                                    input.classList.add('startAnimation');
-                                    next.focus();
-                                }
-                            }
-                        }, 0); // Delay before moving to next word
-                    }, 0); // Delay before broadcasting game state
-                }
-            }
-        });
-    }
-
-    function setupNewInput(input) {
-        input.addEventListener('keydown', async (event) => {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                const newWord = input.value.trim().toLowerCase();
-                if (newWord && checkWord(newWord) && doubleAvoider(newWord)) {
-                    wordList.push(newWord);
-                    lastWord = newWord;
-                    await saveWord(newWord);
-                    currentPlayerIndex++;
-                    score++;
-                    addTime();
-                    input.disabled = true;
-                    input.classList.add('startAnimation');
-
-                    setTimeout(() => {
-                        broadcastGameState();
-                        setTimeout(() => {
-                            updateUI(true);
-                        }, 0); // Delay before updating UI
-                    }, 0); // Delay before broadcasting game state
-                } else {
-                    input.value = '';
-                    updateSize(input);
-                    input.classList.add('shake');
-                    setTimeout(() => input.classList.remove('shake'), 500);
-                }
-            }
-        });
-    }
-
     updateUI();
+    startTimer();
 });
