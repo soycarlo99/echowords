@@ -65,9 +65,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const gameContainer = document.querySelector('.grid-child-game');
         gameContainer.innerHTML = '';
 
-        // Render filled word boxes
-        gameState.wordList.forEach((word, index) => {
-            const wordBox = createWordBox(word, true, index);
+        // Render empty boxes for existing words
+        gameState.wordList.forEach((_, index) => {
+            const wordBox = createWordBox('', true, index);
             gameContainer.appendChild(wordBox);
         });
 
@@ -75,21 +75,18 @@ document.addEventListener("DOMContentLoaded", () => {
         const newWordBox = createWordBox('', false, gameState.wordList.length);
         gameContainer.appendChild(newWordBox);
 
-        // Focus on the first empty input
-        const firstEmptyInput = gameContainer.querySelector('.wordInput:not(:disabled)');
-        if (firstEmptyInput) firstEmptyInput.focus();
+        // Focus on the first input
+        const firstInput = gameContainer.querySelector('.wordInput');
+        if (firstInput) firstInput.focus();
     }
 
-
-    function createWordBox(word = '', isPrefilled = false, index) {
+    function createWordBox(word = '', isExisting = false, index) {
         const box = document.createElement('div');
         box.classList.add('wordCard');
         box.innerHTML = `
         <input class="wordInput" id="gameInput" type="text" 
-               placeholder="${isPrefilled ? 'Re-enter word...' : 'Enter new word...'}" 
-               value="${isPrefilled ? word : ''}" 
-               ${isPrefilled ? `data-correct="${word}"` : ''} 
-               ${isPrefilled ? 'disabled' : ''}>
+               placeholder="${isExisting ? 'Re-enter word...' : 'Enter new word...'}" 
+               data-index="${index}">
         <p class="doubleWarning" style="display: none;">Word already used</p>
     `;
 
@@ -101,14 +98,12 @@ document.addEventListener("DOMContentLoaded", () => {
             broadcastUserInput(e.target.value);
         });
 
-        if (!isPrefilled) {
-            input.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleWordSubmission(input, index);
-                }
-            });
-        }
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                handleWordSubmission(input, index);
+            }
+        });
 
         return box;
     }
@@ -116,24 +111,37 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function handleWordSubmission(input, index) {
         const enteredWord = input.value.trim().toLowerCase();
-        const isNewWord = !input.dataset.correct;
-
-        if (isNewWord) {
-            if (isValidNewWord(enteredWord)) {
-                submitNewWord(enteredWord, input, index);
+        if (index < gameState.wordList.length) {
+            // Re-entering existing word
+            if (enteredWord === gameState.wordList[index].toLowerCase()) {
+                input.disabled = true;
+                input.classList.add('correct');
+                showCorrectAnimation(input, index);
+                focusNextInput(input);
             } else {
-                showInvalidWordAnimation(input, index);
+                showInvalidWordAnimation(input);
             }
         } else {
-            const correctWord = input.dataset.correct.toLowerCase();
-            if (enteredWord === correctWord) {
-                markWordAsCorrect(input, index);
+            // Entering new word
+            if (isValidNewWord(enteredWord)) {
+                submitNewWord(enteredWord, input);
             } else {
-                showIncorrectWordAnimation(input, index);
+                showInvalidWordAnimation(input);
             }
         }
     }
 
+    function startNewRound() {
+        renderWordBoxes();
+        restartClock();
+        broadcastGameState();
+    }
+
+    function focusNextInput(currentInput) {
+        const nextInput = currentInput.closest('.wordCard').nextElementSibling?.querySelector('.wordInput');
+        if (nextInput) nextInput.focus();
+    }
+    
     function isValidNewWord(word) {
         return word && checkWordStart(word) && !isWordDuplicate(word);
     }
@@ -153,8 +161,9 @@ document.addEventListener("DOMContentLoaded", () => {
         gameState.score++;
         saveWord(word);
         input.disabled = true;
-        broadcastGameState();
         showCorrectAnimation(input, index);
+        updateUI();
+        broadcastGameState();
     }
 
     function markWordAsCorrect(input, index) {
