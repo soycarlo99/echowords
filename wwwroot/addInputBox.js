@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let gameState = {
         wordList: [],
         currentPlayerIndex: 0,
-        remainingSeconds: 1000,
+        remainingSeconds: 100,
         lastWord: '',
         score: 0
     };
@@ -118,6 +118,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 input.classList.add('correct');
                 showCorrectAnimation(input, index);
                 focusNextInput(input);
+                addTimeToTimer(1.5);
             } else {
                 showInvalidWordAnimation(input);
             }
@@ -125,6 +126,7 @@ document.addEventListener("DOMContentLoaded", () => {
             // Entering new word
             if (isValidNewWord(enteredWord)) {
                 submitNewWord(enteredWord, input);
+                restartClock();
             } else {
                 showInvalidWordAnimation(input);
             }
@@ -135,6 +137,17 @@ document.addEventListener("DOMContentLoaded", () => {
         renderWordBoxes();
         restartClock();
         broadcastGameState();
+    }
+
+    function restartClock() {
+        // Reset the remaining time to the default value
+        gameState.remainingSeconds = 10;
+        clearInterval(timerInterval);
+        startTimer();
+    }
+    function addTimeToTimer(secondsToAdd) {
+        gameState.remainingSeconds += secondsToAdd;
+        updateTimer();
     }
 
     function focusNextInput(currentInput) {
@@ -156,7 +169,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function submitNewWord(word, input, index) {
         gameState.wordList.push(word);
-        //gameState.lastWord = word;
+        gameState.lastWord = word;
         gameState.currentPlayerIndex++;
         gameState.score++;
         saveWord(word);
@@ -252,6 +265,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    updateUI();
     startTimer();
+    updateUI();
 });

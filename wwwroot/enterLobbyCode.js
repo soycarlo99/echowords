@@ -38,6 +38,12 @@ document.addEventListener("DOMContentLoaded", () => {
         }, false);
     }
 
+    // After obtaining lobbyCode (or in your redirection logic)
+    const gameLink = document.getElementById('gameLink');
+    if(gameLink) {
+        gameLink.href = `gamePage.html?roomId=${lobbyCode}`;
+    }
+
     // Retrieve the 4-digit lobby code from input fields
     function getLobbyCode() {
         let code = '';

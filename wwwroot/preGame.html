@@ -51,25 +51,34 @@
     <div class="cardHolder"></div>
     <div class="joinGameInstruction">
       <div class="centerCardBtn" id="buttonsJoinCreate">
-        <a href="gamePage.html">
-          <button class="button" id="createLobbyButton">Start game</button>
+        <a id="gameLink">
+          <button class="button" id="startGameButton">Start game</button>
         </a>
       </div>
     </div>
   </main>
 
-    <script>
-      // Parse the roomId from the URL query parameters
-      const urlParams = new URLSearchParams(window.location.search);
-      const roomId = urlParams.get('roomId');
+  <script>
+    // Parse the roomId from the URL query parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const roomId = urlParams.get('roomId');
 
-      if (roomId) {
+    if (roomId) {
       // Update the roomID element with the actual lobby ID
       const roomIDElement = document.getElementById('roomID');
       if (roomIDElement) {
-      roomIDElement.textContent = `Room ID: ${roomId}`;
-    }
+        roomIDElement.textContent = `Room ID: ${roomId}`;
+      }
       console.log("Received roomId:", roomId);
+
+      // Update the gameLink anchor with the dynamic URL
+      const gameLink = document.getElementById('gameLink');
+      if (gameLink) {
+        gameLink.href = `gamePage.html?roomId=${roomId}`;
+        console.log("Updated gameLink href to:", gameLink.href);
+      }
+    } else {
+      console.error("No roomId found in URL.");
     }
   </script>
 </body>
