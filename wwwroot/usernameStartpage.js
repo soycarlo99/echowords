@@ -15,7 +15,6 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
   
-    //localStorage.setItem(`username${playerCount}`, username);
     playerCount++;
     localStorage.setItem('playerCount', playerCount);
   
