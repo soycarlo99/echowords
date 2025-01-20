@@ -383,6 +383,18 @@ input[type=number] {
   text-align: center;
   color: var(--text-color);
   font-family: 'Open Sans', sans-serif;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+.card h4 b {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
 }
 
 .cardHolder {
@@ -390,7 +402,7 @@ input[type=number] {
   justify-content: space-around;
   align-items: center;
   flex-wrap: wrap;
-  align-items: center;    /* Vertical centering */
+  align-items: center;
   padding-bottom: 2rem;
   gap: 1.5rem;
 }
