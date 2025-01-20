@@ -4,9 +4,25 @@ using Wordapp;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Set the server to listen on port 5158
+builder.WebHost.UseUrls("http://localhost:5185");
+
+// Register services
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddSignalR();  // Register SignalR
+builder.Services.AddSignalR();
+
+// Add and configure CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy
+            .AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
 
 var app = builder.Build();
 
@@ -16,12 +32,17 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// Use the CORS policy before routing and endpoints are set up
+app.UseCors("AllowAll");
+
 app.UseDefaultFiles();
 app.UseStaticFiles();
 app.UseRouting();
 
-app.MapHub<GameHub>("/gameHub");  // Map SignalR hub
+// Map SignalR hub
+app.MapHub<GameHub>("/gameHub");
 
+// Middleware to set or retrieve ClientId cookie
 app.Use(async (context, next) =>
 {
     const string clientIdCookieName = "ClientId";

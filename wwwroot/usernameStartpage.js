@@ -15,23 +15,16 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
   
-    localStorage.setItem(`username${playerCount}`, username);
+    //localStorage.setItem(`username${playerCount}`, username);
     playerCount++;
     localStorage.setItem('playerCount', playerCount);
   
     errorMessage.style.display = "none";
 
     addPlayerName().then(() => {
-    window.location.href = "preGame.html";
+    window.location.href = "joinGame.html";
     });
   });
-  
-  // $('#acceptButton').on('click', function(e) {
-  //   if (e.key === 'Enter') {
-  //     e.preventDefault();
-  //     addPlayerName();
-  //   }
-  // });
   
   //#region Carlo 
   async function addPlayerName() {

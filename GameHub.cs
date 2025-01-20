@@ -58,5 +58,11 @@ namespace Wordapp
                 await Clients.Others.SendAsync("ReceiveAnimation", index);
             }
         }
+        
+        public async Task JoinLobby(string lobbyId)
+        {
+            await Groups.AddToGroupAsync(Context.ConnectionId, lobbyId);
+            await Clients.Group(lobbyId).SendAsync("ReceiveMessage", $"A new player has joined lobby {lobbyId}.");
+        }
     }
 }

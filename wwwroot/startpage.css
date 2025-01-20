@@ -83,7 +83,7 @@ h1 {
   margin: 0;
 }
 
-#gamerules, #acceptButton, #createLobbyButton, #joinLobbyButton, #joinButton, #gameInput,
+#gamerules, #acceptButton, .createLobbyButton, #joinLobbyButton, #joinButton, #gameInput,
 button, input[type="submit"] {
   appearance: none;
   background-color: white;

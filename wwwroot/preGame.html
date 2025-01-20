@@ -4,7 +4,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Document</title>
   <link rel="stylesheet" href="startpage.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script>4
   <script src="darkmode.JS" defer></script>
+  <script src="createLobby.js" defer></script>
+  <script src="usernamePreGame.js"></script>
+  <script src="addCard.js" defer></script>
 </head>
 <body>
   <nav class="nav">
@@ -53,7 +57,22 @@
       </div>
     </div>
   </main>
-  <script src="usernamePreGame.js"></script>
-  <script src="addCard.js" defer></script>
+
+    <script>
+      // Parse the roomId from the URL query parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      const roomId = urlParams.get('roomId');
+
+      if (roomId) {
+      // Update the roomID element with the actual lobby ID
+      const roomIDElement = document.getElementById('roomID');
+      if (roomIDElement) {
+      roomIDElement.textContent = `Room ID: ${roomId}`;
+    }
+      // You can also store roomId in a global variable or use it 
+      // to initialize a connection to SignalR for joining the lobby
+      console.log("Received roomId:", roomId);
+    }
+  </script>
 </body>
 </html>

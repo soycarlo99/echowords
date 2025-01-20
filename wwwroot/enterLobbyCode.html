@@ -2,26 +2,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Document</title>
+    <title>Enter Lobby Code</title>
     <link rel="stylesheet" href="startpage.css">
-    <script src="enterLobbyCode.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script>
     <script src="darkmode.JS" defer></script>
+    <script src="enterLobbyCode.js" defer></script>
+    <script src="addCard.js" defer></script>
 </head>
 <body>
-    <nav class="nav">
-        <div>
-            <h1>Echo Words</h1>
-        </div>
-        <div>
-            <a href="gameRules.html">
-                <button class="button" id="gamerules" >Game Rules</button>
-            </a>
-            <button id="darkModeToggle">Toggle Dark Mode</button>
-        </div>
-    </nav>
+<nav class="nav">
+    <div>
+        <h1>Echo Words</h1>
+    </div>
+    <div>
+        <a href="gameRules.html">
+            <button class="button" id="gamerules">Game Rules</button>
+        </a>
+        <button id="darkModeToggle">Toggle Dark Mode</button>
+    </div>
+</nav>
 <main id="lobbyMain">
     <div class="instructions">
-    <h1 id="lobby">Enter lobby code</h1>
+        <h1 id="lobby">Enter lobby code</h1>
     </div>
     <div class="pin-code">
         <input type="number" maxlength="1" autofocus>
@@ -30,8 +32,7 @@
         <input type="number" maxlength="1">
     </div>
     <div>
-    <button class="button" id="joinButton">Join lobby</button>
-    </div>
+        <button class="button" id="joinButton">Join lobby</button>
     </div>
 </main>
 </body>

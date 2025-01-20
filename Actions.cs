@@ -13,7 +13,7 @@ public class Actions
     {
         _hubContext = hubContext;
         db = database.Connection();
-        
+
         app.MapGet("/test-word/{word}", TestWord);
 
         app.MapPost("/new-word", async (HttpContext context) =>
@@ -33,12 +33,107 @@ public class Actions
             var requestBody = await context.Request.ReadFromJsonAsync<WordRequest>();
             if (requestBody?.Word is null)
             {
+                Console.WriteLine("Bad request: Missing player name.");
                 return Results.BadRequest("Player name is required.");
             }
             string newPlayer = requestBody.Word.ToLower();
-            bool success = await PlayerName(newPlayer, context.Request.Cookies["ClientId"]);
+            string? lobbyId = requestBody.LobbyId;  // LobbyId can be null
+            bool success = await PlayerName(newPlayer, context.Request.Cookies["ClientId"], lobbyId);
             return success ? Results.Ok("New player added successfully.") : Results.StatusCode(500);
         });
+
+        app.MapPost("/create-lobby", async (HttpContext context) =>
+        {
+            string lobbyId;
+            int attempts = 0;
+            do
+            {
+                lobbyId = new Random().Next(1000, 10000).ToString();
+                attempts++;
+                if(attempts > 10) 
+                {
+                    return Results.StatusCode(500);
+                }
+            }
+            while(LobbyManager.Exists(lobbyId));
+
+            LobbyManager.AddLobby(lobbyId);
+            return Results.Ok(new { lobbyId });
+        });
+
+        app.MapGet("/lobby/{lobbyId}/players", async (string lobbyId) => 
+        {
+            var players = await GetPlayersByLobbyAsync(lobbyId);
+            return Results.Ok(players);
+        });
+        
+        app.MapPost("/update-player-lobby", async (HttpContext context) =>
+        {
+            // Parse the request for LobbyId
+            var requestBody = await context.Request.ReadFromJsonAsync<WordRequest>();
+            if (requestBody?.LobbyId is null)
+            {
+                return Results.BadRequest("Lobby ID is required.");
+            }
+
+            string lobbyId = requestBody.LobbyId;
+            string? clientId = context.Request.Cookies["ClientId"];
+
+            if (clientId is null)
+            {
+                return Results.BadRequest("Client ID missing.");
+            }
+
+            try
+            {
+                // Update the players table setting the lobbyid for the matching clientid
+                await using var cmd = db.CreateCommand("UPDATE players SET lobbyid = $1 WHERE clientid = $2");
+                cmd.Parameters.AddWithValue(lobbyId);
+                cmd.Parameters.AddWithValue(clientId);
+
+                int rowsAffected = await cmd.ExecuteNonQueryAsync();
+                if (rowsAffected > 0)
+                {
+                    return Results.Ok("Player lobby updated.");
+                }
+                else
+                {
+                    return Results.NotFound("No player found with the given client ID.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating player lobby: {ex.Message}");
+                return Results.StatusCode(500);
+            }
+        });
+    }
+
+    public async Task<List<Player>> GetPlayersByLobbyAsync(string lobbyId)
+    {
+        var players = new List<Player>();
+        try
+        {
+            await using var cmd = db.CreateCommand("SELECT id, username, clientid, lobbyid, avatarseed, joined_at FROM players WHERE lobbyid = $1");
+            cmd.Parameters.AddWithValue(lobbyId);
+            await using var reader = await cmd.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                players.Add(new Player {
+                    Id = reader.GetInt32(0),
+                    Username = reader.GetString(1),
+                    ClientId = reader.IsDBNull(2) ? null : reader.GetString(2),
+                    LobbyId = reader.GetString(3),
+                    AvatarSeed = reader.IsDBNull(4) ? null : reader.GetString(4),
+                    JoinedAt = reader.GetDateTime(5)
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error retrieving players: {ex.Message}");
+        }
+        return players;
     }
     
     async Task<bool> TestWord(string word)
@@ -80,13 +175,20 @@ public class Actions
         }
     }
 
-    async Task<bool> PlayerName(string newPlayer, string clientId)
+    async Task<bool> PlayerName(string newPlayer, string clientId, string? lobbyId)
     {
         try
         {
-            await using var cmd = db.CreateCommand("INSERT INTO playername (username, clientid) VALUES ($1, $2)");
+            await using var cmd = db.CreateCommand("INSERT INTO players (username, clientid, lobbyid) VALUES ($1, $2, $3)");
             cmd.Parameters.AddWithValue(newPlayer);
             cmd.Parameters.AddWithValue(clientId);
+        
+            // Handle nullable lobbyId: insert DBNull.Value if lobbyId is null
+            if (lobbyId is null)
+                cmd.Parameters.AddWithValue(DBNull.Value);
+            else
+                cmd.Parameters.AddWithValue(lobbyId);
+        
             int rowsAffected = await cmd.ExecuteNonQueryAsync();
             return rowsAffected > 0;
         }
