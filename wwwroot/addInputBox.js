@@ -23,11 +23,11 @@ document.addEventListener("DOMContentLoaded", () => {
         updateUI();
     });
 
-    connection.on("ReceiveUserInput", (playerIndex, input) => {
+    connection.on("ReceiveUserInput", (index, input) => {
         const inputs = document.querySelectorAll('.wordInput');
-        if (inputs[playerIndex]) {
-            inputs[playerIndex].value = input;
-            updateInputSize(inputs[playerIndex]);
+        if (inputs[index]) {
+            inputs[index].value = input;
+            updateInputSize(inputs[index]);
         }
     });
 
@@ -35,17 +35,17 @@ document.addEventListener("DOMContentLoaded", () => {
         const inputs = document.querySelectorAll('.wordInput');
         if (inputs[index]) {
             inputs[index].classList.add(animationType);
-            //setTimeout(() => inputs[index].classList.remove(animationType), 9999);
         }
     });
+
 
     function broadcastGameState() {
         connection.invoke("BroadcastGameState", gameState)
             .catch(err => console.error("Error broadcasting game state:", err));
     }
 
-    function broadcastUserInput(input) {
-        connection.invoke("BroadcastUserInput", gameState.currentPlayerIndex, input)
+    function broadcastUserInput(index, input) {
+        connection.invoke("BroadcastUserInput", index, input)
             .catch(err => console.error("Error broadcasting user input:", err));
     }
 
@@ -65,17 +65,14 @@ document.addEventListener("DOMContentLoaded", () => {
         const gameContainer = document.querySelector('.grid-child-game');
         gameContainer.innerHTML = '';
 
-        // Render empty boxes for existing words
         gameState.wordList.forEach((_, index) => {
             const wordBox = createWordBox('', true, index);
             gameContainer.appendChild(wordBox);
         });
 
-        // Render empty box for new word
         const newWordBox = createWordBox('', false, gameState.wordList.length);
         gameContainer.appendChild(newWordBox);
 
-        // Focus on the first input
         const firstInput = gameContainer.querySelector('.wordInput');
         if (firstInput) firstInput.focus();
     }
@@ -95,7 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         input.addEventListener('input', (e) => {
             updateInputSize(input);
-            broadcastUserInput(e.target.value);
+            broadcastUserInput(index, e.target.value);
         });
 
         input.addEventListener('keydown', (e) => {
@@ -108,53 +105,26 @@ document.addEventListener("DOMContentLoaded", () => {
         return box;
     }
 
-
     function handleWordSubmission(input, index) {
         const enteredWord = input.value.trim().toLowerCase();
         if (index < gameState.wordList.length) {
-            // Re-entering existing word
             if (enteredWord === gameState.wordList[index].toLowerCase()) {
-                input.disabled = true;
-                input.classList.add('correct');
-                showCorrectAnimation(input, index);
+                markWordAsCorrect(input, index);
                 focusNextInput(input);
                 addTimeToTimer(1.5);
             } else {
-                showInvalidWordAnimation(input);
+                showIncorrectWordAnimation(input, index);
             }
         } else {
-            // Entering new word
             if (isValidNewWord(enteredWord)) {
-                submitNewWord(enteredWord, input);
+                submitNewWord(enteredWord, input, index);
                 restartClock();
             } else {
-                showInvalidWordAnimation(input);
+                showInvalidWordAnimation(input, index);
             }
         }
     }
 
-    function startNewRound() {
-        renderWordBoxes();
-        restartClock();
-        broadcastGameState();
-    }
-
-    function restartClock() {
-        // Reset the remaining time to the default value
-        gameState.remainingSeconds = 10;
-        clearInterval(timerInterval);
-        startTimer();
-    }
-    function addTimeToTimer(secondsToAdd) {
-        gameState.remainingSeconds += secondsToAdd;
-        updateTimer();
-    }
-
-    function focusNextInput(currentInput) {
-        const nextInput = currentInput.closest('.wordCard').nextElementSibling?.querySelector('.wordInput');
-        if (nextInput) nextInput.focus();
-    }
-    
     function isValidNewWord(word) {
         return word && checkWordStart(word) && !isWordDuplicate(word);
     }
@@ -173,27 +143,32 @@ document.addEventListener("DOMContentLoaded", () => {
         gameState.currentPlayerIndex++;
         gameState.score++;
         saveWord(word);
-        input.disabled = true;
-        showCorrectAnimation(input, index);
+        markWordAsCorrect(input, index);
         updateUI();
         broadcastGameState();
     }
 
     function markWordAsCorrect(input, index) {
         input.disabled = true;
-        gameState.score++;
-        input.classList.add('startAnimation');
-        showCorrectAnimation(input, index);
-        broadcastGameState();
+        input.classList.add('correct', 'startAnimation');
         broadcastAnimation(index, 'startAnimation');
+    }
+
+
+    function showIncorrectWordAnimation(input, index) {
+        input.classList.add('shake');
+        broadcastAnimation(index, 'shake');
+        setTimeout(() => {
+            input.classList.remove('shake');
+            input.value = '';
+            updateInputSize(input);
+        }, 500);
     }
 
     function showCorrectAnimation(input, index) {
         input.classList.add('startAnimation');
         input.disabled = true;
         broadcastAnimation(index, 'startAnimation');
-        
-        //input.classList.remove('startAnimation');
     }
 
     function showInvalidWordAnimation(input, index) {
@@ -204,15 +179,6 @@ document.addEventListener("DOMContentLoaded", () => {
             input.value = '';
             updateInputSize(input);
         }, 500);
-    }
-
-    function showIncorrectWordAnimation(input, index) {
-        input.classList.add('shake');
-        broadcastAnimation(index, 'shake');
-        setTimeout(() => {
-            input.value = '';
-            updateInputSize(input);
-        }, 0);
     }
 
     function updateInputSize(input) {
@@ -249,6 +215,22 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             updateTimer();
         }, 100);
+    }
+
+    function restartClock() {
+        gameState.remainingSeconds = 10;
+        clearInterval(timerInterval);
+        startTimer();
+    }
+
+    function addTimeToTimer(secondsToAdd) {
+        gameState.remainingSeconds += secondsToAdd;
+        updateTimer();
+    }
+
+    function focusNextInput(currentInput) {
+        const nextInput = currentInput.closest('.wordCard').nextElementSibling?.querySelector('.wordInput');
+        if (nextInput) nextInput.focus();
     }
 
     async function saveWord(word) {
