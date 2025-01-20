@@ -36,9 +36,8 @@ document.getElementById('createLobbyButton').addEventListener('click', async () 
         const lobbyId = data.lobbyId;
 
         updatePlayerLobby(lobbyId);
-        // await joinLobbyWithSignalR(lobbyId);
-
-        // Redirect to preGame.html with the lobbyId as a query parameter
+        await joinLobbyWithSignalR(lobbyId);
+        
         window.location.href = `preGame.html?roomId=${lobbyId}`;
 
     } catch (error) {

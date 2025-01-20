@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const img = card.querySelector('img[alt="Avatar"]');
       if(img) {
         img.src = newAvatarUrl;
-        // Optionally: Notify server of avatar change for this user
+        //I will add later: notify server of avatar change for this user
       }
     });
   }
