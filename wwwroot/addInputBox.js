@@ -1,9 +1,16 @@
+// CLIENT-SIDE CODE: Handles UI, user interactions, and communication with the server via SignalR
 document.addEventListener("DOMContentLoaded", () => {
+    // -------------------------------------------------------------------------
+    // 1. SIGNALR CONNECTION SETUP (Server-Side Communication)
+    // -------------------------------------------------------------------------
     const connection = new signalR.HubConnectionBuilder()
         .withUrl("/gameHub")
         .withAutomaticReconnect()
         .build();
 
+    // -------------------------------------------------------------------------
+    // 2. GLOBAL GAME STATE & VARIABLES (Client-Side)
+    // -------------------------------------------------------------------------
     let gameState = {
         wordList: [],
         currentPlayerIndex: 0,
@@ -11,13 +18,21 @@ document.addEventListener("DOMContentLoaded", () => {
         lastWord: '',
         score: 0
     };
-
     let timerInterval;
 
-    connection.start().then(() => {
-        console.log("Connected to SignalR hub.");
-    }).catch(err => console.error("SignalR Connection Error:", err));
+    // -------------------------------------------------------------------------
+    // 3. START THE CONNECTION (Server-Side)
+    // -------------------------------------------------------------------------
+    connection.start()
+        .then(() => {
+            console.log("Connected to SignalR hub.");
+        })
+        .catch(err => console.error("SignalR Connection Error:", err));
 
+    // -------------------------------------------------------------------------
+    // 4. SIGNALR SERVER -> CLIENT HANDLERS (Server-Side -> Client)
+    //    These are called when the server broadcasts messages or updates
+    // -------------------------------------------------------------------------
     connection.on("ReceiveGameState", (newState) => {
         gameState = { ...newState };
         updateUI();
@@ -38,7 +53,10 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-
+    // -------------------------------------------------------------------------
+    // 5. SIGNALR CLIENT -> SERVER INVOCATIONS (Server-Side Calls)
+    //    Functions that broadcast data or invoke server methods
+    // -------------------------------------------------------------------------
     function broadcastGameState() {
         connection.invoke("BroadcastGameState", gameState)
             .catch(err => console.error("Error broadcasting game state:", err));
@@ -54,6 +72,9 @@ document.addEventListener("DOMContentLoaded", () => {
             .catch(err => console.error("Error broadcasting animation:", err));
     }
 
+    // -------------------------------------------------------------------------
+    // 6. UI & RENDERING LOGIC (Client-Side)
+    // -------------------------------------------------------------------------
     function updateUI() {
         renderWordBoxes();
         highlightCurrentPlayer();
@@ -66,8 +87,8 @@ document.addEventListener("DOMContentLoaded", () => {
         gameContainer.innerHTML = '';
 
         gameState.wordList.forEach((_, index) => {
-            const wordBox = createWordBox('', true, index);
-            gameContainer.appendChild(wordBox);
+            const existingWordBox = createWordBox('', true, index);
+            gameContainer.appendChild(existingWordBox);
         });
 
         const newWordBox = createWordBox('', false, gameState.wordList.length);
@@ -81,12 +102,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const box = document.createElement('div');
         box.classList.add('wordCard');
         box.innerHTML = `
-        <input class="wordInput" id="gameInput" type="text" 
-               placeholder="${isExisting ? 'Re-enter word...' : 'Enter new word...'}" 
-               data-index="${index}">
-        <p class="doubleWarning" style="display: none;">Word already used</p>
-    `;
-
+            <input class="wordInput" id="gameInput" type="text" 
+                   placeholder="${isExisting ? 'Re-enter word...' : 'Enter new word...'}" 
+                   data-index="${index}">
+            <p class="doubleWarning" style="display: none;">Word already used</p>
+        `;
         const input = box.querySelector('.wordInput');
         updateInputSize(input);
 
@@ -105,8 +125,13 @@ document.addEventListener("DOMContentLoaded", () => {
         return box;
     }
 
+    // -------------------------------------------------------------------------
+    // 7. WORD SUBMISSION & VALIDATION (Client-Side)
+    // -------------------------------------------------------------------------
     function handleWordSubmission(input, index) {
         const enteredWord = input.value.trim().toLowerCase();
+
+        // Submitting an existing word
         if (index < gameState.wordList.length) {
             if (enteredWord === gameState.wordList[index].toLowerCase()) {
                 markWordAsCorrect(input, index);
@@ -116,6 +141,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 showIncorrectWordAnimation(input, index);
             }
         } else {
+            // Submitting a new word
             if (isValidNewWord(enteredWord)) {
                 submitNewWord(enteredWord, input, index);
                 restartClock();
@@ -130,7 +156,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function checkWordStart(word) {
-        return !gameState.lastWord || word.charAt(0).toLowerCase() === gameState.lastWord.slice(-1).toLowerCase();
+        if (!gameState.lastWord) return true;
+        return word.charAt(0).toLowerCase() === gameState.lastWord.slice(-1).toLowerCase();
     }
 
     function isWordDuplicate(word) {
@@ -154,7 +181,9 @@ document.addEventListener("DOMContentLoaded", () => {
         broadcastAnimation(index, 'startAnimation');
     }
 
-
+    // -------------------------------------------------------------------------
+    // 8. ANIMATION & VISUAL FEEDBACK (Client-Side)
+    // -------------------------------------------------------------------------
     function showIncorrectWordAnimation(input, index) {
         input.classList.add('shake');
         broadcastAnimation(index, 'shake');
@@ -186,6 +215,9 @@ document.addEventListener("DOMContentLoaded", () => {
         input.size = Math.min(Math.max(input.value.length, input.placeholder.length, 1), maxChars);
     }
 
+    // -------------------------------------------------------------------------
+    // 9. PLAYER & SCORE HANDLING (Client-Side)
+    // -------------------------------------------------------------------------
     function highlightCurrentPlayer() {
         const players = document.querySelectorAll('.grid-child-players .card');
         players.forEach(player => player.classList.remove('green-shadow'));
@@ -196,6 +228,9 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("counter").textContent = `Score: ${gameState.score}`;
     }
 
+    // -------------------------------------------------------------------------
+    // 10. TIMER LOGIC (Client-Side)
+    // -------------------------------------------------------------------------
     function updateTimer() {
         if (gameState.remainingSeconds <= 0) {
             clearInterval(timerInterval);
@@ -221,6 +256,7 @@ document.addEventListener("DOMContentLoaded", () => {
         gameState.remainingSeconds = 10;
         clearInterval(timerInterval);
         startTimer();
+        broadcastGameState();
     }
 
     function addTimeToTimer(secondsToAdd) {
@@ -228,6 +264,9 @@ document.addEventListener("DOMContentLoaded", () => {
         updateTimer();
     }
 
+    // -------------------------------------------------------------------------
+    // 11. UTILITY FUNCTIONS (Client-Side)
+    // -------------------------------------------------------------------------
     function focusNextInput(currentInput) {
         const nextInput = currentInput.closest('.wordCard').nextElementSibling?.querySelector('.wordInput');
         if (nextInput) nextInput.focus();
@@ -247,6 +286,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    // -------------------------------------------------------------------------
+    // 12. INITIALIZE GAME (Client-Side)
+    // -------------------------------------------------------------------------
     startTimer();
     updateUI();
 });
