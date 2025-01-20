@@ -69,7 +69,6 @@ public class Actions
         
         app.MapPost("/update-player-lobby", async (HttpContext context) =>
         {
-            // Parse the request for LobbyId
             var requestBody = await context.Request.ReadFromJsonAsync<WordRequest>();
             if (requestBody?.LobbyId is null)
             {
@@ -86,8 +85,18 @@ public class Actions
 
             try
             {
-                // Update the players table setting the lobbyid for the matching clientid
-                await using var cmd = db.CreateCommand("UPDATE players SET lobbyid = $1 WHERE clientid = $2");
+                // Update only the most recent player record for the given clientid
+                await using var cmd = db.CreateCommand(@"
+                    UPDATE players 
+                    SET lobbyid = $1 
+                    WHERE id = (
+                        SELECT id 
+                        FROM players 
+                        WHERE clientid = $2 
+                        ORDER BY joined_at DESC 
+                        LIMIT 1
+                    )
+                ");
                 cmd.Parameters.AddWithValue(lobbyId);
                 cmd.Parameters.AddWithValue(clientId);
 
@@ -98,7 +107,25 @@ public class Actions
                 }
                 else
                 {
-                    return Results.NotFound("No player found with the given client ID.");
+                    // If no record found, create a new player record
+                    await using var insertCmd = db.CreateCommand(@"
+                        INSERT INTO players (username, clientid, lobbyid) 
+                        VALUES ($1, $2, $3)
+                    ");
+                    // Using a placeholder username; update as necessary
+                    insertCmd.Parameters.AddWithValue("defaultName");
+                    insertCmd.Parameters.AddWithValue(clientId);
+                    insertCmd.Parameters.AddWithValue(lobbyId);
+
+                    int insertRows = await insertCmd.ExecuteNonQueryAsync();
+                    if(insertRows > 0)
+                    {
+                        return Results.Ok("No existing player found; new player created and lobby updated.");
+                    }
+                    else
+                    {
+                        return Results.StatusCode(500);
+                    }
                 }
             }
             catch (Exception ex)
