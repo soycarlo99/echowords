@@ -123,7 +123,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     await populatePlayersGame(lobbyId);
   }
 
-  // Randomize Avatars Button Logic remains unchanged
+  // Randomize Avatars
   const randomizeBtn = document.getElementById('randomizeAvatars');
   if(randomizeBtn) {
     randomizeBtn.addEventListener('click', () => {
@@ -136,25 +136,22 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  // SignalR integration for real-time updates (basic setup)
+  // SignalR integration for real-time updates
   let connection = new signalR.HubConnectionBuilder()
       .withUrl("http://localhost:5185/gameHub")
       .build();
 
   connection.on("PlayerJoined", (player) => {
     console.log("A new player joined:", player);
-    // Add player to Lobby UI if applicable
     if(document.querySelector('.cardHolder')) {
       const nextIndex = document.querySelectorAll('.cardHolder .card').length;
       addPlayerCardLobby(player.username, nextIndex, player.avatarSeed);
     }
-    // Similarly, update Game Section if necessary
   });
 
   try {
     await connection.start();
     console.log("Connected to SignalR for real-time updates");
-    // Optionally join a SignalR group for the lobby if needed:
     await connection.invoke("JoinLobby", lobbyId);
   } catch(err) {
     console.error(err);
