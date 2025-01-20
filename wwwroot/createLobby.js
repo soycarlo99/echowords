@@ -2,7 +2,7 @@ let connection;
 
 async function joinLobbyWithSignalR(lobbyId) {
     connection = new signalR.HubConnectionBuilder()
-        .withUrl("http://localhost:5185/gameHub") // Use correct port and route
+        .withUrl("http://localhost:5185/gameHub")
         .build();
 
     connection.on("ReceiveMessage", (message) => {
