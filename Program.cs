@@ -4,7 +4,7 @@ using Wordapp;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Set the server to listen on port 5158
+// Set the server to listen on port 5185
 builder.WebHost.UseUrls("http://localhost:5185");
 
 // Register services
