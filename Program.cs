@@ -5,7 +5,7 @@ using Wordapp;
 var builder = WebApplication.CreateBuilder(args);
 
 // Set the server to listen on port 5185
-builder.WebHost.UseUrls("http://localhost:5185");
+// builder.WebHost.UseUrls("http://localhost:5185");
 
 // Register services
 builder.Services.AddEndpointsApiExplorer();
@@ -18,9 +18,10 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAll", policy =>
     {
         policy
-            .AllowAnyOrigin()
+            .SetIsOriginAllowed(_ => true) // Be careful with this in production
             .AllowAnyHeader()
-            .AllowAnyMethod();
+            .AllowAnyMethod()
+            .AllowCredentials(); // Important for SignalR
     });
 });
 
@@ -52,15 +53,10 @@ app.Use(async (context, next) =>
         context.Response.Cookies.Append(clientIdCookieName, clientId, new CookieOptions
         {
             HttpOnly = true,
-            Secure = false,
-            SameSite = SameSiteMode.Strict,
+            Secure = true,  // Enable for HTTPS
+            SameSite = SameSiteMode.None,  // Required for cross-site access
             MaxAge = TimeSpan.FromDays(365)
         });
-        Console.WriteLine($"New client ID generated and set: {clientId}");
-    }
-    else
-    {
-        Console.WriteLine($"Existing client ID found: {clientId}");
     }
     await next();
 });

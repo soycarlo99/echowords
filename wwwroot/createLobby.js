@@ -2,7 +2,12 @@ let connection;
 
 async function joinLobbyWithSignalR(lobbyId) {
     connection = new signalR.HubConnectionBuilder()
-        .withUrl("http://localhost:5185/gameHub")
+        .withUrl("/gameHub", {
+            skipNegotiation: true,
+            transport: signalR.HttpTransportType.WebSockets
+        })
+        .withAutomaticReconnect([0, 2000, 5000, 10000, 30000])
+        .configureLogging(signalR.LogLevel.Information)
         .build();
 
     connection.on("ReceiveMessage", (message) => {
@@ -21,11 +26,12 @@ async function joinLobbyWithSignalR(lobbyId) {
 
 document.getElementById('createLobbyButton').addEventListener('click', async () => {
     try {
-        const response = await fetch('http://localhost:5185/create-lobby', {
+        const response = await fetch('/create-lobby', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
-            }
+            },
+            credentials: 'include' // Important for cookies
         });
 
         if (!response.ok) {
@@ -35,7 +41,7 @@ document.getElementById('createLobbyButton').addEventListener('click', async () 
         const data = await response.json();
         const lobbyId = data.lobbyId;
 
-        updatePlayerLobby(lobbyId);
+        await updatePlayerLobby(lobbyId);
         await joinLobbyWithSignalR(lobbyId);
         
         window.location.href = `preGame.html?roomId=${lobbyId}`;
@@ -45,13 +51,13 @@ document.getElementById('createLobbyButton').addEventListener('click', async () 
     }
 });
 
-
 async function updatePlayerLobby(lobbyId) {
     const payload = { LobbyId: lobbyId };
     try {
-        const response = await fetch('http://localhost:5185/update-player-lobby', {
+        const response = await fetch('/update-player-lobby', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include', // Important for cookies
             body: JSON.stringify(payload)
         });
 
