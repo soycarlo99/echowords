@@ -18,10 +18,10 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAll", policy =>
     {
         policy
-            .SetIsOriginAllowed(_ => true) // Be careful with this in production
+            .SetIsOriginAllowed(_ => true) // Needs to be changed to a specific origin in production
             .AllowAnyHeader()
             .AllowAnyMethod()
-            .AllowCredentials(); // Important for SignalR
+            .AllowCredentials(); // This is needed for SignalR to work
     });
 });
 
@@ -33,7 +33,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// Use the CORS policy before routing and endpoints are set up
+// CORS policy before routing
 app.UseCors("AllowAll");
 
 app.UseDefaultFiles();
@@ -69,7 +69,7 @@ static string GenerateUniqueClientId()
     return Convert.ToBase64String(bytes);
 }
 
-// Retrieve SignalR Hub context and instantiate Actions
+// Retrieves SignalR Hub context and instantiate Actions
 var hubContext = app.Services.GetRequiredService<IHubContext<GameHub>>();
 var actions = new Actions(app, hubContext);
 
