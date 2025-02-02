@@ -10,7 +10,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Register services
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddSignalR();
+builder.Services.AddSignalR(options => {
+    options.EnableDetailedErrors = true;
+    options.HandshakeTimeout = TimeSpan.FromSeconds(15);
+});
 
 // Add and configure CORS
 builder.Services.AddCors(options =>
@@ -18,10 +21,10 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAll", policy =>
     {
         policy
-            .SetIsOriginAllowed(_ => true) // Needs to be changed to a specific origin in production
-            .AllowAnyHeader()
+            .SetIsOriginAllowed(_ => true)
             .AllowAnyMethod()
-            .AllowCredentials(); // This is needed for SignalR to work
+            .AllowAnyHeader()
+            .AllowCredentials();
     });
 });
 
@@ -35,6 +38,17 @@ if (app.Environment.IsDevelopment())
 
 // CORS policy before routing
 app.UseCors("AllowAll");
+
+// Handle forwarded headers
+app.Use((context, next) =>
+{
+    var forwardedProto = context.Request.Headers["X-Forwarded-Proto"].FirstOrDefault();
+    if (forwardedProto != null)
+    {
+        context.Request.Scheme = forwardedProto;
+    }
+    return next();
+});
 
 app.UseDefaultFiles();
 app.UseStaticFiles();

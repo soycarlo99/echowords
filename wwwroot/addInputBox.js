@@ -4,8 +4,15 @@ document.addEventListener("DOMContentLoaded", () => {
     // 1. SIGNALR CONNECTION SETUP (Server-Side Communication)
     // -------------------------------------------------------------------------
     const connection = new signalR.HubConnectionBuilder()
-        .withUrl("/gameHub")
+        .withUrl("/gameHub", {
+            skipNegotiation: true,
+            transport: signalR.HttpTransportType.WebSockets,
+            headers: {
+                "X-Forwarded-Proto": "https"
+            }
+        })
         .withAutomaticReconnect()
+        .configureLogging(signalR.LogLevel.Debug)
         .build();
 
     // -------------------------------------------------------------------------
@@ -291,4 +298,18 @@ document.addEventListener("DOMContentLoaded", () => {
     // -------------------------------------------------------------------------
     startTimer();
     updateUI();
+
+    // Add connection state handling
+    connection.onreconnecting(error => {
+        console.log("Reconnecting to hub...", error);
+    });
+
+    connection.onreconnected(connectionId => {
+        console.log("Reconnected to hub.", connectionId);
+        const urlParams = new URLSearchParams(window.location.search);
+        const lobbyId = urlParams.get('roomId');
+        if (lobbyId) {
+            connection.invoke("JoinLobby", lobbyId);
+        }
+    });
 });

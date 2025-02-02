@@ -91,25 +91,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     if(!gridChildPlayers) return;
 
     try {
-      const response = await fetch(`http://localhost:5185/lobby/${lobbyId}/players`);
-      if(!response.ok) throw new Error("Failed to fetch players");
-      const players = await response.json();
-
-      const playerCount = players.length;
-      if(playerCount < 1) {
-        console.warn("You need at least 1 player to start!");
-        return;
-      }
-      if(playerCount > 8) {
-        console.warn("Maximum 8 players allowed in a lobby!");
-        return;
-      }
-
-      players.forEach((player, index) => {
-        addPlayerCardGame(player.username, index, player.avatarSeed);
-      });
+        const response = await fetch(`/lobby/${lobbyId}/players`);
+        if(!response.ok) throw new Error("Failed to fetch players");
+        const players = await response.json();
+        
+        players.forEach((player, index) => {
+            addPlayerCardGame(player.username, index, player.avatarSeed);
+        });
     } catch (error) {
-      console.error(error);
+        console.error("Error fetching players:", error);
     }
   }
 
@@ -138,7 +128,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // SignalR integration for real-time updates
   let connection = new signalR.HubConnectionBuilder()
-      .withUrl("http://localhost:5185/gameHub")
+      .withUrl("/gameHub", {
+          skipNegotiation: true,
+          transport: signalR.HttpTransportType.WebSockets,
+          headers: {
+              "X-Forwarded-Proto": "https"
+          }
+      })
+      .withAutomaticReconnect()
+      .configureLogging(signalR.LogLevel.Debug)
       .build();
 
   connection.on("PlayerJoined", (player) => {
