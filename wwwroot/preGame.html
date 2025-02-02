@@ -1,8 +1,9 @@
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Document</title>
+    <title>Echo Words</title>
     <link rel="stylesheet" href="startpage.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script>
     <script src="darkmode.JS" defer></script>
@@ -103,8 +104,24 @@
         </div>
         <div class="difficulty-info">
           <p id="initialTime"></p>
-          <p id="correctBonus"></p>
-          <p id="rewriteBonus"></p>
+          <p id="correctBonus">
+            <span>new word time bonus:</span>
+            <span id="correctBonusValue"></span>
+            <i
+              class="info-icon"
+              data-tooltip="Bonus time added when a new word is entered correctly. that means when the new word's first letter matches the previous word's last letter and when the new word is not already used in game"
+              >i</i
+            >
+          </p>
+          <p id="rewriteBonus">
+            <span>rewrite time bonus:</span>
+            <span id="rewriteBonusValue"></span>
+            <i
+              class="info-icon"
+              data-tooltip="Bonus time added when a previously entered word is rewritten correctly."
+              >i</i
+            >
+          </p>
         </div>
       </div>
     </main>
@@ -134,4 +151,3 @@
     </script>
   </body>
 </html>
-
