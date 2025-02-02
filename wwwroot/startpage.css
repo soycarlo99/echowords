@@ -711,6 +711,37 @@ input[type="number"] {
   font-size: 2.5rem;
   font-weight: bold;
   border-radius: 15px;
+  box-shadow: 0 0 30px rgba(255, 110, 127, 0.7);
+}
+
+#playerNameInput:not(:placeholder-shown):valid {
+  box-shadow: 0 0 30px rgba(2, 235, 3, 0.7);
+}
+
+.shakeName {
+  animation: shakeName 0.3s;
+  box-shadow: 0 0 30px rgba(255, 110, 127, 0.7) !important;
+}
+
+@keyframes shakeName {
+  0% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-10px);
+  }
+  40% {
+    transform: translateX(10px);
+  }
+  60% {
+    transform: translateX(-10px);
+  }
+  80% {
+    transform: translateX(10px);
+  }
+  100% {
+    transform: translateX(0);
+  }
 }
 
 ::placeholder {

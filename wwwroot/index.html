@@ -1,46 +1,68 @@
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Document</title>
-    <link rel="stylesheet" href="startpage.css">
+    <link rel="stylesheet" href="startpage.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
     <script src="darkmode.JS" defer></script>
-</head>
-<body>
-<nav class="nav">
-    <div>
+  </head>
+  <body>
+    <nav class="nav">
+      <div>
         <h1>Echo Words</h1>
-    </div>
-    <div>
+      </div>
+      <div>
         <a href="gameRules.html">
-            <button class="button" id="gamerules" >Game Rules</button>
+          <button class="button" id="gamerules">Game Rules</button>
         </a>
         <button id="darkModeToggle">Toggle Dark Mode</button>
-    </div>
-</nav>
-<main class="startPageMain">
-    <div>
-        <h3>You need to pick a player name before you can enter or create a lobby</h3>
-        <input class="playerName" type="text" id="playerNameInput" placeholder="Enter your name">
+      </div>
+    </nav>
+    <main class="startPageMain">
+      <div>
+        <h3>
+          You need to pick a player name before you can enter or create a lobby
+        </h3>
+        <input
+          class="playerName"
+          type="text"
+          maxlength="20"
+          minlength="3"
+          id="playerNameInput"
+          placeholder="Enter your name"
+        />
         <button class="button idxacpt" id="acceptButton">Accept</button>
-    <div>
-    </div>
-        <p id="errorMessage" style="color: red; display: none;">Please enter a username.</p>
-    </div>
-</main>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-<script src="usernameStartpage.js"></script>
-<script>
-    const playerNameInput = document.getElementById("playerNameInput");
-    const acceptButton = document.getElementById("acceptButton");
+        <div></div>
+        <p id="errorMessage" style="color: red; display: none">
+          Please enter a username.
+        </p>
+      </div>
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="usernameStartpage.js"></script>
+    <script>
+      const playerNameInput = document.getElementById("playerNameInput");
+      const acceptButton = document.getElementById("acceptButton");
 
-    playerNameInput.addEventListener("keypress", function(event) {
+      playerNameInput.addEventListener("keypress", function (event) {
         if (event.key === "Enter") {
-            event.preventDefault();
-            acceptButton.click();
+          event.preventDefault();
+          acceptButton.click();
         }
-    });
-</script>
-</body>
+      });
+
+      //Visuals for when the player writes too long name
+      document.addEventListener("input", function (event) {
+        if (event.target.id === "playerNameInput") {
+          if (event.target.value.length >= event.target.maxLength) {
+            event.target.classList.add("shakeName");
+            setTimeout(() => {
+              event.target.classList.remove("shakeName");
+            }, 500); // Remove the shake class after 500ms
+          }
+        }
+      });
+    </script>
+  </body>
 </html>
