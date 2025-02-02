@@ -275,7 +275,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const bonusTime = isRewrite ? gameState.rewriteWordBonus : gameState.correctWordBonus;
         gameState.remainingSeconds += bonusTime;
         updateTimer();
-        broadcastGameState();
+        //broadcastGameState();
     }
 
     // -------------------------------------------------------------------------
