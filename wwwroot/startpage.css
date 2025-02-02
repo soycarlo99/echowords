@@ -797,6 +797,22 @@ input[type="text"]:-ms-input-placeholder {
   transform: scale(1);
 }
 
+#easybtn {
+  background-color: green;
+}
+
+#mediumbtn {
+  background-color: greenyellow;
+}
+
+#hardbtn {
+  background-color: orange;
+}
+
+#extremebtn {
+  background-color: red;
+}
+
 /* Tablet Devices */
 @media screen and (max-width: 1024px) {
   h1 {
@@ -1124,7 +1140,9 @@ input[type="text"]:-ms-input-placeholder {
 }
 
 .difficulty-btn.active {
-  background-color: var(--btn-bg-primary);
+  /* background-color: var(--btn-bg-primary); */
+  animation: 1.5s namePulse infinite;
+  box-shadow: var(--btn-hover-shadow);
 }
 
 .difficulty-info {
@@ -1169,4 +1187,3 @@ input[type="text"]:-ms-input-placeholder {
     width: 100%;
   }
 }
-

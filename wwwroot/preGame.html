@@ -1,104 +1,137 @@
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Document</title>
-  <link rel="stylesheet" href="startpage.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script>
-  <script src="darkmode.JS" defer></script>
-  <script src="createLobby.js" defer></script>
-  <script src="usernamePreGame.js"></script>
-  <script src="addCard.js" defer></script>
-  <script src="difficultySelector.js" defer></script>
-</head>
-<body>
-  <nav class="nav">
-    <div>
-      <h1>Echo Words</h1>
-    </div>
-    <div>
-      <div class="tooltip-container" >
-        <button class="button" id="gamerules">Game Rules</button>
-        <button id="darkModeToggle">Toggle Dark Mode</button>
-        <div class="tooltip-content" id="Pregame">
-          <main>
-            <div>
-              <ul>
-                <li>Player 1 starts by entering a word and presses "Enter" to submit.</li>
-                <li>Once Player 1 submits their word, a timer (2-3 seconds) will start, and the word will disappear.</li>
-                <li>Player 2 must:
-                  <ul>
-                    <li>Re-enter Player 1's word.</li>
-                    <li>Add their own word, ensuring the first letter of their word matches the last letter of Player 1's word.</li>
-                  </ul>
-                </li>
-                <li>The game continues as each player iterates through the array and enters a new word.</li>
-                <li>A 10-second countdown starts for every player's input.</li>
-              </ul>
-            </div>
-          </main>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Document</title>
+    <link rel="stylesheet" href="startpage.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script>
+    <script src="darkmode.JS" defer></script>
+    <script src="createLobby.js" defer></script>
+    <script src="usernamePreGame.js"></script>
+    <script src="addCard.js" defer></script>
+    <script src="difficultySelector.js" defer></script>
+  </head>
+  <body>
+    <nav class="nav">
+      <div>
+        <h1>Echo Words</h1>
+      </div>
+      <div>
+        <div class="tooltip-container">
+          <button class="button" id="gamerules">Game Rules</button>
+          <button id="darkModeToggle">Toggle Dark Mode</button>
+          <div class="tooltip-content" id="Pregame">
+            <main>
+              <div>
+                <ul>
+                  <li>
+                    Player 1 starts by entering a word and presses "Enter" to
+                    submit.
+                  </li>
+                  <li>
+                    Once Player 1 submits their word, a timer (2-3 seconds) will
+                    start, and the word will disappear.
+                  </li>
+                  <li>
+                    Player 2 must:
+                    <ul>
+                      <li>Re-enter Player 1's word.</li>
+                      <li>
+                        Add their own word, ensuring the first letter of their
+                        word matches the last letter of Player 1's word.
+                      </li>
+                    </ul>
+                  </li>
+                  <li>
+                    The game continues as each player iterates through the array
+                    and enters a new word.
+                  </li>
+                  <li>
+                    A 10-second countdown starts for every player's input.
+                  </li>
+                </ul>
+              </div>
+            </main>
+          </div>
         </div>
       </div>
-    </div>
-    <div>
-      <p id="roomID">Room ID: XXXX</p>
-    </div>
-  </nav>
-  <main>
-    <div class="preGameText">
-      <p id="inviteFriendsText">Invite friends to start 🎉</p>
-      <p id="instructionsText">Need <span style="color: red">minimum 2 </span>players and max 8 players in each lobby</p>
-    </div>
-
-
-
-    <div class="cardHolder"></div>
-    <div class="joinGameInstruction">
-      <div class="centerCardBtn" id="buttonsJoinCreate">
-        <a id="gameLink">
-          <button class="button" id="startGameButton">Start game</button>
-        </a>
+      <div>
+        <p id="roomID">Room ID: XXXX</p>
       </div>
-    </div>
-
-    <div class="difficulty-selector">
-      <h2>Select Game Difficulty</h2>
-      <div class="difficulty-buttons">
-        <button class="difficulty-btn" data-difficulty="easy">Easy</button>
-        <button class="difficulty-btn" data-difficulty="medium">Medium</button>
-        <button class="difficulty-btn" data-difficulty="hard">Hard</button>
-        <button class="difficulty-btn" data-difficulty="extreme">Extreme</button>
+    </nav>
+    <main>
+      <div class="preGameText">
+        <p id="inviteFriendsText">Invite friends to start 🎉</p>
+        <p id="instructionsText">
+          Need <span style="color: red">minimum 2 </span>players and max 8
+          players in each lobby
+        </p>
       </div>
-      <div class="difficulty-info">
-        <p id="initialTime"></p>
-        <p id="correctBonus"></p>
-        <p id="rewriteBonus"></p>
+
+      <div class="cardHolder"></div>
+      <div class="joinGameInstruction">
+        <div class="centerCardBtn" id="buttonsJoinCreate">
+          <a id="gameLink">
+            <button class="button" id="startGameButton">Start game</button>
+          </a>
+        </div>
       </div>
-    </div>
-  </main>
 
-  <script>
-    // Parse the roomId from the URL query parameters
-    const urlParams = new URLSearchParams(window.location.search);
-    const roomId = urlParams.get('roomId');
+      <div class="difficulty-selector">
+        <h2>Select Game Difficulty</h2>
+        <div class="difficulty-buttons">
+          <button class="difficulty-btn" id="easybtn" data-difficulty="easy">
+            Easy
+          </button>
+          <button
+            class="difficulty-btn"
+            id="mediumbtn"
+            data-difficulty="medium"
+          >
+            Medium
+          </button>
+          <button class="difficulty-btn" id="hardbtn" data-difficulty="hard">
+            Hard
+          </button>
+          <button
+            class="difficulty-btn"
+            id="extremebtn"
+            data-difficulty="extreme"
+          >
+            Extreme
+          </button>
+        </div>
+        <div class="difficulty-info">
+          <p id="initialTime"></p>
+          <p id="correctBonus"></p>
+          <p id="rewriteBonus"></p>
+        </div>
+      </div>
+    </main>
 
-    if (roomId) {
-      // Update the roomID element with the actual lobby ID
-      const roomIDElement = document.getElementById('roomID');
-      if (roomIDElement) {
-        roomIDElement.textContent = `Room ID: ${roomId}`;
+    <script>
+      // Parse the roomId from the URL query parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      const roomId = urlParams.get("roomId");
+
+      if (roomId) {
+        // Update the roomID element with the actual lobby ID
+        const roomIDElement = document.getElementById("roomID");
+        if (roomIDElement) {
+          roomIDElement.textContent = `Room ID: ${roomId}`;
+        }
+        console.log("Received roomId:", roomId);
+
+        // Update the gameLink anchor with the dynamic URL
+        const gameLink = document.getElementById("gameLink");
+        if (gameLink) {
+          gameLink.href = `gamePage.html?roomId=${roomId}`;
+          console.log("Updated gameLink href to:", gameLink.href);
+        }
+      } else {
+        console.error("No roomId found in URL.");
       }
-      console.log("Received roomId:", roomId);
-
-      // Update the gameLink anchor with the dynamic URL
-      const gameLink = document.getElementById('gameLink');
-      if (gameLink) {
-        gameLink.href = `gamePage.html?roomId=${roomId}`;
-        console.log("Updated gameLink href to:", gameLink.href);
-      }
-    } else {
-      console.error("No roomId found in URL.");
-    }
-  </script>
-</body>
+    </script>
+  </body>
 </html>
+
