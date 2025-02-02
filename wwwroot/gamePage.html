@@ -4,21 +4,32 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Echo Words</title>
-  <link rel="stylesheet" href="startpage.css" />
-
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js" defer></script>
-
+  
+  <!-- Favicon -->
   <link rel="icon" href="/favicon.ico" type="image/x-icon" />
-  <script src="darkmode.JS" defer></script>
-  <script src="addCard.js" defer></script>
-  <script src="gamePageTimer.js" defer></script>
-  <script src="addInputBox.js" defer></script>
-  <script src="usernamePreGame.js" defer></script>
-  <script type="module" src="yourTurn.js" defer></script>
-  <script src="gamePagePlayerCards.js" defer></script>
-  <script src="wordCheck.js" defer></script>
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="startpage.css" />
+  
+  <!-- External Libraries (load first) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js" defer></script>
+  
+  <!-- Core Game Logic -->
+  <script src="addInputBox.js" defer></script>
+  <script src="gamePageTimer.js" defer></script>
+  <script src="wordCheck.js" defer></script>
+  
+  <!-- Player Management -->
+  <script src="usernamePreGame.js" defer></script>
+  <script src="addCard.js" defer></script>
+  <script src="gamePagePlayerCards.js" defer></script>
+  
+  <!-- UI/UX -->
+  <script src="darkmode.js" defer></script>
+  
+  <!-- Game Flow -->
+  <script type="module" src="yourTurn.js" defer></script>
 </head>
 <body>
   <nav>

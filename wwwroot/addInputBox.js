@@ -21,9 +21,11 @@ document.addEventListener("DOMContentLoaded", () => {
     let gameState = {
         wordList: [],
         currentPlayerIndex: 0,
-        remainingSeconds: 100,
+        remainingSeconds: 0,
         lastWord: '',
-        score: 0
+        score: 0,
+        correctWordBonus: 0,
+        rewriteWordBonus: 0
     };
     let timerInterval;
 
@@ -143,7 +145,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (enteredWord === gameState.wordList[index].toLowerCase()) {
                 markWordAsCorrect(input, index);
                 focusNextInput(input);
-                addTimeToTimer(1.5);
+                addTimeToTimer(false);
             } else {
                 showIncorrectWordAnimation(input, index);
             }
@@ -250,6 +252,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function startTimer() {
         clearInterval(timerInterval);
+        if (!gameState.remainingSeconds) {
+            initializeGameSettings();
+        }
         timerInterval = setInterval(() => {
             gameState.remainingSeconds -= 0.1;
             if (gameState.remainingSeconds <= 0) {
@@ -260,15 +265,17 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function restartClock() {
-        gameState.remainingSeconds = 10;
+        initializeGameSettings();
         clearInterval(timerInterval);
         startTimer();
         broadcastGameState();
     }
 
-    function addTimeToTimer(secondsToAdd) {
-        gameState.remainingSeconds += secondsToAdd;
+    function addTimeToTimer(isRewrite) {
+        const bonusTime = isRewrite ? gameState.rewriteWordBonus : gameState.correctWordBonus;
+        gameState.remainingSeconds += bonusTime;
         updateTimer();
+        broadcastGameState();
     }
 
     // -------------------------------------------------------------------------
@@ -312,4 +319,35 @@ document.addEventListener("DOMContentLoaded", () => {
             connection.invoke("JoinLobby", lobbyId);
         }
     });
+
+    function initializeGameSettings() {
+        const difficulty = localStorage.getItem('gameDifficulty') || 'medium';
+        const difficultySettings = {
+            easy: {
+                initialTime: 60,
+                correctWordBonus: 3,
+                rewriteWordBonus: 1.5
+            },
+            medium: {
+                initialTime: 30,
+                correctWordBonus: 2,
+                rewriteWordBonus: 1
+            },
+            hard: {
+                initialTime: 15,
+                correctWordBonus: 1,
+                rewriteWordBonus: 0.5
+            },
+            extreme: {
+                initialTime: 10,
+                correctWordBonus: 0.5,
+                rewriteWordBonus: 0.25
+            }
+        };
+
+        const settings = difficultySettings[difficulty];
+        gameState.remainingSeconds = settings.initialTime;
+        gameState.correctWordBonus = settings.correctWordBonus;
+        gameState.rewriteWordBonus = settings.rewriteWordBonus;
+    }
 });
