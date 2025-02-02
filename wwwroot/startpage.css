@@ -797,3 +797,287 @@ input[type="text"]:-ms-input-placeholder {
   transform: scale(1);
 }
 
+/* Tablet Devices */
+@media screen and (max-width: 1024px) {
+  h1 {
+    font-size: 2.5rem;
+  }
+
+  .rulestext {
+    font-size: 1.5rem;
+    margin: 2rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+
+  #title {
+    font-size: 2.5rem;
+    margin: 2rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+
+  .grid-container {
+    gap: 1rem;
+  }
+
+  .card {
+    width: 7rem;
+  }
+
+  .pin-code {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    margin: 1rem auto;
+  }
+
+  .pin-code input {
+    width: 5rem;
+    height: 5rem;
+    font-size: 4rem;
+    text-align: center;
+  }
+
+  .wordInput,
+  #gameInput,
+  .gameInputContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 600px;
+    margin: 1rem auto;
+    gap: 1rem;
+  }
+
+  #gameInput {
+    font-size: 1.8rem;
+    padding: 12px 24px;
+    margin: 0;
+  }
+
+  input[type="text"].wordInput {
+    font-size: 1.8rem;
+    padding: 12px;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+  }
+}
+
+/* Mobile Devices */
+@media screen and (max-width: 768px) {
+  h1 {
+    font-size: 2rem;
+  }
+
+  main {
+    padding: 1rem;
+    height: calc(100vh - 4rem);
+  }
+
+  .grid-container {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .grid-child-game {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .grid-child-players {
+    max-height: 200px;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .gameInputContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 300px;
+    margin: 1rem auto;
+    gap: 0.8rem;
+  }
+
+  .card {
+    width: 6rem;
+  }
+
+  #gamerules,
+  #acceptButton,
+  .createLobbyButton,
+  #joinLobbyButton,
+  #joinButton,
+  #gameInput,
+  #soloPlay,
+  button,
+  input[type="submit"] {
+    font-size: 1.2rem;
+    min-height: 50px;
+    padding: 12px 20px;
+  }
+
+  .pin-code {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    max-width: 300px;
+    margin: 1rem auto;
+  }
+
+  .pin-code input {
+    width: 4rem;
+    height: 4rem;
+    font-size: 3rem;
+    text-align: center;
+  }
+
+  .enterNameSection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  input[type="text"] {
+    font-size: 1.5rem;
+    width: 100%;
+    max-width: 300px;
+    text-align: center;
+    margin: 0 auto;
+  }
+
+  .joinGameInstruction {
+    font-size: 1.5rem;
+  }
+
+  .joinGameTitle {
+    font-size: 2rem;
+  }
+
+  .wordInput,
+  #gameInput,
+  .gameInputContainer {
+    flex-direction: column;
+    max-width: 300px;
+    gap: 0.8rem;
+  }
+
+  #gameInput {
+    font-size: 1.5rem;
+    padding: 10px 20px;
+    width: 100%;
+    margin: 0.5rem 0;
+  }
+
+  input[type="text"].wordInput {
+    font-size: 1.5rem;
+    padding: 10px;
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .game-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+  }
+}
+
+/* Small Mobile Devices */
+@media screen and (max-width: 480px) {
+  .grid-container {
+    max-width: 100%;
+    padding: 0 1rem;
+  }
+
+  .grid-child-game {
+    width: 100%;
+  }
+
+  .grid-child-players {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    width: 100%;
+  }
+
+  .gameInputContainer {
+    max-width: 250px;
+  }
+
+  .card {
+    width: 5rem;
+  }
+
+  .pin-code {
+    gap: 0.3rem;
+    max-width: 250px;
+  }
+
+  .pin-code input {
+    width: 3rem;
+    height: 3rem;
+    font-size: 2.5rem;
+  }
+
+  h1 {
+    font-size: 1.8rem;
+  }
+
+  #gamerules,
+  #acceptButton,
+  .createLobbyButton,
+  #joinLobbyButton,
+  #joinButton,
+  #gameInput,
+  #soloPlay,
+  button,
+  input[type="submit"] {
+    font-size: 1rem;
+    min-height: 45px;
+    padding: 10px 16px;
+  }
+
+  input[type="text"] {
+    font-size: 1.2rem;
+    max-width: 250px;
+  }
+
+  .wordInput,
+  #gameInput,
+  .gameInputContainer {
+    max-width: 250px;
+    gap: 0.5rem;
+  }
+
+  #gameInput {
+    font-size: 1.2rem;
+    padding: 8px 16px;
+  }
+
+  input[type="text"].wordInput {
+    font-size: 1.2rem;
+    padding: 8px;
+    max-width: 250px;
+  }
+}
+
