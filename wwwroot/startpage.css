@@ -899,6 +899,10 @@ input[type="text"]:-ms-input-placeholder {
     gap: 1rem;
   }
 
+  .randomizeBtn {
+    padding: 8px;
+  }
+
   #gameInput {
     font-size: 1.8rem;
     padding: 12px 24px;
@@ -959,9 +963,13 @@ input[type="text"]:-ms-input-placeholder {
     gap: 0.8rem;
   }
 
-  .card {
-    width: 6rem;
+  .randomizeBtn {
+    padding: 9px;
   }
+
+  /* .card { */
+  /*   width: 6rem; */
+  /* } */
 
   #gamerules,
   #acceptButton,
@@ -1071,9 +1079,9 @@ input[type="text"]:-ms-input-placeholder {
     max-width: 250px;
   }
 
-  .card {
-    width: 5rem;
-  }
+  /* .card { */
+  /*   width: 5rem; */
+  /* } */
 
   .pin-code {
     gap: 0.3rem;
