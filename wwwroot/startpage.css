@@ -454,6 +454,7 @@ input[type="number"] {
 
 #roomID {
   color: white;
+  font-size: 1.3rem;
 }
 
 .score {
@@ -1263,4 +1264,13 @@ input[type="text"]:-ms-input-placeholder {
 .info-icon:hover::before {
   visibility: visible;
   opacity: 1;
+}
+
+.copyable {
+  cursor: pointer;
+  color: white;
+  text-decoration: none;
+}
+.copyable:hover {
+  color: grey;
 }

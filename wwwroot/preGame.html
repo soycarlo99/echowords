@@ -11,6 +11,7 @@
     <script src="usernamePreGame.js"></script>
     <script src="addCard.js" defer></script>
     <script src="difficultySelector.js" defer></script>
+    <script src="pregame.js" defer></script>
   </head>
   <body>
     <nav class="nav">
@@ -62,10 +63,20 @@
     </nav>
     <main>
       <div class="preGameText">
-        <p id="inviteFriendsText">Invite friends to start 🎉</p>
+        <p id="inviteFriendsText">
+          🎉 Ready to play? Invite your friends!
+          <span id="roomLink" class="copyable"
+            >Click here to copy the room ID
+          </span>
+        </p>
         <p id="instructionsText">
-          Need <span style="color: red">minimum 2 </span>players and max 8
-          players in each lobby
+          <span style="color: #007bff">👥 Players needed:</span>
+          <span style="color: #28a745">Minimum 2</span> |
+          <span style="color: #dc3545">Maximum 8</span>
+        </p>
+        <p id="gameStatusText">
+          Waiting for players to join...
+          <span id="currentPlayerCount">1</span>/8
         </p>
       </div>
 
@@ -125,29 +136,20 @@
         </div>
       </div>
     </main>
-
     <script>
-      // Parse the roomId from the URL query parameters
-      const urlParams = new URLSearchParams(window.location.search);
-      const roomId = urlParams.get("roomId");
+      document.addEventListener("DOMContentLoaded", function () {
+        const cardHolder = document.querySelector(".cardHolder");
+        const currentPlayerCount =
+          document.getElementById("currentPlayerCount");
 
-      if (roomId) {
-        // Update the roomID element with the actual lobby ID
-        const roomIDElement = document.getElementById("roomID");
-        if (roomIDElement) {
-          roomIDElement.textContent = `Room ID: ${roomId}`;
+        if (cardHolder && currentPlayerCount) {
+          currentPlayerCount.textContent = cardHolder.children.length;
+        } else {
+          console.error(
+            "Could not find .cardHolder or #currentPlayerCount element.",
+          );
         }
-        console.log("Received roomId:", roomId);
-
-        // Update the gameLink anchor with the dynamic URL
-        const gameLink = document.getElementById("gameLink");
-        if (gameLink) {
-          gameLink.href = `gamePage.html?roomId=${roomId}`;
-          console.log("Updated gameLink href to:", gameLink.href);
-        }
-      } else {
-        console.error("No roomId found in URL.");
-      }
+      });
     </script>
   </body>
 </html>
