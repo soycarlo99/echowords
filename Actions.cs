@@ -57,7 +57,7 @@ public class Actions
             }
             while(LobbyManager.Exists(lobbyId));
 
-            LobbyManager.AddLobby(lobbyId);
+            await Task.Run(() => LobbyManager.AddLobby(lobbyId));
             return Results.Ok(new { lobbyId });
         });
 
@@ -202,7 +202,7 @@ public class Actions
         }
     }
 
-    async Task<bool> PlayerName(string newPlayer, string clientId, string? lobbyId)
+    async Task<bool> PlayerName(string? newPlayer, string? clientId, string? lobbyId)
     {
         try
         {

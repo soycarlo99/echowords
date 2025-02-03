@@ -13,7 +13,7 @@ public static class LobbyManager
         }
     }
 
-    public static Lobby GetLobby(string lobbyId)
+    public static Lobby? GetLobby(string lobbyId)
     {
         lobbies.TryGetValue(lobbyId, out var lobby);
         return lobby;
