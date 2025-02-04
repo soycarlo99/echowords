@@ -1,28 +1,32 @@
 document.addEventListener("DOMContentLoaded", async () => {
   // Parse the lobbyId from URL query parameters
   const urlParams = new URLSearchParams(window.location.search);
-  const lobbyId = urlParams.get('roomId');
+  const lobbyId = urlParams.get("roomId");
 
-  if(!lobbyId) {
+  if (!lobbyId) {
     console.error("Lobby ID not found in URL.");
     return;
   }
 
   // Function to create a player card in the Lobby section
   function addPlayerCardLobby(username, playerIndex, avatarSeed) {
-    const cardHolderLobby = document.querySelector('.cardHolder');
-    if(!cardHolderLobby) return;
+    const cardHolderLobby = document.querySelector(".cardHolder");
+    if (!cardHolderLobby) return;
 
     // Prevent duplicate entries
-    if (Array.from(cardHolderLobby.children).some(card => card.querySelector('h4')?.textContent === username)) {
+    if (
+      Array.from(cardHolderLobby.children).some(
+        (card) => card.querySelector("h4")?.textContent === username,
+      )
+    ) {
       console.warn(`Player "${username}" already exists.`);
       return;
     }
 
     const storedSeed = avatarSeed || username;
     const avatarUrl = `https://api.dicebear.com/9.x/open-peeps/svg?seed=${encodeURIComponent(storedSeed)}`;
-    const card = document.createElement('div');
-    card.classList.add('card');
+    const card = document.createElement("div");
+    card.classList.add("card");
     card.innerHTML = `
       <img src="${avatarUrl}" alt="Avatar" style="width:100%">
       <div class="container">
@@ -32,12 +36,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     `;
     cardHolderLobby.appendChild(card);
 
-    const randomizeBtn = card.querySelector('.randomizeBtn');
-    randomizeBtn.addEventListener('click', () => {
+    const randomizeBtn = card.querySelector(".randomizeBtn");
+    randomizeBtn.addEventListener("click", () => {
       const randomSeed = Math.random().toString(36).substring(2, 12);
       const newAvatarUrl = `https://api.dicebear.com/9.x/open-peeps/svg?seed=${encodeURIComponent(randomSeed)}`;
       const img = card.querySelector('img[alt="Avatar"]');
-      if(img) {
+      if (img) {
         img.src = newAvatarUrl;
         //I will add later: notify server of avatar change for this user
       }
@@ -47,9 +51,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Function to retrieve and populate lobby players from the server
   async function populatePlayersLobby(lobbyId) {
     try {
-      const response = await fetch(`http://localhost:5185/lobby/${lobbyId}/players`);
-      console.log(`Fetching players for lobby ${lobbyId}: status`, response.status);
-      if(!response.ok) throw new Error("Failed to fetch players");
+      const response = await fetch(`/lobby/${lobbyId}/players`);
+      console.log(
+        `Fetching players for lobby ${lobbyId}: status`,
+        response.status,
+      );
+      if (!response.ok) throw new Error("Failed to fetch players");
       const players = await response.json();
       console.log("Players data retrieved:", players);
       players.forEach((player, index) => {
@@ -62,19 +69,23 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Function to create a player card in the Game section
   function addPlayerCardGame(username, playerIndex, avatarSeed) {
-    const gridChildPlayers = document.querySelector('.grid-child-players');
-    if(!gridChildPlayers) return;
+    const gridChildPlayers = document.querySelector(".grid-child-players");
+    if (!gridChildPlayers) return;
 
     // Prevent duplicate entries
-    if (Array.from(gridChildPlayers.children).some(card => card.querySelector('h4')?.textContent === username)) {
+    if (
+      Array.from(gridChildPlayers.children).some(
+        (card) => card.querySelector("h4")?.textContent === username,
+      )
+    ) {
       console.warn(`Player "${username}" already exists.`);
       return;
     }
 
     const storedSeed = avatarSeed || username;
     const avatarUrl = `https://api.dicebear.com/9.x/open-peeps/svg?seed=${encodeURIComponent(storedSeed)}`;
-    const card = document.createElement('div');
-    card.classList.add('card');
+    const card = document.createElement("div");
+    card.classList.add("card");
     card.innerHTML = `
       <img src="${avatarUrl}" alt="Avatar" style="width:100%">
       <div class="container">
@@ -87,38 +98,38 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Function to retrieve and populate game players from the server
   async function populatePlayersGame(lobbyId) {
-    const gridChildPlayers = document.querySelector('.grid-child-players');
-    if(!gridChildPlayers) return;
+    const gridChildPlayers = document.querySelector(".grid-child-players");
+    if (!gridChildPlayers) return;
 
     try {
-        const response = await fetch(`/lobby/${lobbyId}/players`);
-        if(!response.ok) throw new Error("Failed to fetch players");
-        const players = await response.json();
-        
-        players.forEach((player, index) => {
-            addPlayerCardGame(player.username, index, player.avatarSeed);
-        });
+      const response = await fetch(`/lobby/${lobbyId}/players`);
+      if (!response.ok) throw new Error("Failed to fetch players");
+      const players = await response.json();
+
+      players.forEach((player, index) => {
+        addPlayerCardGame(player.username, index, player.avatarSeed);
+      });
     } catch (error) {
-        console.error("Error fetching players:", error);
+      console.error("Error fetching players:", error);
     }
   }
 
   // Populate Lobby Section if on a page with .cardHolder
-  if(document.querySelector('.cardHolder')) {
+  if (document.querySelector(".cardHolder")) {
     await populatePlayersLobby(lobbyId);
   }
 
   // Populate Game Section if on a page with .grid-child-players
-  if(document.querySelector('.grid-child-players')) {
+  if (document.querySelector(".grid-child-players")) {
     await populatePlayersGame(lobbyId);
   }
 
   // Randomize Avatars
-  const randomizeBtn = document.getElementById('randomizeAvatars');
-  if(randomizeBtn) {
-    randomizeBtn.addEventListener('click', () => {
+  const randomizeBtn = document.getElementById("randomizeAvatars");
+  if (randomizeBtn) {
+    randomizeBtn.addEventListener("click", () => {
       const avatarImages = document.querySelectorAll('.card img[alt="Avatar"]');
-      avatarImages.forEach(img => {
+      avatarImages.forEach((img) => {
         const randomSeed = Math.random().toString(36).substring(2, 12);
         const newAvatarUrl = `https://api.dicebear.com/9.x/open-peeps/svg?seed=${encodeURIComponent(randomSeed)}`;
         img.src = newAvatarUrl;
@@ -128,21 +139,21 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // SignalR integration for real-time updates
   let connection = new signalR.HubConnectionBuilder()
-      .withUrl("/gameHub", {
-          skipNegotiation: true,
-          transport: signalR.HttpTransportType.WebSockets,
-          headers: {
-              "X-Forwarded-Proto": "https"
-          }
-      })
-      .withAutomaticReconnect()
-      .configureLogging(signalR.LogLevel.Debug)
-      .build();
+    .withUrl("/gameHub", {
+      skipNegotiation: true,
+      transport: signalR.HttpTransportType.WebSockets,
+      headers: {
+        "X-Forwarded-Proto": "https",
+      },
+    })
+    .withAutomaticReconnect()
+    .configureLogging(signalR.LogLevel.Debug)
+    .build();
 
   connection.on("PlayerJoined", (player) => {
     console.log("A new player joined:", player);
-    if(document.querySelector('.cardHolder')) {
-      const nextIndex = document.querySelectorAll('.cardHolder .card').length;
+    if (document.querySelector(".cardHolder")) {
+      const nextIndex = document.querySelectorAll(".cardHolder .card").length;
       addPlayerCardLobby(player.username, nextIndex, player.avatarSeed);
     }
   });
@@ -151,7 +162,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     await connection.start();
     console.log("Connected to SignalR for real-time updates");
     await connection.invoke("JoinLobby", lobbyId);
-  } catch(err) {
+  } catch (err) {
     console.error(err);
   }
 });
+
