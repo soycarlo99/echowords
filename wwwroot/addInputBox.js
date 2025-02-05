@@ -373,7 +373,7 @@ connection.on("ReceiveGameStart", () => {
               setTimeout(() => {
                   initializeGameSettings();
                   startTimer();
-                  updateUI();
+                  //updateUI();
                   timerElement.textContent = gameState.remainingSeconds.toFixed(1);
               }, 100);
           }
