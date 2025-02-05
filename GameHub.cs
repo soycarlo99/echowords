@@ -37,10 +37,20 @@ namespace Wordapp
             }
         }
 
-        public async Task JoinLobby(string lobbyId)
+            public async Task JoinLobby(string roomId)
         {
-            await Groups.AddToGroupAsync(Context.ConnectionId, lobbyId);
-            await Clients.Group(lobbyId).SendAsync("ReceiveMessage", $"A new player has joined lobby {lobbyId}.");
+            await Groups.AddToGroupAsync(Context.ConnectionId, roomId);
         }
+
+        public async Task StartGame(string roomId)
+        {
+            await Clients.Group(roomId).SendAsync("RedirectToGame");
+        }
+        public async Task BroadcastGameStart()
+        {
+            await Clients.All.SendAsync("ReceiveGameStart");
+        }
+
+        
     }
 }
