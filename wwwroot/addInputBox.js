@@ -138,7 +138,9 @@ document.addEventListener("DOMContentLoaded", () => {
             <input class="wordInput" id="gameInput" type="text" 
                    placeholder="${isExisting ? "Re-enter word..." : "Enter new word..."}" 
                    data-index="${index}">
-            <p class="doubleWarning" style="display: none;">Word already used</p>
+                  <div id="notification" class="notification hidden">
+                    <span id="notificationMessage"></span>
+                  </div>
         `;
     const input = box.querySelector(".wordInput");
     updateInputSize(input);
@@ -193,22 +195,56 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   }
 
+  // NOTIFICATIONS //////////////bi
+
+  function showNotification(message) {
+    const notification = document.getElementById("notification");
+    const notificationMessage = document.getElementById("notificationMessage");
+    notificationMessage.textContent = message;
+    notification.classList.remove("hidden", "fadeOut");
+
+    notification.classList.add("fadeIn");
+
+    setTimeout(() => {
+      notification.classList.add("fadeOut");
+      setTimeout(() => {
+        notification.classList.add("hidden");
+      }, 1000);
+    }, 2000);
+  }
+
   function checkWordStart(word) {
     if (!gameState.lastWord) return true;
-    return (
-      word.charAt(0).toLowerCase() ===
+    if (
+      word.charAt(0).toLowerCase() !==
       gameState.lastWord.slice(-1).toLowerCase()
-    );
+    ) {
+      showNotification(
+        "The word must start with the last letter of the previous word.",
+      );
+      return false;
+    }
+    return true;
   }
 
   function isWordDuplicate(word) {
-    return gameState.wordList.includes(word);
+    if (gameState.wordList.includes(word)) {
+      showNotification("This word has already been used.");
+      return true;
+    }
+    return false;
   }
 
   function isAlphabetic(word) {
-    return !/[^a-zA-Z\u00E0-\u00FC\u00C0-\u00DC\u00D8-\u00F6\u00F8-\u02AF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD]/.test(
-      word,
-    );
+    if (
+      /[^a-zA-Z\u00E0-\u00FC\u00C0-\u00DC\u00D8-\u00F6\u00F8-\u02AF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD]/.test(
+        word,
+      )
+    ) {
+      showNotification("Please enter only alphabetic characters.");
+      return false;
+    }
+    return true;
   }
 
   function submitNewWord(word, input, index) {
