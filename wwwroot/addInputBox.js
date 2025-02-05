@@ -91,33 +91,40 @@ document.addEventListener("DOMContentLoaded", () => {
   // -------------------------------------------------------------------------
 
   function updateUI() {
+    console.log("updateUI called, wordList length:", gameState.wordList.length, "previous length:", previousWordListLength);
     if (gameState.wordList.length === 1 && previousWordListLength === 0) {
+        connection.invoke("BroadcastGameStart")
+            .catch(err => console.error("Error broadcasting game start:", err));
     }
 
     if (gameState.wordList.length === 1) {
-      updateTimer();
-      setTimeout(() => {
-        renderWordBoxes();
-        highlightCurrentPlayer();
-        updateScore();
-
-      }, 3000);
+        updateTimer();
+        setTimeout(() => {
+            renderWordBoxes();
+            highlightCurrentPlayer();
+            updateScore();
+        }, 2800);
     } else if (gameState.wordList.length > previousWordListLength) {
-      setTimeout(() => {
+        setTimeout(() => {
+            renderWordBoxes();
+            highlightCurrentPlayer();
+            updateScore();
+            updateTimer();
+        }, 750);
+    } else {
         renderWordBoxes();
         highlightCurrentPlayer();
         updateScore();
         updateTimer();
-      }, 750);
-    } else {
-      renderWordBoxes();
-      highlightCurrentPlayer();
-      updateScore();
-      updateTimer();
     }
 
     previousWordListLength = gameState.wordList.length;
-  }
+}
+
+connection.on("ReceiveGameStart", () => {
+    console.log("Game start received");
+    startGameCountdown();
+});
 
   function renderWordBoxes() {
     const gameContainer = document.querySelector(".grid-child-game");
@@ -131,7 +138,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const newWordBox = createWordBox("", false, gameState.wordList.length);
     gameContainer.appendChild(newWordBox);
 
-    //DOM update
     setTimeout(() => {
       const firstInput = gameContainer.querySelector(
         ".wordInput:not([disabled])",
@@ -141,7 +147,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const length = firstInput.value.length;
         firstInput.setSelectionRange(length, length);
       }
-    }, 50);
+    },50);
   }
 
   function createWordBox(word = "", isExisting = false, index) {
@@ -353,28 +359,27 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("timer").textContent =
     "Please write the first word for the game to start";
 
-  // Modified startGameCountdown function
-  function startGameCountdown() {
-    const timerElement = document.getElementById("timer");
-    let countdown = 3;
-
-    function updateCountdown() {
-      if (countdown > 0) {
-        timerElement.textContent = countdown.toString();
-        countdown--;
-        setTimeout(updateCountdown, 1000);
-      } else {
-        timerElement.textContent = "Go!";
-        setTimeout(() => {
-          initializeGameSettings();
-          startTimer();
-          updateUI();
-          timerElement.textContent = gameState.remainingSeconds.toFixed(1);
-        }, 1000);
+    function startGameCountdown() {
+      const timerElement = document.getElementById("timer");
+      let countdown = 3;
+  
+      function updateCountdown() {
+          if (countdown > 0) {
+              timerElement.textContent = countdown.toString();
+              countdown--;
+              setTimeout(updateCountdown, 1000);
+          } else {
+              timerElement.textContent = "Go!";
+              setTimeout(() => {
+                  initializeGameSettings();
+                  startTimer();
+                  updateUI();
+                  timerElement.textContent = gameState.remainingSeconds.toFixed(1);
+              }, 100);
+          }
       }
-    }
-
-    updateCountdown();
+  
+      updateCountdown();
   }
 
   function startTimer() {
