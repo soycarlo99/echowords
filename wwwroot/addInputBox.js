@@ -185,7 +185,12 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function isValidNewWord(word) {
-    return word && checkWordStart(word) && !isWordDuplicate(word);
+    return (
+      word &&
+      checkWordStart(word) &&
+      !isWordDuplicate(word) &&
+      isAlphabetic(word)
+    );
   }
 
   function checkWordStart(word) {
@@ -198,6 +203,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function isWordDuplicate(word) {
     return gameState.wordList.includes(word);
+  }
+
+  function isAlphabetic(word) {
+    return !/[^a-zA-Z\u00E0-\u00FC\u00C0-\u00DC\u00D8-\u00F6\u00F8-\u02AF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD]/.test(
+      word,
+    );
   }
 
   function submitNewWord(word, input, index) {
