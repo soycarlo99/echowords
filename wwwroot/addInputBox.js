@@ -91,12 +91,16 @@ document.addEventListener("DOMContentLoaded", () => {
   // -------------------------------------------------------------------------
 
   function updateUI() {
+    if (gameState.wordList.length === 1 && previousWordListLength === 0) {
+    }
+
     if (gameState.wordList.length === 1) {
+      updateTimer();
       setTimeout(() => {
         renderWordBoxes();
         highlightCurrentPlayer();
         updateScore();
-        updateTimer();
+
       }, 3000);
     } else if (gameState.wordList.length > previousWordListLength) {
       setTimeout(() => {
@@ -127,8 +131,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const newWordBox = createWordBox("", false, gameState.wordList.length);
     gameContainer.appendChild(newWordBox);
 
-    const firstInput = gameContainer.querySelector(".wordInput");
-    if (firstInput) firstInput.focus();
+    // Add small delay to ensure DOM has updated
+    setTimeout(() => {
+      const firstInput = gameContainer.querySelector(
+        ".wordInput:not([disabled])",
+      );
+      if (firstInput) {
+        firstInput.focus();
+        // Set cursor position to end of input
+        const length = firstInput.value.length;
+        firstInput.setSelectionRange(length, length);
+      }
+    }, 50);
   }
 
   function createWordBox(word = "", isExisting = false, index) {
@@ -176,10 +190,11 @@ document.addEventListener("DOMContentLoaded", () => {
         showIncorrectWordAnimation(input, index);
       }
     } else {
-      // Submitting a new word
       if (isValidNewWord(enteredWord)) {
         submitNewWord(enteredWord, input, index);
-        restartClock();
+        if (gameState.wordList.length > 1) {
+          restartClock();
+        }
       } else {
         showInvalidWordAnimation(input, index);
       }
@@ -256,6 +271,10 @@ document.addEventListener("DOMContentLoaded", () => {
     markWordAsCorrect(input, index);
     updateUI();
     broadcastGameState();
+
+    if (gameState.wordList.length === 1) {
+      startGameCountdown();
+    }
   }
 
   function markWordAsCorrect(input, index) {
@@ -333,6 +352,33 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  document.getElementById("timer").textContent =
+    "Please write the first word for the game to start";
+
+  // Modified startGameCountdown function
+  function startGameCountdown() {
+    const timerElement = document.getElementById("timer");
+    let countdown = 3;
+
+    function updateCountdown() {
+      if (countdown > 0) {
+        timerElement.textContent = countdown.toString();
+        countdown--;
+        setTimeout(updateCountdown, 1000);
+      } else {
+        timerElement.textContent = "Go!";
+        setTimeout(() => {
+          initializeGameSettings();
+          startTimer();
+          updateUI();
+          timerElement.textContent = gameState.remainingSeconds.toFixed(1);
+        }, 1000);
+      }
+    }
+
+    updateCountdown();
+  }
+
   function startTimer() {
     clearInterval(timerInterval);
     if (!gameState.remainingSeconds) {
@@ -390,7 +436,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // -------------------------------------------------------------------------
   // 12. INITIALIZE GAME (Client-Side)
   // -------------------------------------------------------------------------
-  startTimer();
+  //startGameCountdown();
   updateUI();
 
   // Add connection state handling
