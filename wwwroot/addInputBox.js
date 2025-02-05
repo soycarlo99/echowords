@@ -131,14 +131,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const newWordBox = createWordBox("", false, gameState.wordList.length);
     gameContainer.appendChild(newWordBox);
 
-    // Add small delay to ensure DOM has updated
+    //DOM update
     setTimeout(() => {
       const firstInput = gameContainer.querySelector(
         ".wordInput:not([disabled])",
       );
       if (firstInput) {
         firstInput.focus();
-        // Set cursor position to end of input
         const length = firstInput.value.length;
         firstInput.setSelectionRange(length, length);
       }
@@ -180,7 +179,6 @@ document.addEventListener("DOMContentLoaded", () => {
   function handleWordSubmission(input, index) {
     const enteredWord = input.value.trim().toLowerCase();
 
-    // Submitting an existing word
     if (index < gameState.wordList.length) {
       if (enteredWord === gameState.wordList[index].toLowerCase()) {
         markWordAsCorrect(input, index);
