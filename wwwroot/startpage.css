@@ -370,7 +370,7 @@ input[type="number"] {
   transition:
     transform 0.2s,
     box-shadow 0.2s;
-  overflow: hidden;
+  /* overflow: hidden; */
   width: 8rem;
 }
 
