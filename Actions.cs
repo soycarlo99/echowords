@@ -85,7 +85,7 @@ public class Actions
 
             try
             {
-                // Update only the most recent player record for the given clientid
+                // First try to update existing player
                 await using var cmd = db.CreateCommand(@"
                     UPDATE players 
                     SET lobbyid = $1 
@@ -96,41 +96,82 @@ public class Actions
                         ORDER BY joined_at DESC 
                         LIMIT 1
                     )
-                ");
+                    RETURNING id, username, clientid, lobbyid, avatarseed, joined_at");
                 cmd.Parameters.AddWithValue(lobbyId);
                 cmd.Parameters.AddWithValue(clientId);
 
-                int rowsAffected = await cmd.ExecuteNonQueryAsync();
-                if (rowsAffected > 0)
+                Player? updatedPlayer = null;
+                await using var reader = await cmd.ExecuteReaderAsync();
+                if (await reader.ReadAsync())
                 {
+                    updatedPlayer = new Player
+                    {
+                        Id = reader.GetInt32(0),
+                        Username = reader.GetString(1),
+                        ClientId = reader.IsDBNull(2) ? null : reader.GetString(2),
+                        LobbyId = reader.GetString(3),
+                        AvatarSeed = reader.IsDBNull(4) ? null : reader.GetString(4),
+                        JoinedAt = reader.GetDateTime(5)
+                    };
+                }
+
+                if (updatedPlayer != null)
+                {
+                    // Notify other clients in the lobby about the updated player
+                    await _hubContext.Clients.Group(lobbyId).SendAsync("PlayerJoined", updatedPlayer);
                     return Results.Ok("Player lobby updated.");
                 }
-                                else
+                else
                 {
-                    // First, get the most recent username for this client
+                    // If no existing player was updated, get the most recent username for this client
                     await using var nameCmd = db.CreateCommand(@"
-                        SELECT username 
+                        SELECT username, avatarseed 
                         FROM players 
                         WHERE clientid = $1 
                         ORDER BY joined_at DESC 
-                        LIMIT 1
-                    ");
+                        LIMIT 1");
                     nameCmd.Parameters.AddWithValue(clientId);
-                    string username = await nameCmd.ExecuteScalarAsync() as string ?? "defaultName";
+                    
+                    string username = "defaultName";
+                    string? avatarSeed = null;
+                    
+                    await using var nameReader = await nameCmd.ExecuteReaderAsync();
+                    if (await nameReader.ReadAsync())
+                    {
+                        username = nameReader.GetString(0);
+                        avatarSeed = nameReader.IsDBNull(1) ? null : nameReader.GetString(1);
+                    }
 
                     // Create new player record with the existing username
                     await using var insertCmd = db.CreateCommand(@"
-                        INSERT INTO players (username, clientid, lobbyid) 
-                        VALUES ($1, $2, $3)
-                    ");
+                        INSERT INTO players (username, clientid, lobbyid, avatarseed) 
+                        VALUES ($1, $2, $3, $4)
+                        RETURNING id, username, clientid, lobbyid, avatarseed, joined_at");
                     insertCmd.Parameters.AddWithValue(username);
                     insertCmd.Parameters.AddWithValue(clientId);
                     insertCmd.Parameters.AddWithValue(lobbyId);
+                    //insertCmd.Parameters.AddWithValue(avatarSeed ?? DBNull.Value);
 
-                    int insertRows = await insertCmd.ExecuteNonQueryAsync();
-                    if(insertRows > 0)
+                    Player? newPlayer = null;
+                    await using var insertReader = await insertCmd.ExecuteReaderAsync();
+                    if (await insertReader.ReadAsync())
                     {
-                        return Results.Ok("No existing player found; new player created and lobby updated.");
+                        newPlayer = new Player
+                        {
+                            Id = insertReader.GetInt32(0),
+                            Username = insertReader.GetString(1),
+                            ClientId = insertReader.IsDBNull(2) ? null : insertReader.GetString(2),
+                            LobbyId = insertReader.GetString(3),
+                            AvatarSeed = insertReader.IsDBNull(4) ? null : insertReader.GetString(4),
+                            JoinedAt = insertReader.GetDateTime(5)
+                        };
+                    }
+
+                    if (newPlayer != null)
+                    {
+                        // Notify other clients in the lobby about the new player
+                        await _hubContext.Clients.Group(lobbyId).SendAsync("PlayerJoined", newPlayer);
+                        return Results.Ok("New player created and lobby updated.");
                     }
                     else
                     {

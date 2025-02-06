@@ -137,33 +137,41 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  // SignalR integration for real-time updates
-  let connection = new signalR.HubConnectionBuilder()
-    .withUrl("/gameHub", {
-      skipNegotiation: true,
-      transport: signalR.HttpTransportType.WebSockets,
-      headers: {
-        "X-Forwarded-Proto": "https",
-      },
-    })
-    .withAutomaticReconnect()
-    .configureLogging(signalR.LogLevel.Debug)
-    .build();
+// SignalR integration for real-time updates
+let connection = new signalR.HubConnectionBuilder()
+  .withUrl("/gameHub", {
+    skipNegotiation: true,
+    transport: signalR.HttpTransportType.WebSockets,
+    headers: {
+      "X-Forwarded-Proto": "https",
+    },
+  })
+  .withAutomaticReconnect()
+  .configureLogging(signalR.LogLevel.Debug)
+  .build();
 
-  connection.on("PlayerJoined", (player) => {
-    console.log("A new player joined:", player);
-    if (document.querySelector(".cardHolder")) {
-      const nextIndex = document.querySelectorAll(".cardHolder .card").length;
-      addPlayerCardLobby(player.username, nextIndex, player.avatarSeed);
-    }
-  });
+connection.on("PlayerJoined", (player) => {
+  console.log("A new player joined:", player);
+  if (document.querySelector(".cardHolder")) {
+    addPlayerCardLobby(player.username, document.querySelectorAll(".cardHolder .card").length, player.avatarSeed);
+  }
+});
 
+async function initializeSignalR() {
   try {
     await connection.start();
     console.log("Connected to SignalR for real-time updates");
-    await connection.invoke("JoinLobby", lobbyId);
+    const urlParams = new URLSearchParams(window.location.search);
+    const lobbyId = urlParams.get("roomId");
+    if (lobbyId) {
+      await connection.invoke("JoinLobby", lobbyId);
+    }
   } catch (err) {
     console.error(err);
+    setTimeout(initializeSignalR, 5000); // Retry connection after 5 seconds
   }
+}
+
+initializeSignalR();
 });
 

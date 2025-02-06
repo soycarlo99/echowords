@@ -37,10 +37,33 @@ namespace Wordapp
             }
         }
 
-            public async Task JoinLobby(string roomId)
-        {
-            await Groups.AddToGroupAsync(Context.ConnectionId, roomId);
-        }
+public async Task JoinLobby(string lobbyId)
+{
+    try
+    {
+        await Groups.AddToGroupAsync(Context.ConnectionId, lobbyId);
+        Console.WriteLine($"Client {Context.ConnectionId} joined lobby {lobbyId}");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error joining lobby: {ex.Message}");
+        throw;
+    }
+}
+
+public async Task NotifyPlayerJoined(string lobbyId, Player player)
+{
+    try
+    {
+        Console.WriteLine($"Broadcasting player joined to lobby {lobbyId}: {player.Username}");
+        await Clients.Group(lobbyId).SendAsync("PlayerJoined", player);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error notifying player joined: {ex.Message}");
+        throw;
+    }
+}
 
         public async Task StartGame(string roomId)
         {

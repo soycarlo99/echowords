@@ -68,18 +68,25 @@ document.addEventListener("DOMContentLoaded", () => {
   // Connect to SignalR and join the lobby
   async function joinLobby(lobbyId) {
     let connection = new signalR.HubConnectionBuilder()
-      .withUrl("http://localhost:5185/gameHub")
-      .build();
+        .withUrl("/gameHub", {
+            skipNegotiation: true,
+            transport: signalR.HttpTransportType.WebSockets,
+            headers: {
+                "X-Forwarded-Proto": "https",
+            },
+        })
+        .withAutomaticReconnect()
+        .build();
 
     try {
-      await connection.start();
-      console.log("Connected to SignalR");
-      await connection.invoke("JoinLobby", lobbyId);
-      console.log(`Joined lobby ${lobbyId}`);
+        await connection.start();
+        console.log("Connected to SignalR");
+        await connection.invoke("JoinLobby", lobbyId);
+        console.log(`Joined lobby ${lobbyId}`);
     } catch (err) {
-      console.error("Error joining lobby:", err);
+        console.error("Error joining lobby:", err);
     }
-  }
+}
 
   // Update player's lobby on the server
   async function updatePlayerLobby(lobbyId) {
