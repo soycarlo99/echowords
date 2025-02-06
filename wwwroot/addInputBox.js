@@ -366,6 +366,7 @@ connection.on("ReceiveGameStart", () => {
   // -------------------------------------------------------------------------
   function highlightCurrentPlayer() {
     const players = document.querySelectorAll(".grid-child-players .card");
+    if (players.length === 0) return; // Add this guard clause
     players.forEach((player) => player.classList.remove("green-shadow"));
     players[gameState.currentPlayerIndex % players.length].classList.add(
       "green-shadow",
@@ -498,7 +499,11 @@ function addTimeToTimer(isRewrite) {
   // 12. INITIALIZE GAME (Client-Side)
   // -------------------------------------------------------------------------
   //startGameCountdown();
+  setTimeout(() => {
+    highlightCurrentPlayer();
+  }, 100);
   updateUI();
+
 
   connection.onreconnecting((error) => {
     console.log("Reconnecting to hub...", error);
