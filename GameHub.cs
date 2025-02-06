@@ -50,7 +50,10 @@ namespace Wordapp
         {
             await Clients.All.SendAsync("ReceiveGameStart");
         }
-
+        public async Task BroadcastDifficulty(string roomId, string difficulty)
+        {
+            await Clients.Group(roomId).SendAsync("ReceiveDifficultyUpdate", difficulty);
+        }
         
     }
 }

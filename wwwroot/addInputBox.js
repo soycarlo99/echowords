@@ -274,7 +274,6 @@ connection.on("ReceiveGameStart", () => {
     saveWord(word);
     markWordAsCorrect(input, index);
     
-    // Add delay before broadcasting if this is the last word
     if (index === gameState.wordList.length - 1) {
         setTimeout(() => {
             updateUI();

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Echo Words</title>
     <link rel="stylesheet" href="startpage.css" />
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script> -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script>
     <script src="darkmode.JS" defer></script>
     <script src="createLobby.js" defer></script>
@@ -125,88 +126,5 @@
         </div>
       </div>
     </main>
-
-    <script>
-      // Remove duplicate declarations - only declare these once
-      const urlParams = new URLSearchParams(window.location.search);
-      const roomId = urlParams.get("roomId");
-
-      if (roomId) {
-        // Update the roomID element with the actual lobby ID
-        const roomIDElement = document.getElementById("roomID");
-        if (roomIDElement) {
-          roomIDElement.textContent = `Room ID: ${roomId}`;
-        }
-        console.log("Received roomId:", roomId);
-
-        // Update the gameLink anchor with the dynamic URL
-        const gameLink = document.getElementById("gameLink");
-        if (gameLink) {
-          gameLink.href = `gamePage.html?roomId=${roomId}`;
-          console.log("Updated gameLink href to:", gameLink.href);
-        }
-      } else {
-        console.error("No roomId found in URL.");
-      }
-
-      // Create SignalR connection
-      const connection = new signalR.HubConnectionBuilder()
-        .withUrl("/gameHub")
-        .build();
-
-      // Set up all SignalR handlers BEFORE starting the connection
-      connection.on("RedirectToGame", () => {
-        console.log("Received redirect signal");
-        window.location.href = `gamePage.html?roomId=${roomId}`;
-      });
-
-      // Set up handler for ReceiveMessage since the error suggests it's being called
-      connection.on("ReceiveMessage", (message) => {
-        console.log("Received message:", message);
-      });
-
-      async function initializeConnection() {
-        if (!roomId) {
-          console.error("No roomId found in URL.");
-          return;
-        }
-
-        const roomIDElement = document.getElementById("roomID");
-        if (roomIDElement) {
-          roomIDElement.textContent = `Room ID: ${roomId}`;
-        }
-        
-        try {
-          // Start the connection
-          await connection.start();
-          console.log("Connected to SignalR hub");
-          
-          // Join the lobby after connection is established
-          await connection.invoke("JoinLobby", roomId);
-          console.log("Joined lobby:", roomId);
-
-          // Add click event listener to the start game button
-          const startGameButton = document.getElementById("startGameButton");
-          if (startGameButton) {
-            startGameButton.addEventListener("click", async (e) => {
-              e.preventDefault();
-              try {
-                await connection.invoke("StartGame", roomId);
-                console.log("Start game signal sent");
-              } catch (err) {
-                console.error("Error starting game:", err);
-              }
-            });
-          } else {
-            console.error("Start game button not found");
-          }
-        } catch (err) {
-          console.error("Error during connection:", err);
-        }
-      }
-
-      // Initialize the connection
-      initializeConnection();
-    </script>
   </body>
 </html>
