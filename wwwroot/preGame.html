@@ -124,5 +124,24 @@
         </div>
       </div>
     </main>
+    <script>
+      //updates roomID and gameLink href
+      const urlParams = new URLSearchParams(window.location.search);
+      const roomId = urlParams.get("roomId");
+      if (roomId) {
+        const roomIDElement = document.getElementById("roomID");
+        if (roomIDElement) {
+          roomIDElement.textContent = `Room ID: ${roomId}`;
+        }
+        console.log("Received roomId:", roomId);
+        const gameLink = document.getElementById("gameLink");
+        if (gameLink) {
+          gameLink.href = `gamePage.html?roomId=${roomId}`;
+          console.log("Updated gameLink href to:", gameLink.href);
+        }
+      } else {
+        console.error("No roomId found in URL.");
+      }
+    </script>
   </body>
 </html>
