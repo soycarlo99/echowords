@@ -105,15 +105,25 @@ public class Actions
                 {
                     return Results.Ok("Player lobby updated.");
                 }
-                else
+                                else
                 {
-                    // If no record found, create a new player record
+                    // First, get the most recent username for this client
+                    await using var nameCmd = db.CreateCommand(@"
+                        SELECT username 
+                        FROM players 
+                        WHERE clientid = $1 
+                        ORDER BY joined_at DESC 
+                        LIMIT 1
+                    ");
+                    nameCmd.Parameters.AddWithValue(clientId);
+                    string username = await nameCmd.ExecuteScalarAsync() as string ?? "defaultName";
+
+                    // Create new player record with the existing username
                     await using var insertCmd = db.CreateCommand(@"
                         INSERT INTO players (username, clientid, lobbyid) 
                         VALUES ($1, $2, $3)
                     ");
-                    // Using a placeholder username; update as necessary
-                    insertCmd.Parameters.AddWithValue("defaultName");
+                    insertCmd.Parameters.AddWithValue(username);
                     insertCmd.Parameters.AddWithValue(clientId);
                     insertCmd.Parameters.AddWithValue(lobbyId);
 
@@ -209,8 +219,7 @@ public class Actions
             await using var cmd = db.CreateCommand("INSERT INTO players (username, clientid, lobbyid) VALUES ($1, $2, $3)");
             cmd.Parameters.AddWithValue(newPlayer);
             cmd.Parameters.AddWithValue(clientId);
-        
-            // Handle nullable lobbyId: insert DBNull.Value if lobbyId is null
+    
             if (lobbyId is null)
                 cmd.Parameters.AddWithValue(DBNull.Value);
             else
