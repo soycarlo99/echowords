@@ -415,6 +415,7 @@ connection.on("ReceiveGameStart", () => {
   // -------------------------------------------------------------------------
   // 11. UTILITY FUNCTIONS (Client-Side)
   // -------------------------------------------------------------------------
+  
   function focusNextInput(currentInput) {
     const nextInput = currentInput
       .closest(".wordCard")
