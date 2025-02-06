@@ -23,10 +23,11 @@ document.addEventListener("DOMContentLoaded", () => {
     currentPlayerIndex: 0,
     remainingSeconds: 0,
     lastWord: "",
-    score: 0,
+    scores: {}, // Object to store scores for each player
     correctWordBonus: 0,
     rewriteWordBonus: 0,
-  };
+};
+
   let timerInterval;
   let previousWordListLength = 0;
 
@@ -66,10 +67,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  connection.on("ReceiveTimerSync", (remainingTime) => {
-    gameState.remainingSeconds = remainingTime;
-    clearInterval(timerInterval);
-    startTimerWithoutBroadcast();
+connection.on("ReceiveTimerSync", (remainingTime) => {
+  gameState.remainingSeconds = remainingTime;
+  clearInterval(timerInterval);
+  startTimerWithoutBroadcast();
 });
 
 connection.on("ReceiveTimerStart", (initialTime) => {
@@ -117,7 +118,10 @@ function broadcastTimerStart(initialTime) {
 
   function updateUI() {
     console.log("updateUI called, wordList length:", gameState.wordList.length, "previous length:", previousWordListLength);
+    console.log("Current gameState:", gameState); // Add this to see the full state
+
     if (gameState.wordList.length === 1 && previousWordListLength === 0) {
+        console.log("Broadcasting game start");
         connection.invoke("BroadcastGameStart")
             .catch(err => console.error("Error broadcasting game start:", err));
     }
@@ -127,19 +131,34 @@ function broadcastTimerStart(initialTime) {
         setTimeout(() => {
             renderWordBoxes();
             highlightCurrentPlayer();
-            updateScore();
+            // Debug log
+            console.log("Player cards before score update:", document.querySelectorAll(".grid-child-players .card").length);
+            console.log("Current scores:", gameState.scores);
+            if (document.querySelectorAll(".grid-child-players .card").length > 0) {
+                updateScore();
+            }
         }, 2800);
     } else if (gameState.wordList.length > previousWordListLength) {
         setTimeout(() => {
             renderWordBoxes();
             highlightCurrentPlayer();
-            updateScore();
+            // Debug log
+            console.log("Player cards before score update:", document.querySelectorAll(".grid-child-players .card").length);
+            console.log("Current scores:", gameState.scores);
+            if (document.querySelectorAll(".grid-child-players .card").length > 0) {
+                updateScore();
+            }
             updateTimer();
         }, 1500);
     } else {
         renderWordBoxes();
         highlightCurrentPlayer();
-        updateScore();
+        // Debug log
+        console.log("Player cards before score update:", document.querySelectorAll(".grid-child-players .card").length);
+        console.log("Current scores:", gameState.scores);
+        if (document.querySelectorAll(".grid-child-players .card").length > 0) {
+            updateScore();
+        }
         updateTimer();
     }
 
@@ -294,8 +313,12 @@ connection.on("ReceiveGameStart", () => {
   function submitNewWord(word, input, index) {
     gameState.wordList.push(word);
     gameState.lastWord = word;
+    
+    // Update score for current player
+    const currentPlayer = gameState.currentPlayerIndex % document.querySelectorAll(".grid-child-players .card").length;
+    gameState.scores[currentPlayer] = (gameState.scores[currentPlayer] || 0) + 1;
+    
     gameState.currentPlayerIndex++;
-    gameState.score++;
     saveWord(word);
     markWordAsCorrect(input, index);
     
@@ -373,26 +396,45 @@ connection.on("ReceiveGameStart", () => {
     );
   }
 
+  // function updateScore() {
+  //   document.getElementById("counter").textContent =
+  //     `Score: ${gameState.score}`;
+  // }
+
   function updateScore() {
-    document.getElementById("counter").textContent =
-      `Score: ${gameState.score}`;
-  }
+    console.log("updateScore called");
+    const players = document.querySelectorAll(".grid-child-players .card");
+    console.log("Number of players found:", players.length);
+    players.forEach((player, index) => {
+        const counter = player.querySelector(".counter");
+        console.log(`Player ${index} counter:`, counter);
+        if (counter) {
+            const score = gameState.scores[index] || 0;
+            console.log(`Setting score for player ${index}:`, score);
+            counter.textContent = `Score: ${score}`;
+        }
+    });
+}
 
   // -------------------------------------------------------------------------
   // 10. TIMER LOGIC (Client-Side)
   // -------------------------------------------------------------------------
   function updateTimer() {
-    if (gameState.remainingSeconds <= 0) {
-      clearInterval(timerInterval);
-      document.getElementById("timer").textContent = "Finished";
-      document
-        .querySelectorAll(".wordInput")
-        .forEach((input) => (input.disabled = true));
-    } else {
-      document.getElementById("timer").textContent =
-        gameState.remainingSeconds.toFixed(1);
+    if (!gameState.wordList.length) {
+        // If no words yet, show the initial message
+        document.getElementById("timer").textContent = "Please write the first word for the game to start";
+        return;
     }
-  }
+
+    if (gameState.remainingSeconds <= 0) {
+        clearInterval(timerInterval);
+        document.getElementById("timer").textContent = "Finished";
+        document.querySelectorAll(".wordInput")
+            .forEach((input) => (input.disabled = true));
+    } else {
+        document.getElementById("timer").textContent = gameState.remainingSeconds.toFixed(1);
+    }
+}
 
   document.getElementById("timer").textContent =
     "Please write the first word for the game to start";
@@ -501,6 +543,7 @@ function addTimeToTimer(isRewrite) {
   //startGameCountdown();
   setTimeout(() => {
     highlightCurrentPlayer();
+
   }, 100);
   updateUI();
 

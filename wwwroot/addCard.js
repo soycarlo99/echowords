@@ -67,7 +67,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  // Function to create a player card in the Game section
   function addPlayerCardGame(username, playerIndex, avatarSeed) {
     const gridChildPlayers = document.querySelector(".grid-child-players");
     if (!gridChildPlayers) return;
@@ -90,11 +89,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       <img src="${avatarUrl}" alt="Avatar" style="width:100%">
       <div class="container">
           <h4><b>${username}</b></h4>
-          <p id="counter">Score: 0</p>
+          <p class="counter" id="counters" data-player-index="${playerIndex}">Score: 0</p>
       </div>
     `;
     gridChildPlayers.appendChild(card);
-  }
+}
 
   // Function to retrieve and populate game players from the server
   async function populatePlayersGame(lobbyId) {
