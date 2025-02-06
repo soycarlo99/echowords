@@ -384,12 +384,10 @@ document.head.appendChild(style);
     
     // Speed bonus calculation
     const typingSpeed = calculateTypingSpeed(input);
-    const speedMultiplier = Math.max(1, typingSpeed / 2); // Typing speed bonus
+    const speedMultiplier = Math.max(1, typingSpeed / 2);
     
-    // Time remaining bonus (more points for maintaining high time)
-    const timeRemainingMultiplier = 1 + (gameState.remainingSeconds / 60); // Max 2x multiplier at 60 seconds
+    const timeRemainingMultiplier = 1 + (gameState.remainingSeconds / 60);
     
-    // Difficulty multiplier
     const difficultyMultiplier = getDifficultyMultiplier();
     
     // Calculate final score
@@ -399,8 +397,7 @@ document.head.appendChild(style);
         timeRemainingMultiplier * 
         difficultyMultiplier
     );
-    
-    // Show score animation
+
     showScoreAnimation(finalScore, input);
     
     return finalScore;
@@ -410,7 +407,7 @@ function calculateTypingSpeed(input) {
     // Get the time difference between first keystroke and submission
     const timeElapsed = (Date.now() - input.dataset.firstKeystroke) / 1000;
     const wordsPerMinute = (input.value.length / 5) / (timeElapsed / 60);
-    return Math.min(wordsPerMinute / 30, 2); // Cap at 2x multiplier
+    return Math.min(wordsPerMinute / 30, 2);
 }
 
 function getDifficultyMultiplier() {
