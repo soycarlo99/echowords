@@ -110,7 +110,7 @@ document.addEventListener("DOMContentLoaded", () => {
             highlightCurrentPlayer();
             updateScore();
             updateTimer();
-        }, 750);
+        }, 1500);
     } else {
         renderWordBoxes();
         highlightCurrentPlayer();
@@ -273,13 +273,22 @@ connection.on("ReceiveGameStart", () => {
     gameState.score++;
     saveWord(word);
     markWordAsCorrect(input, index);
-    updateUI();
-    broadcastGameState();
+    
+    // Add delay before broadcasting if this is the last word
+    if (index === gameState.wordList.length - 1) {
+        setTimeout(() => {
+            updateUI();
+            broadcastGameState();
+        }, 900);
+    } else {
+        updateUI();
+        broadcastGameState();
+    }
 
     if (gameState.wordList.length === 1) {
-      startGameCountdown();
+        startGameCountdown();
     }
-  }
+}
 
   function markWordAsCorrect(input, index) {
     input.disabled = true;
@@ -415,7 +424,7 @@ connection.on("ReceiveGameStart", () => {
   // -------------------------------------------------------------------------
   // 11. UTILITY FUNCTIONS (Client-Side)
   // -------------------------------------------------------------------------
-  
+
   function focusNextInput(currentInput) {
     const nextInput = currentInput
       .closest(".wordCard")
