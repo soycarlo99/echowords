@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
     currentPlayerIndex: 0,
     remainingSeconds: 0,
     lastWord: "",
-    scores: {}, // Object to store scores for each player
+    scores: {},
     correctWordBonus: 0,
     rewriteWordBonus: 0,
 };
@@ -209,9 +209,12 @@ connection.on("ReceiveGameStart", () => {
     updateInputSize(input);
 
     input.addEventListener("input", (e) => {
+      if (!input.dataset.firstKeystroke) {
+          input.dataset.firstKeystroke = Date.now();
+      }
       updateInputSize(input);
       broadcastUserInput(index, e.target.value);
-    });
+  });
 
     input.addEventListener("keydown", (e) => {
       if (e.key === "Enter") {
@@ -222,6 +225,30 @@ connection.on("ReceiveGameStart", () => {
 
     return box;
   }
+
+  const style = document.createElement('style');
+style.textContent = `
+    .score-popup {
+        position: absolute;
+        color: #2ecc71;
+        font-size: 1.2em;
+        font-weight: bold;
+        animation: scorePopup 1s ease-out forwards;
+        pointer-events: none;
+    }
+
+    @keyframes scorePopup {
+        0% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        100% {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+    }
+`;
+document.head.appendChild(style);
 
   // -------------------------------------------------------------------------
   // 7. WORD SUBMISSION & VALIDATION (Client-Side)
@@ -311,13 +338,14 @@ connection.on("ReceiveGameStart", () => {
   }
 
   function submitNewWord(word, input, index) {
-    gameState.wordList.push(word);
-    gameState.lastWord = word;
+    const basePoints = calculateWordScore(word, input);
     
     // Update score for current player
     const currentPlayer = gameState.currentPlayerIndex % document.querySelectorAll(".grid-child-players .card").length;
-    gameState.scores[currentPlayer] = (gameState.scores[currentPlayer] || 0) + 1;
+    gameState.scores[currentPlayer] = (gameState.scores[currentPlayer] || 0) + basePoints;
     
+    gameState.wordList.push(word);
+    gameState.lastWord = word;
     gameState.currentPlayerIndex++;
     saveWord(word);
     markWordAsCorrect(input, index);
@@ -346,6 +374,81 @@ connection.on("ReceiveGameStart", () => {
     input.classList.add("correct", "startAnimation");
     broadcastAnimation(index, "startAnimation");
   }
+
+  // -------------------------------------------------------------------------
+  // SCORING SYSTEM
+  // -------------------------------------------------------------------------
+  function calculateWordScore(word, input) {
+    // Base points based on word length (longer words = more points)
+    const lengthPoints = word.length * 100;
+    
+    // Speed bonus calculation
+    const typingSpeed = calculateTypingSpeed(input);
+    const speedMultiplier = Math.max(1, typingSpeed / 2); // Typing speed bonus
+    
+    // Time remaining bonus (more points for maintaining high time)
+    const timeRemainingMultiplier = 1 + (gameState.remainingSeconds / 60); // Max 2x multiplier at 60 seconds
+    
+    // Difficulty multiplier
+    const difficultyMultiplier = getDifficultyMultiplier();
+    
+    // Calculate final score
+    const finalScore = Math.round(
+        lengthPoints * 
+        speedMultiplier * 
+        timeRemainingMultiplier * 
+        difficultyMultiplier
+    );
+    
+    // Show score animation
+    showScoreAnimation(finalScore, input);
+    
+    return finalScore;
+}
+
+function calculateTypingSpeed(input) {
+    // Get the time difference between first keystroke and submission
+    const timeElapsed = (Date.now() - input.dataset.firstKeystroke) / 1000;
+    const wordsPerMinute = (input.value.length / 5) / (timeElapsed / 60);
+    return Math.min(wordsPerMinute / 30, 2); // Cap at 2x multiplier
+}
+
+function getDifficultyMultiplier() {
+    const difficulty = localStorage.getItem("gameDifficulty") || "medium";
+    const multipliers = {
+        easy: 1,
+        medium: 1.5,
+        hard: 2,
+        extreme: 3
+    };
+    return multipliers[difficulty];
+}
+
+function showScoreAnimation(score, input) {
+    const scorePopup = document.createElement('div');
+    scorePopup.classList.add('score-popup');
+    scorePopup.textContent = `+${score}`;
+    input.parentElement.appendChild(scorePopup);
+    
+    setTimeout(() => {
+        scorePopup.remove();
+    }, 1000);
+}
+
+function updateScore() {
+  console.log("updateScore called");
+  const players = document.querySelectorAll(".grid-child-players .card");
+  console.log("Number of players found:", players.length);
+  players.forEach((player, index) => {
+      const counter = player.querySelector(".counter");
+      console.log(`Player ${index} counter:`, counter);
+      if (counter) {
+          const score = gameState.scores[index] || 0;
+          console.log(`Setting score for player ${index}:`, score);
+          counter.textContent = `Score: ${score}`;
+      }
+  });
+}
 
   // -------------------------------------------------------------------------
   // 8. ANIMATION & VISUAL FEEDBACK (Client-Side)
