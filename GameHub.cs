@@ -54,6 +54,15 @@ namespace Wordapp
         {
             await Clients.Group(roomId).SendAsync("ReceiveDifficultyUpdate", difficulty);
         }
+        public async Task BroadcastTimerSync(double remainingTime)
+{
+    await Clients.Others.SendAsync("ReceiveTimerSync", remainingTime);
+}
+
+public async Task BroadcastTimerStart(double initialTime)
+{
+    await Clients.Others.SendAsync("ReceiveTimerStart", initialTime);
+}
         
     }
 }

@@ -45,9 +45,11 @@ document.addEventListener("DOMContentLoaded", () => {
   //    These are called when the server broadcasts messages or updates
   // -------------------------------------------------------------------------
   connection.on("ReceiveGameState", (newState) => {
-    gameState = { ...newState };
+    const oldLength = gameState.wordList.length;
+    gameState = { ...gameState, ...newState }; 
+    previousWordListLength = oldLength;
     updateUI();
-  });
+});
 
   connection.on("ReceiveUserInput", (index, input) => {
     const inputs = document.querySelectorAll(".wordInput");
@@ -64,15 +66,28 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  connection.on("ReceiveTimerSync", (remainingTime) => {
+    gameState.remainingSeconds = remainingTime;
+    clearInterval(timerInterval);
+    startTimerWithoutBroadcast();
+});
+
+connection.on("ReceiveTimerStart", (initialTime) => {
+    gameState.remainingSeconds = initialTime;
+    clearInterval(timerInterval);
+    startTimerWithoutBroadcast();
+});
+
   // -------------------------------------------------------------------------
   // 5. SIGNALR CLIENT -> SERVER INVOCATIONS (Server-Side Calls)
   //    Functions that broadcast data or invoke server methods
   // -------------------------------------------------------------------------
   function broadcastGameState() {
-    connection
-      .invoke("BroadcastGameState", gameState)
-      .catch((err) => console.error("Error broadcasting game state:", err));
-  }
+    const gameStateWithoutTimer = { ...gameState };
+    delete gameStateWithoutTimer.remainingSeconds;
+    connection.invoke("BroadcastGameState", gameStateWithoutTimer)
+        .catch(err => console.error("Error broadcasting game state:", err));
+}
 
   function broadcastUserInput(index, input) {
     connection
@@ -85,6 +100,16 @@ document.addEventListener("DOMContentLoaded", () => {
       .invoke("BroadcastAnimation", index, animationType)
       .catch((err) => console.error("Error broadcasting animation:", err));
   }
+
+  function broadcastTimerSync(remainingTime) {
+    connection.invoke("BroadcastTimerSync", remainingTime)
+        .catch(err => console.error("Error broadcasting timer sync:", err));
+}
+
+function broadcastTimerStart(initialTime) {
+    connection.invoke("BroadcastTimerStart", initialTime)
+        .catch(err => console.error("Error broadcasting timer start:", err));
+}
 
   // -------------------------------------------------------------------------
   // 6. UI & RENDERING LOGIC (Client-Side)
@@ -274,6 +299,10 @@ connection.on("ReceiveGameStart", () => {
     saveWord(word);
     markWordAsCorrect(input, index);
     
+    const bonusTime = gameState.correctWordBonus;
+    const newTotalTime = gameState.remainingSeconds + bonusTime;
+    broadcastTimerSync(newTotalTime);
+    
     if (index === gameState.wordList.length - 1) {
         setTimeout(() => {
             updateUI();
@@ -393,32 +422,52 @@ connection.on("ReceiveGameStart", () => {
   function startTimer() {
     clearInterval(timerInterval);
     if (!gameState.remainingSeconds) {
-      initializeGameSettings();
+        initializeGameSettings();
     }
-    timerInterval = setInterval(() => {
-      gameState.remainingSeconds -= 0.1;
+    broadcastTimerStart(gameState.remainingSeconds);
+    startTimerWithoutBroadcast();
+}
+
+function startTimerWithoutBroadcast() {
+  clearInterval(timerInterval);
+  let lastUpdate = Date.now();
+  
+  timerInterval = setInterval(() => {
+      const now = Date.now();
+      const delta = (now - lastUpdate) / 1000;
+      lastUpdate = now;
+      
+      gameState.remainingSeconds -= delta;
+      
       if (gameState.remainingSeconds <= 0) {
-        clearInterval(timerInterval);
+          clearInterval(timerInterval);
+          gameState.remainingSeconds = 0;
+          broadcastTimerSync(0);
       }
+      
       updateTimer();
-    }, 100);
-  }
+      
+      if (Math.floor(gameState.remainingSeconds) !== Math.floor(gameState.remainingSeconds + delta)) {
+          broadcastTimerSync(gameState.remainingSeconds);
+      }
+  }, 100);
+}
 
-  function restartClock() {
-    initializeGameSettings();
-    clearInterval(timerInterval);
-    startTimer();
-    broadcastGameState();
-  }
+function restartClock() {
+  initializeGameSettings();
+  clearInterval(timerInterval);
+  startTimer();
+  broadcastGameState();
+}
 
-  function addTimeToTimer(isRewrite) {
-    const bonusTime = isRewrite
+function addTimeToTimer(isRewrite) {
+  const bonusTime = isRewrite
       ? gameState.rewriteWordBonus
       : gameState.correctWordBonus;
-    gameState.remainingSeconds += bonusTime;
-    updateTimer();
-    //broadcastGameState();
-  }
+  
+  const newTotalTime = gameState.remainingSeconds + bonusTime;
+  broadcastTimerSync(newTotalTime);
+}
 
   // -------------------------------------------------------------------------
   // 11. UTILITY FUNCTIONS (Client-Side)
@@ -451,7 +500,6 @@ connection.on("ReceiveGameStart", () => {
   //startGameCountdown();
   updateUI();
 
-  // Add connection state handling
   connection.onreconnecting((error) => {
     console.log("Reconnecting to hub...", error);
   });
