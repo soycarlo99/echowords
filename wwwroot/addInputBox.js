@@ -378,6 +378,7 @@ document.head.appendChild(style);
   // -------------------------------------------------------------------------
   // SCORING SYSTEM
   // -------------------------------------------------------------------------
+  
   function calculateWordScore(word, input) {
     // Base points based on word length (longer words = more points)
     const lengthPoints = word.length * 100;
