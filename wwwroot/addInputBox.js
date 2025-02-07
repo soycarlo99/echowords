@@ -351,8 +351,8 @@ document.head.appendChild(style);
     markWordAsCorrect(input, index);
     
     const bonusTime = gameState.correctWordBonus;
-    const newTotalTime = gameState.remainingSeconds + bonusTime;
-    broadcastTimerSync(newTotalTime);
+    gameState.remainingSeconds += bonusTime;
+    broadcastTimerSync(gameState.remainingSeconds);
     
     if (index === gameState.wordList.length - 1) {
         setTimeout(() => {
@@ -590,20 +590,24 @@ function startTimerWithoutBroadcast() {
       const delta = (now - lastUpdate) / 1000;
       lastUpdate = now;
       
-      gameState.remainingSeconds -= delta;
+      const previousSeconds = Math.floor(gameState.remainingSeconds);
+      gameState.remainingSeconds = Math.max(0, gameState.remainingSeconds - delta);
+      const currentSeconds = Math.floor(gameState.remainingSeconds);
+      
+      updateTimer();
+      
+      // Only broadcast when the whole second changes
+      if (previousSeconds !== currentSeconds) {
+          broadcastTimerSync(gameState.remainingSeconds);
+      }
       
       if (gameState.remainingSeconds <= 0) {
           clearInterval(timerInterval);
           gameState.remainingSeconds = 0;
           broadcastTimerSync(0);
+          updateTimer();
       }
-      
-      updateTimer();
-      
-      if (Math.floor(gameState.remainingSeconds) !== Math.floor(gameState.remainingSeconds + delta)) {
-          broadcastTimerSync(gameState.remainingSeconds);
-      }
-  }, 100);
+  }, 50); // Reduced interval for more precise timing
 }
 
 function restartClock() {
@@ -614,12 +618,10 @@ function restartClock() {
 }
 
 function addTimeToTimer(isRewrite) {
-  const bonusTime = isRewrite
-      ? gameState.rewriteWordBonus
-      : gameState.correctWordBonus;
-  
-  const newTotalTime = gameState.remainingSeconds + bonusTime;
-  broadcastTimerSync(newTotalTime);
+  const bonusTime = isRewrite ? gameState.rewriteWordBonus : gameState.correctWordBonus;
+  gameState.remainingSeconds += bonusTime; // Directly update the gameState
+  broadcastTimerSync(gameState.remainingSeconds);
+  updateTimer(); // Immediately update the UI
 }
 
   // -------------------------------------------------------------------------
