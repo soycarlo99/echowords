@@ -68,15 +68,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // Connect to SignalR and join the lobby
   async function joinLobby(lobbyId) {
     let connection = new signalR.HubConnectionBuilder()
-        .withUrl("/gameHub", {
-            skipNegotiation: true,
-            transport: signalR.HttpTransportType.WebSockets,
-            headers: {
-                "X-Forwarded-Proto": "https",
-            },
-        })
-        .withAutomaticReconnect()
-        .build();
+    .withUrl("http://localhost:5185/gameHub")
+    .build();
 
     try {
         await connection.start();
@@ -93,7 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const payload = { LobbyId: lobbyId };
     try {
       const response = await fetch(
-        "http://localhost:5185/update-player-lobby",
+        "/update-player-lobby",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
