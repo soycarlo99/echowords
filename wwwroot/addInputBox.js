@@ -212,10 +212,16 @@ connection.on("ReceiveGameStart", () => {
     const input = box.querySelector(".wordInput");
     updateInputSize(input);
 
-    // Add paste prevention through JavaScript as well
     input.addEventListener('paste', (e) => {
         e.preventDefault();
         return false;
+    });
+
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === "Tab") {
+        e.preventDefault();
+        handleWordSubmission(input, index);
+      }
     });
 
     input.addEventListener("input", (e) => {
@@ -239,12 +245,7 @@ connection.on("ReceiveGameStart", () => {
       broadcastUserInput(index, e.target.value);
   });
 
-    input.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        handleWordSubmission(input, index);
-      }
-    });
+
 
     return box;
   }
