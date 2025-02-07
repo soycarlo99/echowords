@@ -394,6 +394,7 @@ document.head.appendChild(style);
 }
 
   function markWordAsCorrect(input, index) {
+    correctSound.play();
     input.disabled = true;
     input.classList.add("correct", "startAnimation");
     broadcastAnimation(index, "startAnimation");
@@ -473,7 +474,36 @@ function updateScore() {
   // -------------------------------------------------------------------------
   // 8. ANIMATION & VISUAL FEEDBACK (Client-Side)
   // -------------------------------------------------------------------------
+  class SoundPlayer {
+    constructor(src, volume = 0.3, maxInstances = 3) {
+        this.src = src;
+        this.volume = volume;
+        this.maxInstances = maxInstances;
+        this.instances = [];
+        this.currentIndex = 0;
+        
+        for (let i = 0; i < maxInstances; i++) {
+            const audio = new Audio(src);
+            audio.volume = volume;
+            this.instances.push(audio);
+        }
+    }
+
+    play() {
+        const audio = this.instances[this.currentIndex];
+        
+        audio.currentTime = 0;
+        audio.play();
+        
+        this.currentIndex = (this.currentIndex + 1) % this.maxInstances;
+    }
+}
+
+  const errorSound = new SoundPlayer('photos/wrong.mp3', 0.3, 3);
+  const correctSound = new SoundPlayer('photos/correct.wav', 0.3, 3);
+
   function showIncorrectWordAnimation(input, index) {
+    errorSound.play();
     input.classList.add("shake");
     broadcastAnimation(index, "shake");
     setTimeout(() => {
@@ -490,6 +520,7 @@ function updateScore() {
   }
 
   function showInvalidWordAnimation(input, index) {
+    errorSound.play();
     input.classList.add("shake");
     broadcastAnimation(index, "shake");
     setTimeout(() => {
