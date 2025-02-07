@@ -200,13 +200,27 @@ connection.on("ReceiveGameStart", () => {
     box.innerHTML = `
             <input class="wordInput" id="gameInput" type="text" 
                    placeholder="${isExisting ? "Re-enter word..." : "Enter new word..."}" 
-                   data-index="${index}">
+                   data-index="${index}"
+                   maxlength="20">
                   <div id="notification" class="notification hidden">
                     <span id="notificationMessage"></span>
                   </div>
         `;
     const input = box.querySelector(".wordInput");
     updateInputSize(input);
+
+    input.addEventListener("input", (e) => {
+      if (e.target.value.length > 20) {
+          e.target.value = e.target.value.slice(0, 20);
+          showNotification("Maximum word length is 20 characters");
+      }
+      
+      if (!input.dataset.firstKeystroke) {
+          input.dataset.firstKeystroke = Date.now();
+      }
+      updateInputSize(input);
+      broadcastUserInput(index, e.target.value);
+  });
 
     input.addEventListener("input", (e) => {
       if (!input.dataset.firstKeystroke) {
