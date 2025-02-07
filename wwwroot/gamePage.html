@@ -4,14 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Echo Words</title>
-
-    <!-- Favicon -->
     <link rel="icon" href="/favicon.ico" type="image/x-icon" />
-
-    <!-- Stylesheets -->
     <link rel="stylesheet" href="startpage.css" />
-
-    <!-- External Libraries (load first) -->
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"
       defer
@@ -20,22 +14,12 @@
       src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"
       defer
     ></script>
-
-    <!-- Core Game Logic -->
     <script src="addInputBox.js" defer></script>
-    <!-- <script src="gamePageTimer.js" defer></script> -->
     <script src="wordCheck.js" defer></script>
-
-    <!-- Player Management -->
     <script src="usernamePreGame.js" defer></script>
     <script src="addCard.js" defer></script>
     <script src="gamePagePlayerCards.js" defer></script>
-
-    <!-- UI/UX -->
     <script src="darkmode.js" defer></script>
-
-    <!-- Game Flow -->
-    <!-- <script type="module" src="yourTurn.js" defer></script> -->
   </head>
   <body>
     <nav style="display: flex; justify-content: space-between; align-items: center;">
@@ -84,13 +68,21 @@
       <div class="grid-container">
         <div class="grid-child-game"></div>
         <div class="grid-child-players"></div>
+        <div class="modal-overlay" id="gameOverModal">
+          <div class="modal">
+            <h2>Game Over!</h2>
+            <p>What would you like to do next?</p>
+            <div class="modal-buttons">
+                <button class="modal-button play-again" id="playAgainBtn" onclick="location.reload()">Play Again</button>
+                <button class="modal-button results" id="resultsBtn" onclick="window.location.href='matchResult.html'">View Results</button>
+            </div>
+        </div>
+      </div>
+
       </div>
     </main>
 
     <script src="usernamePreGame.js" defer></script>
-    <script type="module" src="yourTurn.js" defer></script>
-    <script src="gamePagePlayerCards.js" defer></script>
-    <script src="wordCheck.js" defer></script>
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"
       defer

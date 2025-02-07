@@ -391,7 +391,6 @@ document.head.appendChild(style);
     
     const difficultyMultiplier = getDifficultyMultiplier();
     
-    // Calculate final score
     const finalScore = Math.round(
         lengthPoints * 
         speedMultiplier * 
@@ -405,7 +404,6 @@ document.head.appendChild(style);
 }
 
 function calculateTypingSpeed(input) {
-    // Get the time difference between first keystroke and submission
     const timeElapsed = (Date.now() - input.dataset.firstKeystroke) / 1000;
     const wordsPerMinute = (input.value.length / 5) / (timeElapsed / 60);
     return Math.min(wordsPerMinute / 30, 2);
@@ -521,15 +519,20 @@ function updateScore() {
   // 10. TIMER LOGIC (Client-Side)
   // -------------------------------------------------------------------------
   function updateTimer() {
-    if (!gameState.wordList.length) {
-        // If no words yet, show the initial message
-        document.getElementById("timer").textContent = "Please write the first word for the game to start";
-        return;
-    }
+    if (isInCountdown) {
+      return;
+  }
+
+  if (!gameState.wordList.length) {
+      document.getElementById("timer").textContent = "Please write the first word for the game to start";
+      return;
+  }
 
     if (gameState.remainingSeconds <= 0) {
         clearInterval(timerInterval);
         document.getElementById("timer").textContent = "Finished";
+        const modal = document.getElementById('gameOverModal');
+        modal.style.display = 'flex';
         document.querySelectorAll(".wordInput")
             .forEach((input) => (input.disabled = true));
     } else {
@@ -540,28 +543,34 @@ function updateScore() {
   document.getElementById("timer").textContent =
     "Please write the first word for the game to start";
 
+    let isInCountdown = false;
+
     function startGameCountdown() {
-      const timerElement = document.getElementById("timer");
-      let countdown = 3;
-  
-      function updateCountdown() {
-          if (countdown > 0) {
-              timerElement.textContent = countdown.toString();
-              countdown--;
-              setTimeout(updateCountdown, 1000);
-          } else {
-              timerElement.textContent = "Go!";
-              setTimeout(() => {
-                  initializeGameSettings();
-                  startTimer();
-                  //updateUI();
-                  timerElement.textContent = gameState.remainingSeconds.toFixed(1);
-              }, 100);
-          }
-      }
-  
-      updateCountdown();
-  }
+        const timerElement = document.getElementById("timer");
+        let countdown = 3;
+        
+        // Clear any existing intervals and set countdown flag
+        clearInterval(timerInterval);
+        isInCountdown = true;
+    
+        function updateCountdown() {
+            if (countdown > 0) {
+                timerElement.textContent = countdown.toString();
+                countdown--;
+                setTimeout(updateCountdown, 1000);
+            } else {
+                timerElement.textContent = "Go!";
+                setTimeout(() => {
+                    isInCountdown = false;  // Reset countdown flag
+                    initializeGameSettings();
+                    startTimer();
+                    timerElement.textContent = gameState.remainingSeconds.toFixed(1);
+                }, 1000);
+            }
+        }
+    
+        updateCountdown();
+    }
 
   function startTimer() {
     clearInterval(timerInterval);
