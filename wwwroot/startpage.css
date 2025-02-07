@@ -11,7 +11,7 @@
   --btn-bg-secondary: #177eaa;
   --btn-hover-shadow: rgba(0, 0, 0, 0.25) 0 8px 15px;
   --btn-text-color: #fff;
-  --input-bg: #f3f3f3;
+  --input-bg: #c1c1c1;
   --input-border-focus: #573d8b;
   --card-bg: #fff;
   --card-shadow: rgba(0, 0, 0, 0.1);
@@ -261,6 +261,7 @@ input[type="text"] {
   font-size: 6rem;
   background-color: var(--input-bg);
   margin-right: 5px;
+  border-radius: 5px;
 }
 
 .pin-code input:focus {
@@ -350,7 +351,7 @@ input[type="number"] {
 }
 
 .grid-child-players {
-  border: 1px solid #ccc;
+  /* border: 1px solid #ccc; */
   border-radius: 8px;
   padding: 1rem;
   overflow-y: auto;
@@ -359,8 +360,10 @@ input[type="number"] {
   gap: 1rem;
   align-content: start;
   max-height: calc(100vh - 10rem);
-  box-sizing: border-box;
+  /* box-sizing: border-box; */
   justify-items: center;
+  padding-top: 1.6rem;
+padding-bottom: 1.6rem;
 }
 
 .card {
