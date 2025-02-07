@@ -201,13 +201,22 @@ connection.on("ReceiveGameStart", () => {
             <input class="wordInput" id="gameInput" type="text" 
                    placeholder="${isExisting ? "Re-enter word..." : "Enter new word..."}" 
                    data-index="${index}"
-                   maxlength="20">
+                   maxlength="20"
+                   autocomplete="off"
+                   spellcheck="false"
+                   onpaste="return false">
                   <div id="notification" class="notification hidden">
                     <span id="notificationMessage"></span>
                   </div>
         `;
     const input = box.querySelector(".wordInput");
     updateInputSize(input);
+
+    // Add paste prevention through JavaScript as well
+    input.addEventListener('paste', (e) => {
+        e.preventDefault();
+        return false;
+    });
 
     input.addEventListener("input", (e) => {
       if (e.target.value.length > 20) {
