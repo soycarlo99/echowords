@@ -1270,13 +1270,20 @@ input[type="text"]:-ms-input-placeholder {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: #ff9900; /* Orange background */
+  background-color: #FF8C00; /* Warmer orange */
   color: white;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  padding: 20px 30px;
+  border-radius: 15px;
+  box-shadow: 
+    0 0 20px rgba(255, 140, 0, 0.4),
+    0 0 40px rgba(255, 140, 0, 0.2),
+    inset 0 0 15px rgba(255, 255, 255, 0.1);
   text-align: center;
-  animation: fadeIn 0.5s;
+  animation: notificationIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  font-size: 1.1rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(5px);
+  z-index: 9999;
 }
 
 .notification.hidden {
@@ -1284,93 +1291,47 @@ input[type="text"]:-ms-input-placeholder {
 }
 
 #closeNotification {
-  background-color: #333;
+  background-color: rgba(255, 255, 255, 0.2);
   color: white;
-  border: none;
-  padding: 5px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 8px 16px;
+  margin-top: 15px;
   cursor: pointer;
-  border-radius: 5px;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  font-weight: 500;
 }
 
 #closeNotification:hover {
-  background-color: #444;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
+  background-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
-@keyframes fadeIn {
-  from {
+@keyframes notificationIn {
+  0% {
     opacity: 0;
-    transform: translate(-50%, -60%);
+    transform: translate(-50%, 100%);
   }
-  to {
+  100% {
     opacity: 1;
     transform: translate(-50%, -50%);
   }
 }
 
-@keyframes fadeOut {
-  from {
+@keyframes notificationOut {
+  0% {
     opacity: 1;
+    transform: translate(-50%, -50%);
   }
-  to {
+  100% {
     opacity: 0;
+    transform: translate(-50%, -200%);
   }
 }
 
 .notification.fadeOut {
-  animation: fadeOut 1s;
-}
-
-
-@keyframes fadeIn {
-  from {
-      opacity: 0;
-      transform: scale(0.5);
-      transform: translateY(20px);
-  }
-  to {
-      opacity: 1;
-      transform: scale(1);
-      transform: translateY(0);
-  }
-}
-
-@keyframes slideIn {
-  from {
-      opacity: 0;
-      transform: translateX(-100px);
-  }
-  to {
-      opacity: 1;
-      transform: translateX(0);
-  }
-}
-
-@keyframes scaleIn {
-  from {
-      opacity: 0;
-      transform: scale(0.5);
-  }
-  to {
-      opacity: 1;
-      transform: scale(1);
-  }
-}
-
-@keyframes rotateIn {
-  from {
-      opacity: 0;
-      transform: rotate(-180deg) scale(0.3);
-  }
-  to {
-      opacity: 1;
-      transform: rotate(0) scale(1);
-  }
-}
-
-.fade-in {
-  animation: fadeIn 0.5s ease-out forwards;
+  animation: notificationOut 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
 }
 
 
