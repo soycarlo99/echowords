@@ -499,7 +499,7 @@ function updateScore() {
     }
 }
 
-  const errorSound = new SoundPlayer('soundEffects/wrong.mp3', 0.3, 3);
+  const errorSound = new SoundPlayer('soundEffects/wrong.mp3', 0.08, 3);
   const correctSound = new SoundPlayer('soundEffects/correct.wav', 0.3, 3);
 
   function showIncorrectWordAnimation(input, index) {
