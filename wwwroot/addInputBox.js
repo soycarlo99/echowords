@@ -573,26 +573,65 @@ function updateScore() {
   // -------------------------------------------------------------------------
   // 10. TIMER LOGIC (Client-Side)
   // -------------------------------------------------------------------------
+
   function updateTimer() {
     if (isInCountdown) {
-      return;
-  }
+        return;
+    }
 
-  if (!gameState.wordList.length) {
-      document.getElementById("timer").textContent = "Please write the first word for the game to start";
-      return;
-  }
+    const timerElement = document.getElementById("timer");
+    let timerSpan = timerElement.querySelector('span');
+    
+    // Create span if it doesn't exist
+    if (!timerSpan) {
+        timerSpan = document.createElement('span');
+        timerElement.appendChild(timerSpan);
+    }
+
+    if (!gameState.wordList.length) {
+        timerSpan.textContent = "Please write the first word for the game to start";
+        timerElement.style.setProperty('--transform', 'scaleX(1)');
+        return;
+    }
 
     if (gameState.remainingSeconds <= 0) {
         clearInterval(timerInterval);
-        document.getElementById("timer").textContent = "Finished";
+        timerSpan.textContent = "Finished";
+        timerElement.style.setProperty('--transform', 'scaleX(0)');
         const modal = document.getElementById('gameOverModal');
         modal.style.display = 'flex';
         document.querySelectorAll(".wordInput")
             .forEach((input) => (input.disabled = true));
     } else {
-        document.getElementById("timer").textContent = gameState.remainingSeconds.toFixed(1);
+        // Update timer text
+        timerSpan.textContent = gameState.remainingSeconds.toFixed(1);
+        
+        // Calculate progress percentage
+        const initialTime = getDifficultySettings().initialTime;
+        const progress = (gameState.remainingSeconds / initialTime);
+        
+        // Update progress bar by directly setting the transform style
+        timerElement.style.setProperty('--transform', `scaleX(${progress})`);
+        
+        // Update colors based on remaining time
+        timerElement.classList.remove('warning', 'danger');
+        if (gameState.remainingSeconds <= 5) {
+            timerElement.classList.add('danger');
+        } else if (gameState.remainingSeconds <= 8) {
+            timerElement.classList.add('warning');
+        }
     }
+}
+
+function getDifficultySettings() {
+  const difficulty = localStorage.getItem("gameDifficulty") || "medium";
+  const difficultySettings = {
+      easy: { initialTime: 60 },
+      medium: { initialTime: 30 },
+      hard: { initialTime: 15 },
+      extreme: { initialTime: 10 }
+  };
+  return difficultySettings[difficulty];
 }
 
   document.getElementById("timer").textContent =
@@ -662,7 +701,7 @@ function startTimerWithoutBroadcast() {
           broadcastTimerSync(0);
           updateTimer();
       }
-  }, 50); // Reduced interval for more precise timing
+  }, 50); // Update every 50ms for smooth animation
 }
 
 function restartClock() {
@@ -731,32 +770,32 @@ function addTimeToTimer(isRewrite) {
   function initializeGameSettings() {
     const difficulty = localStorage.getItem("gameDifficulty") || "medium";
     const difficultySettings = {
-      easy: {
-        initialTime: 60,
-        correctWordBonus: 3,
-        rewriteWordBonus: 1.5,
-      },
-      medium: {
-        initialTime: 30,
-        correctWordBonus: 2,
-        rewriteWordBonus: 1,
-      },
-      hard: {
-        initialTime: 15,
-        correctWordBonus: 1,
-        rewriteWordBonus: 0.5,
-      },
-      extreme: {
-        initialTime: 10,
-        correctWordBonus: 0.5,
-        rewriteWordBonus: 0.25,
-      },
+        easy: {
+            initialTime: 60,
+            correctWordBonus: 3,
+            rewriteWordBonus: 1.5,
+        },
+        medium: {
+            initialTime: 30,
+            correctWordBonus: 2,
+            rewriteWordBonus: 1,
+        },
+        hard: {
+            initialTime: 15,
+            correctWordBonus: 1,
+            rewriteWordBonus: 0.5,
+        },
+        extreme: {
+            initialTime: 10,
+            correctWordBonus: 0.5,
+            rewriteWordBonus: 0.25,
+        },
     };
 
     const settings = difficultySettings[difficulty];
     gameState.remainingSeconds = settings.initialTime;
     gameState.correctWordBonus = settings.correctWordBonus;
     gameState.rewriteWordBonus = settings.rewriteWordBonus;
-  }
+}
 });
 

@@ -599,21 +599,46 @@ padding-bottom: 1.6rem;
 }
 
 #timer {
-  /* position: fixed; */
+  width: 100%;
+  height: 40px;
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 8px;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Outfit", sans-serif;
+  font-size: 1.2rem;
+  color: white;
+}
+
+#timer::before {
+  content: '';
+  position: absolute;
   top: 0;
-  right: 50%;
-  font-size: 1.5rem;
-  font-family: Outfit, "Oswald", sans-serif;
-  color: #ffffff;
-  background: var(--timer-bg-gradient);
-  border: 2px solid rgba(255, 255, 255, 0.7);
-  border-radius: 50px;
-  padding: 10px 25px;
-  box-shadow: 0 0 20px rgba(255, 110, 127, 0.9);
-  text-align: center;
-  z-index: 1000;
-  animation: fadePulse 1.7s infinite ease-in-out;
-  min-width: 4rem;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: #2ecc71;
+  transform-origin: left;
+  transform: scaleX(1);
+  transition: transform 0.1s linear, background-color 0.3s ease;
+  z-index: 0;
+}
+
+#timer.warning::before {
+  background: #f39c12;
+}
+
+#timer.danger::before {
+  background: #e74c3c;
+}
+
+#timer span {
+  position: relative;
+  z-index: 1;
 }
 
 #counters {
