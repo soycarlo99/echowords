@@ -1,4 +1,21 @@
-@import url("https://fonts.googleapis.com/css2?family=Italiana&family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Oswald:wght@200..700&display=swap");
+@font-face {
+  font-family: 'Italiana';
+  src: url('../fonts/Italiana-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+
+@font-face {
+  font-family: 'Outfit';
+  src: url('../fonts/Outfit-VariableFont_wght.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+
+
+
 
 :root {
   --h1-title: #fff;
@@ -568,8 +585,8 @@ padding-bottom: 1.6rem;
   /* position: fixed; */
   top: 0;
   right: 50%;
-  font-size: 1rem;
-  font-family: "Oswald", sans-serif;
+  font-size: 1.5rem;
+  font-family: Outfit, "Oswald", sans-serif;
   color: #ffffff;
   background: var(--timer-bg-gradient);
   border: 2px solid rgba(255, 255, 255, 0.7);
