@@ -1,7 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
   console.log("DOM fully loaded");
 
-  // Input navigation logic for PIN code fields
   var pinContainer = document.querySelector(".pin-code");
   if (pinContainer) {
     pinContainer.addEventListener(
@@ -35,7 +34,6 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         }
 
-        // Check if all fields are filled and trigger join button
         const inputs = document.querySelectorAll(".pin-code input");
         let code = "";
         inputs.forEach((input) => {
@@ -49,13 +47,11 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   }
 
-  // After obtaining lobbyCode (or in your redirection logic)
   const gameLink = document.getElementById("gameLink");
   if (gameLink) {
     gameLink.href = `gamePage.html?roomId=${lobbyCode}`;
   }
 
-  // Retrieve the 4-digit lobby code from input fields
   function getLobbyCode() {
     let code = "";
     const inputs = document.querySelectorAll(".pin-code input");
@@ -65,7 +61,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return code;
   }
 
-  // Connect to SignalR and join the lobby
   async function joinLobby(lobbyId) {
     let connection = new signalR.HubConnectionBuilder()
     .withUrl("http://localhost:5185/gameHub")
@@ -81,7 +76,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 }
 
-  // Update player's lobby on the server
   async function updatePlayerLobby(lobbyId) {
     const payload = { LobbyId: lobbyId };
     try {
@@ -90,7 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          credentials: "include", // Ensure cookies are sent
+          credentials: "include",
           body: JSON.stringify(payload),
         },
       );
@@ -104,19 +98,36 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Event listener for the Join Lobby button
   document.getElementById("joinButton").addEventListener("click", async () => {
+    const spinner = document.getElementById("loadingSpinner");
+    const joinButton = document.getElementById("joinButton");
+    
     const lobbyCode = getLobbyCode();
     console.log(`Lobby code entered: ${lobbyCode}`);
     if (lobbyCode.length < 4) {
       alert("Please enter a complete 4-digit lobby code.");
       return;
     }
-    console.log(`Attempting to join lobby: ${lobbyCode}`);
-    await joinLobby(lobbyCode);
-    await updatePlayerLobby(lobbyCode);
-    console.log("Redirecting to preGame.html...");
-    window.location.href = `preGame.html?roomId=${lobbyCode}`;
+
+    spinner.classList.add("show");
+    joinButton.disabled = true;
+
+    try {
+      console.log(`Attempting to join lobby: ${lobbyCode}`);
+      
+      const delay = Math.random() * 1000 + 1000;
+      await new Promise(resolve => setTimeout(resolve, delay));
+      
+      await joinLobby(lobbyCode);
+      await updatePlayerLobby(lobbyCode);
+      console.log("Redirecting to preGame.html...");
+      window.location.href = `preGame.html?roomId=${lobbyCode}`;
+    } catch (error) {
+      console.error("Error joining lobby:", error);
+      spinner.classList.remove("show");
+      joinButton.disabled = false;
+      alert("Failed to join lobby. Please try again.");
+    }
   });
 });
 
