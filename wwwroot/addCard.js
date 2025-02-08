@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", async () => {
-  // Parse the lobbyId from URL query parameters
   const urlParams = new URLSearchParams(window.location.search);
   const lobbyId = urlParams.get("roomId");
 
@@ -8,23 +7,26 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
-  // Function to create a player card in the Lobby section
   function addPlayerCardLobby(username, playerIndex, avatarSeed) {
     const cardHolderLobby = document.querySelector(".cardHolder");
-    if (!cardHolderLobby) return;
+    if (!cardHolderLobby) {
+      console.warn("Card holder not found");
+      return;
+    }
 
-    // Prevent duplicate entries
-    if (Array.from(cardHolderLobby.children).some(
-        (card) => card.querySelector("h4")?.textContent === username
-    )) {
-        console.warn(`Player "${username}" already exists.`);
-        return;
+    const existingPlayer = Array.from(cardHolderLobby.children).find(
+      (card) => card.querySelector("h4")?.textContent.toLowerCase() === username.toLowerCase()
+    );
+    
+    if (existingPlayer) {
+      console.warn(`Player "${username}" already exists.`);
+      return;
     }
 
     const storedSeed = avatarSeed || username;
     const avatarUrl = `https://api.dicebear.com/9.x/open-peeps/svg?seed=${encodeURIComponent(storedSeed)}`;
     const card = document.createElement("div");
-    card.classList.add("card", "fade-in"); // Add fade-in class
+    card.classList.add("card", "fade-in");
     card.innerHTML = `
       <img src="${avatarUrl}" alt="Avatar" style="width:100%">
       <div class="container">
@@ -34,7 +36,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     `;
     cardHolderLobby.appendChild(card);
     
-    // Trigger reflow to ensure animation plays
     card.offsetHeight;
 
     const randomizeBtn = card.querySelector(".randomizeBtn");
@@ -44,19 +45,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       const img = card.querySelector('img[alt="Avatar"]');
       if (img) {
         img.src = newAvatarUrl;
-        //I will add later: notify server of avatar change for this user
       }
     });
   }
 
-  // Function to retrieve and populate lobby players from the server
   async function populatePlayersLobby(lobbyId) {
     try {
       const response = await fetch(`/lobby/${lobbyId}/players`);
-      console.log(
-        `Fetching players for lobby ${lobbyId}: status`,
-        response.status,
-      );
+      console.log(`Fetching players for lobby ${lobbyId}: status`, response.status);
       if (!response.ok) throw new Error("Failed to fetch players");
       const players = await response.json();
       console.log("Players data retrieved:", players);
@@ -72,12 +68,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     const gridChildPlayers = document.querySelector(".grid-child-players");
     if (!gridChildPlayers) return;
 
-    // Prevent duplicate entries
-    if (
-      Array.from(gridChildPlayers.children).some(
-        (card) => card.querySelector("h4")?.textContent === username,
-      )
-    ) {
+    if (Array.from(gridChildPlayers.children).some(
+      (card) => card.querySelector("h4")?.textContent === username
+    )) {
       console.warn(`Player "${username}" already exists.`);
       return;
     }
@@ -94,9 +87,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       </div>
     `;
     gridChildPlayers.appendChild(card);
-}
+  }
 
-  // Function to retrieve and populate game players from the server
   async function populatePlayersGame(lobbyId) {
     const gridChildPlayers = document.querySelector(".grid-child-players");
     if (!gridChildPlayers) return;
@@ -105,7 +97,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       const response = await fetch(`/lobby/${lobbyId}/players`);
       if (!response.ok) throw new Error("Failed to fetch players");
       const players = await response.json();
-
       players.forEach((player, index) => {
         addPlayerCardGame(player.username, index, player.avatarSeed);
       });
@@ -114,17 +105,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  // Populate Lobby Section if on a page with .cardHolder
-  if (document.querySelector(".cardHolder")) {
-    await populatePlayersLobby(lobbyId);
-  }
-
-  // Populate Game Section if on a page with .grid-child-players
-  if (document.querySelector(".grid-child-players")) {
-    await populatePlayersGame(lobbyId);
-  }
-
-  // Randomize Avatars
   const randomizeBtn = document.getElementById("randomizeAvatars");
   if (randomizeBtn) {
     randomizeBtn.addEventListener("click", () => {
@@ -137,41 +117,77 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-// SignalR integration for real-time updates
-let connection = new signalR.HubConnectionBuilder()
-  .withUrl("/gameHub", {
-    skipNegotiation: true,
-    transport: signalR.HttpTransportType.WebSockets,
-    headers: {
-      "X-Forwarded-Proto": "https",
-    },
-  })
-  .withAutomaticReconnect()
-  .configureLogging(signalR.LogLevel.Debug)
-  .build();
+  let connection = new signalR.HubConnectionBuilder()
+    .withUrl("/gameHub", {
+      skipNegotiation: true,
+      transport: signalR.HttpTransportType.WebSockets,
+      headers: {
+        "X-Forwarded-Proto": "https",
+      },
+    })
+    .withAutomaticReconnect()
+    .configureLogging(signalR.LogLevel.Debug)
+    .build();
 
-connection.on("PlayerJoined", (player) => {
-  console.log("A new player joined:", player);
-  if (document.querySelector(".cardHolder")) {
-    addPlayerCardLobby(player.username, document.querySelectorAll(".cardHolder .card").length, player.avatarSeed);
-  }
-});
+  let isConnected = false;
 
-async function initializeSignalR() {
-  try {
-    await connection.start();
-    console.log("Connected to SignalR for real-time updates");
-    const urlParams = new URLSearchParams(window.location.search);
-    const lobbyId = urlParams.get("roomId");
-    if (lobbyId) {
-      await connection.invoke("JoinLobby", lobbyId);
+  connection.on("PlayerJoined", (player) => {
+    console.log("A new player joined:", player);
+    if (!player || !player.username) {
+      console.error("Invalid player data received");
+      return;
     }
-  } catch (err) {
-    console.error(err);
-    setTimeout(initializeSignalR, 5000); // Retry connection after 5 seconds
+    
+    if (document.querySelector(".cardHolder")) {
+      try {
+        addPlayerCardLobby(
+          player.username, 
+          document.querySelectorAll(".cardHolder .card").length, 
+          player.avatarSeed
+        );
+      } catch (error) {
+        console.error("Error adding player card:", error);
+      }
+    }
+  });
+
+  async function initializeSignalR() {
+    if (isConnected) {
+      console.log("Already connected to SignalR");
+      return;
+    }
+
+    try {
+      await connection.start();
+      isConnected = true;
+      console.log("Connected to SignalR for real-time updates");
+      
+      if (lobbyId) {
+        await connection.invoke("JoinLobby", lobbyId);
+        console.log("Joined lobby:", lobbyId);
+      }
+    } catch (err) {
+      console.error("SignalR connection error:", err);
+      isConnected = false;
+      setTimeout(initializeSignalR, 5000);
+    }
   }
-}
 
-initializeSignalR();
+  if (document.querySelector(".cardHolder")) {
+    Promise.all([
+      initializeSignalR(),
+      populatePlayersLobby(lobbyId)
+    ]).catch(error => {
+      console.error("Error during initialization:", error);
+    });
+  } else if (document.querySelector(".grid-child-players")) {
+    Promise.all([
+      initializeSignalR(),
+      populatePlayersGame(lobbyId)
+    ]).catch(error => {
+      console.error("Error during initialization:", error);
+    });
+  } else {
+    initializeSignalR();
+  }
 });
-
