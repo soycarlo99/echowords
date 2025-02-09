@@ -23,8 +23,16 @@ public class Actions
             {
                 return Results.BadRequest("Word is required.");
             }
+
             string word = requestBody.Word.ToLower();
-            bool success = await NewWord(word, context.Request.Cookies["ClientId"]);
+            string? clientId = context.Request.Cookies["ClientId"];
+
+            if (clientId is null)
+            {
+                return Results.BadRequest("Client ID is required.");
+            }
+
+            bool success = await NewWord(word, clientId);
             return success ? Results.Ok("Word added successfully.") : Results.StatusCode(500);
         });
 
@@ -117,13 +125,11 @@ public class Actions
 
                 if (updatedPlayer != null)
                 {
-                    // Notify other clients in the lobby about the updated player
                     await _hubContext.Clients.Group(lobbyId).SendAsync("PlayerJoined", updatedPlayer);
                     return Results.Ok("Player lobby updated.");
                 }
                 else
                 {
-                    // If no existing player was updated, get the most recent username for this client
                     await using var nameCmd = db.CreateCommand(@"
                         SELECT username, avatarseed 
                         FROM players 
@@ -142,7 +148,6 @@ public class Actions
                         avatarSeed = nameReader.IsDBNull(1) ? null : nameReader.GetString(1);
                     }
 
-                    // Create new player record with the existing username
                     await using var insertCmd = db.CreateCommand(@"
                         INSERT INTO players (username, clientid, lobbyid, avatarseed) 
                         VALUES ($1, $2, $3, $4)
@@ -169,7 +174,6 @@ public class Actions
 
                     if (newPlayer != null)
                     {
-                        // Notify other clients in the lobby about the new player
                         await _hubContext.Clients.Group(lobbyId).SendAsync("PlayerJoined", newPlayer);
                         return Results.Ok("New player created and lobby updated.");
                     }
@@ -238,7 +242,7 @@ public class Actions
             cmd.Parameters.AddWithValue(word);
             cmd.Parameters.AddWithValue(clientId);
             int rowsAffected = await cmd.ExecuteNonQueryAsync();
-            if(rowsAffected > 0)
+            if (rowsAffected > 0)
             {
                 var updatedWordList = await GetWordList();
                 await _hubContext.Clients.All.SendAsync("ReceiveNewWord", word, updatedWordList);
@@ -253,21 +257,54 @@ public class Actions
         }
     }
 
-    async Task<bool> PlayerName(string? newPlayer, string? clientId, string? lobbyId)
+        async Task<bool> PlayerName(string username, string? clientId, string? lobbyId)
     {
         try
         {
-            await using var cmd = db.CreateCommand("INSERT INTO players (username, clientid, lobbyid) VALUES ($1, $2, $3)");
-            cmd.Parameters.AddWithValue(newPlayer);
+            if (clientId == null)
+            {
+                Console.WriteLine("Error: Client ID is null");
+                return false;
+            }
+
+            await using var cmd = db.CreateCommand(@"
+                INSERT INTO players (username, clientid, lobbyid, avatarseed)
+                VALUES ($1, $2, $3, $4)
+                RETURNING id");
+            
+            cmd.Parameters.AddWithValue(username);
             cmd.Parameters.AddWithValue(clientId);
-    
-            if (lobbyId is null)
-                cmd.Parameters.AddWithValue(DBNull.Value);
-            else
-                cmd.Parameters.AddWithValue(lobbyId);
-        
-            int rowsAffected = await cmd.ExecuteNonQueryAsync();
-            return rowsAffected > 0;
+            cmd.Parameters.AddWithValue(lobbyId ?? (object)DBNull.Value);
+            cmd.Parameters.AddWithValue(Guid.NewGuid().ToString()); // Generate a random avatar seed
+
+            // Fix for CS8605: Safely handle possibly null value
+            var result = await cmd.ExecuteScalarAsync();
+            if (result == null)
+            {
+                Console.WriteLine("Error: Failed to get new player ID");
+                return false;
+            }
+
+            int newPlayerId = Convert.ToInt32(result);
+            
+            if (newPlayerId > 0)
+            {
+                if (!string.IsNullOrEmpty(lobbyId))
+                {
+                    // If a lobby ID was provided, notify other players in the lobby
+                    var player = new Player
+                    {
+                        Id = newPlayerId,
+                        Username = username,
+                        ClientId = clientId,
+                        LobbyId = lobbyId,
+                        JoinedAt = DateTime.UtcNow
+                    };
+                    await _hubContext.Clients.Group(lobbyId).SendAsync("PlayerJoined", player);
+                }
+                return true;
+            }
+            return false;
         }
         catch (Exception ex)
         {
