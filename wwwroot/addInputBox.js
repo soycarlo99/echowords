@@ -430,24 +430,68 @@ document.addEventListener("DOMContentLoaded", () => {
   // -------------------------------------------------------------------------
   // 11. TIMER LOGIC (Client-Side)
   // -------------------------------------------------------------------------
-  function updateTimer() {
-    if (isInCountdown) return;
+    function updateTimer() {
+      if (isInCountdown) {
+          return;
+      }
 
-    if (!gameState.wordList.length) {
-      document.getElementById("timer").textContent = "Please write the first word for the game to start";
-      return;
-    }
+      const timerElement = document.getElementById("timer");
+      let timerSpan = timerElement.querySelector('span');
 
-    if (gameState.remainingSeconds <= 0) {
-      clearInterval(timerInterval);
-      document.getElementById("timer").textContent = "Finished";
-      const modal = document.getElementById('gameOverModal');
-      modal.style.display = 'flex';
-      document.querySelectorAll(".wordInput").forEach((input) => (input.disabled = true));
-    } else {
-      document.getElementById("timer").textContent = gameState.remainingSeconds.toFixed(1);
-    }
+      // Create span if it doesn't exist
+      if (!timerSpan) {
+          timerSpan = document.createElement('span');
+          timerElement.appendChild(timerSpan);
+      }
+
+      if (!gameState.wordList.length) {
+          timerSpan.textContent = "Please write the first word for the game to start";
+          timerElement.style.setProperty('--transform', 'scaleX(1)');
+          return;
+      }
+
+      if (gameState.remainingSeconds <= 0) {
+          clearInterval(timerInterval);
+          timerSpan.textContent = "Finished";
+          timerElement.style.setProperty('--transform', 'scaleX(0)');
+          const modal = document.getElementById('gameOverModal');
+          modal.style.display = 'flex';
+          document.querySelectorAll(".wordInput")
+              .forEach((input) => (input.disabled = true));
+      } else {
+          // Update timer text
+          timerSpan.textContent = gameState.remainingSeconds.toFixed(1);
+
+          // Calculate progress percentage
+          const initialTime = getDifficultySettings().initialTime;
+          const progress = (gameState.remainingSeconds / initialTime);
+
+          // Update progress bar by directly setting the transform style
+          timerElement.style.setProperty('--transform', `scaleX(${progress})`);
+
+          // Update colors based on remaining time
+          timerElement.classList.remove('warning', 'danger');
+          if (gameState.remainingSeconds <= 5) {
+              timerElement.classList.add('danger');
+          } else if (gameState.remainingSeconds <= 8) {
+              timerElement.classList.add('warning');
+          }
+      }
   }
+
+
+  function getDifficultySettings() {
+    const difficulty = localStorage.getItem("gameDifficulty") || "medium";
+    const difficultySettings = {
+        easy: { initialTime: 60 },
+        medium: { initialTime: 30 },
+        hard: { initialTime: 15 },
+        extreme: { initialTime: 10 }
+    };
+    return difficultySettings[difficulty];
+  }
+
+
 
   function startGameCountdown() {
     const timerElement = document.getElementById("timer");
@@ -456,20 +500,30 @@ document.addEventListener("DOMContentLoaded", () => {
     clearInterval(timerInterval);
     isInCountdown = true;
 
+    // Clear existing content and create a dedicated countdown display
+    timerElement.innerHTML = '<div class="countdown-display"></div>';
+    const countdownDisplay = timerElement.querySelector('.countdown-display');
+    
+    // Reset timer styles
+    timerElement.classList.remove('warning', 'danger');
+    timerElement.style.setProperty('--transform', 'scaleX(1)');
+
     function updateCountdown() {
-      if (countdown > 0) {
-        timerElement.textContent = countdown.toString();
-        countdown--;
-        setTimeout(updateCountdown, 1000);
-      } else {
-        timerElement.textContent = "Go!";
-        setTimeout(() => {
-          isInCountdown = false;
-          initializeGameSettings();
-          startTimer();
-          timerElement.textContent = gameState.remainingSeconds.toFixed(1);
-        }, 1000);
-      }
+        if (countdown > 0) {
+            countdownDisplay.textContent = countdown;
+            countdownDisplay.classList.add('countdown-active');
+            countdown--;
+            setTimeout(updateCountdown, 1000);
+        } else {
+            countdownDisplay.textContent = "Go!";
+            setTimeout(() => {
+                isInCountdown = false;
+                initializeGameSettings();
+                startTimer();
+                // Reset to normal timer display
+                timerElement.innerHTML = '<span>' + gameState.remainingSeconds.toFixed(1) + '</span>';
+            }, 1000);
+        }
     }
 
     updateCountdown();
