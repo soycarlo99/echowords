@@ -4,18 +4,22 @@ using Wordapp;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Set the server to listen on port 5185
-// builder.WebHost.UseUrls("http://localhost:5185");
+// ============================================================================
+// 1. SERVICE CONFIGURATION
+// ============================================================================
 
-// Register services
+// Add API Explorer and Swagger for API documentation
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddSignalR(options => {
+
+// Configure SignalR with detailed errors and handshake timeout
+builder.Services.AddSignalR(options =>
+{
     options.EnableDetailedErrors = true;
     options.HandshakeTimeout = TimeSpan.FromSeconds(15);
 });
 
-// Add and configure CORS
+// Configure CORS to allow all origins, methods, and headers
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -30,16 +34,21 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+// ============================================================================
+// 2. MIDDLEWARE PIPELINE
+// ============================================================================
+
+// Enable Swagger in development environment
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-// CORS policy before routing
+// Enable CORS before routing
 app.UseCors("AllowAll");
 
-// Handle forwarded headers
+// Handle forwarded headers (e.g., X-Forwarded-Proto)
 app.Use((context, next) =>
 {
     var forwardedProto = context.Request.Headers["X-Forwarded-Proto"].FirstOrDefault();
@@ -50,8 +59,11 @@ app.Use((context, next) =>
     return next();
 });
 
+// Serve default files and static files
 app.UseDefaultFiles();
 app.UseStaticFiles();
+
+// Enable routing
 app.UseRouting();
 
 // Map SignalR hub
@@ -75,6 +87,13 @@ app.Use(async (context, next) =>
     await next();
 });
 
+// ============================================================================
+// 3. HELPER METHODS
+// ============================================================================
+
+/// <summary>
+/// Generates a unique client ID using a cryptographically secure random number generator.
+/// </summary>
 static string GenerateUniqueClientId()
 {
     using var rng = RandomNumberGenerator.Create();
@@ -83,15 +102,20 @@ static string GenerateUniqueClientId()
     return Convert.ToBase64String(bytes);
 }
 
-// Retrieves SignalR Hub context and instantiate Actions
+// ============================================================================
+// 4. APPLICATION STARTUP
+// ============================================================================
+
+// Retrieve SignalR Hub context and instantiate Actions
 var hubContext = app.Services.GetRequiredService<IHubContext<GameHub>>();
 var actions = new Actions(app, hubContext);
 
+// Run the application
 try
 {
     app.Run();
 }
-catch(Exception ex)
+catch (Exception ex)
 {
     Console.WriteLine("Unhandled exception: " + ex.ToString());
 }
