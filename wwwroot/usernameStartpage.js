@@ -24,7 +24,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  //#region Carlo
   async function addPlayerName() {
     const playerName = $('[id="playerNameInput"]').val();
     console.log("PlayerName:", playerName);
@@ -43,6 +42,24 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("Error adding player:", error);
     }
   }
-  //#endregion
+
+  playerNameInput.addEventListener("keypress", function (event) {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      acceptButton.click();
+    }
+  });
+
+  //Visuals for when the player writes too long name
+  document.addEventListener("input", function (event) {
+    if (event.target.id === "playerNameInput") {
+      if (event.target.value.length >= event.target.maxLength) {
+        event.target.classList.add("shakeName");
+        setTimeout(() => {
+          event.target.classList.remove("shakeName");
+        }, 500); // Remove the shake class after 500ms
+      }
+    }
+  });
 });
 
