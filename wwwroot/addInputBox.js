@@ -244,8 +244,37 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  function isLikelyGibberish(word) {
+    word = word.toLowerCase();
+    
+    if (/(.)\1{2,}/.test(word)) {
+        showNotification("Too many repeated characters.");
+        return true;
+    }
+
+    const vowels = (word.match(/[aeiou]/gi) || []).length;
+    const consonants = word.length - vowels;
+    if (consonants / word.length > 0.85) {
+        showNotification("Too many consonants. This doesn't look like a real word.");
+        return true;
+    }
+    
+    const unlikelyCombos = /[qwx]{2}|[jvk]{2}|[mqz]{2}/;
+    if (unlikelyCombos.test(word)) {
+        showNotification("Invalid character combination.");
+        return true;
+    }
+    
+    return false;
+  }
+
   function isValidNewWord(word) {
-    return word && checkWordStart(word) && !isWordDuplicate(word) && isAlphabetic(word);
+
+    return word && 
+           checkWordStart(word) && 
+           !isWordDuplicate(word) && 
+           isAlphabetic(word) && 
+           !isLikelyGibberish(word);
   }
 
   function checkWordStart(word) {
@@ -459,17 +488,13 @@ document.addEventListener("DOMContentLoaded", () => {
           document.querySelectorAll(".wordInput")
               .forEach((input) => (input.disabled = true));
       } else {
-          // Update timer text
           timerSpan.textContent = gameState.remainingSeconds.toFixed(1);
 
-          // Calculate progress percentage
           const initialTime = getDifficultySettings().initialTime;
           const progress = (gameState.remainingSeconds / initialTime);
 
-          // Update progress bar by directly setting the transform style
           timerElement.style.setProperty('--transform', `scaleX(${progress})`);
 
-          // Update colors based on remaining time
           timerElement.classList.remove('warning', 'danger');
           if (gameState.remainingSeconds <= 5) {
               timerElement.classList.add('danger');
@@ -500,11 +525,9 @@ document.addEventListener("DOMContentLoaded", () => {
     clearInterval(timerInterval);
     isInCountdown = true;
 
-    // Clear existing content and create a dedicated countdown display
     timerElement.innerHTML = '<div class="countdown-display"></div>';
     const countdownDisplay = timerElement.querySelector('.countdown-display');
     
-    // Reset timer styles
     timerElement.classList.remove('warning', 'danger');
     timerElement.style.setProperty('--transform', 'scaleX(1)');
 
@@ -520,7 +543,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 isInCountdown = false;
                 initializeGameSettings();
                 startTimer();
-                // Reset to normal timer display
                 timerElement.innerHTML = '<span>' + gameState.remainingSeconds.toFixed(1) + '</span>';
             }, 1000);
         }
