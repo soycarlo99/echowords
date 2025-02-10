@@ -25,19 +25,22 @@ async function joinLobbyWithSignalR(lobbyId) {
 }
 
 document.getElementById('createLobbyButton').addEventListener('click', async () => {
+    const spinner = document.getElementById("loadingSpinner");
+    spinner.classList.add("show");
+    
     try {
         const response = await fetch('/create-lobby', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            credentials: 'include' // Important for cookies
+            credentials: 'include'
         });
 
         if (!response.ok) {
             throw new Error(`Server error: ${response.statusText}`);
         }
-
+        
         const data = await response.json();
         const lobbyId = data.lobbyId;
 
@@ -47,6 +50,7 @@ document.getElementById('createLobbyButton').addEventListener('click', async () 
         window.location.href = `preGame.html?roomId=${lobbyId}`;
 
     } catch (error) {
+        spinner.classList.remove("show");
         console.error("Error creating lobby:", error);
     }
 });

@@ -5,6 +5,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let playerCount = parseInt(localStorage.getItem("playerCount")) || 0;
 
+  const connection = new signalR.HubConnectionBuilder()
+    .withUrl("/gameHub")
+    .withAutomaticReconnect([0, 2000, 5000, 10000]) // Retry intervals in milliseconds
+    .build();
+
+  connection.onreconnecting((error) => {
+    console.log('Reconnecting to hub...', error);
+    // Show some UI indication that we're trying to reconnect
+  });
+
+  connection.onreconnected((connectionId) => {
+    console.log('Reconnected to hub.', connectionId);
+    // Clear any warning UI
+  });
+
+  connection.onclose((error) => {
+    console.log('Connection closed.', error);
+    // Show disconnected UI or try to restart connection
+  });
+
   acceptButton.addEventListener("click", () => {
     const username = playerNameInput.value.trim();
 
