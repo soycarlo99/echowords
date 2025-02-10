@@ -83,6 +83,17 @@ document.addEventListener("DOMContentLoaded", () => {
     startGameCountdown();
   });
 
+  connection.on("ReceiveTimerPause", () => {
+    clearInterval(timerInterval);
+    isInCountdown = true;
+  });
+  
+  connection.on("ReceiveTimerResume", (remainingTime) => {
+    gameState.remainingSeconds = remainingTime;
+    isInCountdown = false;
+    startTimerWithoutBroadcast();
+  });
+
   // -------------------------------------------------------------------------
   // 5. SIGNALR CLIENT -> SERVER INVOCATIONS (Server-Side Calls)
   // -------------------------------------------------------------------------
@@ -132,7 +143,7 @@ document.addEventListener("DOMContentLoaded", () => {
         renderWordBoxes();
         highlightCurrentPlayer();
         updateScore();
-      }, 2800);
+      }, 3100);
     } else if (gameState.wordList.length > previousWordListLength) {
       setTimeout(() => {
         renderWordBoxes();
@@ -317,15 +328,16 @@ document.addEventListener("DOMContentLoaded", () => {
     broadcastTimerSync(gameState.remainingSeconds);
 
     if (index === gameState.wordList.length - 1) {
+      pauseTimer();
       setTimeout(() => {
         updateUI();
         broadcastGameState();
-      }, 900);
+      }, 1500);
     } else {
       updateUI();
       broadcastGameState();
     }
-
+    setTimeout(resumeTimer, 1500);
     if (gameState.wordList.length === 1) {
       startGameCountdown();
     }
@@ -602,6 +614,23 @@ document.addEventListener("DOMContentLoaded", () => {
     updateTimer();
   }
 
+
+  // In Timer Logic section
+function pauseTimer() {
+  clearInterval(timerInterval);
+  isInCountdown = true;
+  connection.invoke("BroadcastTimerPause")
+    .catch(err => console.error("Error pausing timer:", err));
+}
+
+function resumeTimer() {
+  isInCountdown = false;
+  startTimerWithoutBroadcast();
+  connection.invoke("BroadcastTimerResume", gameState.remainingSeconds)
+    .catch(err => console.error("Error resuming timer:", err));
+}
+
+
   // -------------------------------------------------------------------------
   // 12. UTILITY FUNCTIONS (Client-Side)
   // -------------------------------------------------------------------------
@@ -628,22 +657,22 @@ document.addEventListener("DOMContentLoaded", () => {
     const difficulty = localStorage.getItem("gameDifficulty") || "medium";
     const difficultySettings = {
       easy: {
-        initialTime: 60,
+        initialTime: 61.7,
         correctWordBonus: 3,
         rewriteWordBonus: 1.5,
       },
       medium: {
-        initialTime: 30,
+        initialTime: 31.7,
         correctWordBonus: 2,
         rewriteWordBonus: 1,
       },
       hard: {
-        initialTime: 15,
+        initialTime: 17.7,
         correctWordBonus: 1,
         rewriteWordBonus: 0.5,
       },
       extreme: {
-        initialTime: 10,
+        initialTime: 11.7,
         correctWordBonus: 0.5,
         rewriteWordBonus: 0.25,
       },

@@ -89,6 +89,16 @@ namespace Wordapp
         {
             await Clients.Others.SendAsync("ReceiveTimerStart", initialTime);
         }
+
+        public async Task BroadcastTimerPause() 
+        {
+            await Clients.Others.SendAsync("ReceiveTimerPause");
+        }
+
+        public async Task BroadcastTimerResume(int remainingTime)
+        {
+            await Clients.Others.SendAsync("ReceiveTimerResume", remainingTime);
+        }
         
     }
 }
