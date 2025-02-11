@@ -343,12 +343,40 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // function markWordAsCorrect(input, index) {
+  //   correctSound.play();
+  //   input.disabled = true;
+  //   input.classList.add("correct", "startAnimation");
+  //   broadcastAnimation(index, "startAnimation");
+  // }
+
   function markWordAsCorrect(input, index) {
     correctSound.play();
     input.disabled = true;
-    input.classList.add("correct", "startAnimation");
-    broadcastAnimation(index, "startAnimation");
-  }
+    
+    const selectedAnimation = localStorage.getItem('selectedAnimation') || 'default';
+    
+    let animationClass;
+    switch(selectedAnimation) {
+        case 'default':
+            animationClass = 'defaultFade';
+            break;
+        case 'bounce':
+            animationClass = 'bounceSuccess';
+            break;
+        case 'spiral':
+            animationClass = 'wiggleSuccess';
+            break;
+        case 'glitch':
+            animationClass = 'pulseSuccess';
+            break;
+    }
+    
+    input.classList.add('correct', animationClass);
+    broadcastAnimation(index, animationClass);
+}
+
+
 
   // -------------------------------------------------------------------------
   // 8. SCORING SYSTEM (Client-Side)
@@ -615,7 +643,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
 
-  // In Timer Logic section
 function pauseTimer() {
   clearInterval(timerInterval);
   isInCountdown = true;
