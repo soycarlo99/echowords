@@ -356,28 +356,50 @@ document.addEventListener("DOMContentLoaded", () => {
     
     const selectedAnimation = localStorage.getItem('selectedAnimation') || 'default';
     
+    // Map to actual CSS class names
     let animationClass;
     switch(selectedAnimation) {
-        case 'default':
-            animationClass = 'defaultFade';
+        case 'confetti':
+            animationClass = 'confetti-burst';
             break;
-        case 'bounce':
-            animationClass = 'bounceSuccess';
+        case 'gradient':
+            animationClass = 'gradient-wave';
             break;
-        case 'spiral':
-            animationClass = 'wiggleSuccess';
+        case 'wave':
+          animationClass = 'liquid-wave';
+          addBubbles(input);
+          break;
+        case 'neon':
+            animationClass = 'neon-glow';
             break;
-        case 'glitch':
-            animationClass = 'pulseSuccess';
+        case 'flip':
+            animationClass = 'flip-3d';
             break;
+        default:
+            animationClass = 'startAnimation';
     }
+
+    function addBubbles(element) {
+      const container = element.parentElement;
+      for(let i = 0; i < 12; i++) {
+          const bubble = document.createElement('div');
+          bubble.className = 'bubble';
+          bubble.style.left = `${Math.random() * 100}%`;
+          bubble.style.width = bubble.style.height = 
+              `${Math.random() * 4 + 2}px`;
+          bubble.style.animationDelay = `${Math.random() * 0.5}s`;
+          container.appendChild(bubble);
+      }
+  }
     
-    input.classList.add('correct', animationClass);
-    broadcastAnimation(index, animationClass);
+  input.classList.add('correct', animationClass);
+  broadcastAnimation(index, animationClass);
 }
 
 
 
+
+  // -------------------------------------------------------------------------
   // -------------------------------------------------------------------------
   // 8. SCORING SYSTEM (Client-Side)
   // -------------------------------------------------------------------------

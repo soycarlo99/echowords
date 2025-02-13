@@ -16,21 +16,38 @@ document.addEventListener('DOMContentLoaded', () => {
             
             let animationName;
             switch(animationType) {
-                case 'default':
-                    animationName = 'defaultFade';
+                case 'confetti':
+                    animationName = 'confettiBurst';
                     break;
-                case 'bounce':
-                    animationName = 'bounceSuccess';
+                case 'gradient':
+                    animationName = 'gradientWave';
                     break;
-                case 'spiral':
-                    animationName = 'wiggleSuccess';
+                    case 'wave':
+                        animationClass = 'liquid-wave';
+                        addBubbles(input);
+                        break;
+                case 'neon':
+                    animationName = 'neonGlow';
                     break;
-                case 'glitch':
-                    animationName = 'pulseSuccess';
+                case 'flip':
+                    animationName = 'flip3D';
                     break;
             }
             previewText.style.animation = `${animationName} 1s forwards`;
+
+            function addBubbles(element) {
+                for(let i = 0; i < 12; i++) {
+                    const bubble = document.createElement('span');
+                    bubble.style.left = `${Math.random() * 100}%`;
+                    bubble.style.width = bubble.style.height = 
+                        `${Math.random() * 4 + 2}px`;
+                    bubble.style.animationDelay = `${Math.random() * 0.5}s`;
+                    element.appendChild(bubble);
+                }
+            }
         });
+
+
 
         box.addEventListener('mouseleave', () => {
             const previewText = box.querySelector('.preview-text');

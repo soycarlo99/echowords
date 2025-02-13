@@ -1,3 +1,7 @@
+.shopBody {
+    background-color: #333 !important;
+  }
+
 .shop-header {
     display: flex;
     justify-content: space-between;
@@ -9,6 +13,7 @@
     background: #ff9130;
     color: white;
     text-decoration: none;
+    font-size: 2rem;
     padding: 10px 20px;
     border-radius: 5px;
     font-weight: bold;
@@ -81,18 +86,20 @@
     transition: background 0.3s;
 }
 
+
 .select-btn:hover {
     background: #45a049;
-}
-
-.select-btn.selected {
-    background: #2196F3;
-}
-
-.preview-box:hover .preview-text {
-    animation: none;
-}
-
+    }
+    
+    .select-btn.selected {
+        background: #2196F3;
+        }
+        
+        .preview-box:hover .preview-text {
+            animation: none;
+            }
+            
+/*
 .defaultFade {
     animation: defaultFade 1s forwards !important;
 }
@@ -107,101 +114,305 @@
 
 .pulseSuccess {
     animation: pulseSuccess 1s forwards !important;
+} */
+
+
+
+
+/* Updated Animations */
+@keyframes confettiBurst {
+    0% {
+        background-color: #ff9130;
+        transform: scale(1);
+        opacity: 1;
+    }
+    20% {
+        background-color: #a5d6a7;
+        transform: scale(1.1);
+        box-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
+    }
+    40% {
+        transform: scale(0.95) rotate(-5deg);
+        background-color: #81c784;
+        box-shadow: 
+            0 0 30px rgba(76, 175, 80, 0.7),
+            0 -15px 25px rgba(255,255,255,0.5),
+            0 15px 25px rgba(255,255,255,0.5);
+    }
+    60% {
+        transform: scale(1.05) rotate(5deg);
+        background-color: #66bb6a;
+        opacity: 0.9;
+        box-shadow: 
+            0 0 40px rgba(76, 175, 80, 0.9),
+            -10px -20px 35px rgba(255,255,255,0.5),
+            10px 20px 35px rgba(255,255,255,0.5);
+    }
+    80% {
+        transform: scale(0.98);
+        background-color: #4caf50;
+        filter: blur(1px);
+    }
+    100% {
+        background-color: #388e3c;
+        transform: scale(1);
+        box-shadow: 0 0 50px rgba(76, 175, 80, 1);
+        filter: blur(2px);
+    }
 }
 
-@keyframes defaultFade {
-    0% { 
-        background-color: #ff9130;
+@keyframes gradientWave {
+    0% {
+        background-position: 0% 50%;
+        background-size: 100% 100%;
+    }
+    30% {
+        background-image: linear-gradient(
+            45deg,
+            #ff9130 0%,
+            #a5d6a7 25%,
+            #81c784 50%,
+            #4caf50 75%,
+            #388e3c 100%
+        );
+        background-size: 400% 400%;
     }
     50% {
-        background-color: #66BB6A;
-        filter: blur(1px);
+        transform: scale(1.15);
+        background-position: 100% 50%;
     }
-    100% { 
-        background-color: #4CAF50;
-        filter: blur(3px);
+    70% {
+        text-shadow: 0 0 15px rgba(76, 175, 80, 0.8);
     }
-}
-
-@keyframes bounceSuccess {
-    0% { 
-        background-color: #ff9130;
+    100% {
+        background-color: #388e3c;
+        background-position: 0% 50%;
         transform: scale(1);
-        filter: blur(0);
-    }
-    20% { 
-        background-color: #66BB6A;
-        transform: scale(1.1);
-        filter: blur(1px);
-    }
-    40% { 
-        transform: scale(0.95);
         filter: blur(2px);
     }
-    60% { 
-        background-color: #4CAF50;
-        transform: scale(1.05);
-        filter: blur(2.5px);
+}
+
+@keyframes morphPulse {
+    0% {
+        clip-path: circle(50% at 50% 50%);
+        background-color: #ff9130;
     }
-    100% { 
-        background-color: #43A047;
+    25% {
+        clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+        background-color: #a5d6a7;
+    }
+    50% {
+        clip-path: polygon(25% 0%, 100% 0%, 75% 100%, 0% 100%);
+        transform: scale(1.2);
+        background-color: #66bb6a;
+    }
+    75% {
+        clip-path: polygon(0% 15%, 15% 15%, 15% 0%, 85% 0%, 85% 15%, 100% 15%, 100% 85%, 85% 85%, 85% 100%, 15% 100%, 15% 85%, 0% 85%);
+        background-color: #4caf50;
+    }
+    100% {
+        clip-path: circle(50% at 50% 50%);
+        background-color: #388e3c;
+        filter: blur(2px);
+        box-shadow: 0 0 30px rgba(76, 175, 80, 0.7);
+    }
+}
+
+@keyframes neonGlow {
+    0% {
+        text-shadow: 0 0 5px #ff9130,
+                     0 0 10px #ff9130,
+                     0 0 20px #ff9130;
+        background-color: #ff9130;
+    }
+    30% {
+        text-shadow: 0 0 10px #81c784,
+                     0 0 20px #4caf50,
+                     0 0 30px #388e3c;
+        background-color: #81c784;
+        transform: skew(-5deg);
+    }
+    50% {
+        text-shadow: 0 0 20px #4caf50,
+                     0 0 40px #4caf50,
+                     0 0 60px #388e3c;
+        transform: skew(5deg);
+        letter-spacing: 2px;
+    }
+    70% {
+        filter: hue-rotate(90deg);
+        opacity: 0.8;
+    }
+    100% {
+        background-color: #388e3c;
+        text-shadow: 0 0 10px #4caf50,
+                     0 0 20px #388e3c;
+        filter: blur(1px);
+        transform: skew(0);
+    }
+}
+
+@keyframes flip3D {
+    0% {
+        transform: perspective(500px) rotateX(0deg);
+        background-color: #ff9130;
+    }
+    30% {
+        transform: perspective(500px) rotateX(360deg) scale(1.2);
+        background-color: #a5d6a7;
+    }
+    60% {
+        transform: perspective(500px) rotateX(720deg) scale(0.9);
+        background-color: #66bb6a;
+    }
+    80% {
+        text-shadow: 0 0 20px rgba(76, 175, 80, 0.8);
+    }
+    100% {
+        transform: perspective(500px) rotateX(1080deg);
+        background-color: #388e3c;
+        filter: blur(4.5px);
+    }
+}
+
+
+@keyframes liquidWave {
+    0% {
+        background-position: 0% 50%;
         transform: scale(1);
-        filter: blur(3px);
+        opacity: 1;
+    }
+    30% {
+        background-position: 100% 50%;
+        transform: scale(1.05) rotate(-1deg);
+        opacity: 0.9;
+    }
+    60% {
+        background-size: 150% 150%;
+        transform: scale(1.02) rotate(1deg);
+    }
+    100% {
+        background-position: 0% 50%;
+        transform: scale(1);
+        opacity: 1;
+        box-shadow: 0 0 30px rgba(72, 207, 173, 0.4);
     }
 }
 
-@keyframes wiggleSuccess {
-    0% { 
-        background-color: #ff9130;
-        transform: rotate(0);
-        filter: blur(0);
+.liquid-wave {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(
+        120deg,
+        #4a89dc,
+        #48cfad,
+        #37bc9b,
+        #32b08d
+    );
+    background-size: 400% 400%;
+    animation: liquidWave 2s ease-in-out forwards;
+    transform-origin: center;
+}
+
+.liquid-wave::before,
+.liquid-wave::after {
+    content: '';
+    position: absolute;
+    width: 150%;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.15);
+    animation: waveFlow 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.liquid-wave::before {
+    top: -10px;
+    left: -50%;
+    transform: rotate(-3deg);
+}
+
+.liquid-wave::after {
+    bottom: -10px;
+    right: -50%;
+    transform: rotate(3deg);
+    animation-delay: 0.3s;
+}
+
+.animation-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+@keyframes waveFlow {
+    0% {
+        transform: translateX(-60%) rotate(-3deg);
     }
-    25% { 
-        background-color: #66BB6A;
-        transform: rotate(-5deg);
-        filter: blur(1px);
-    }
-    50% { 
-        background-color: #4CAF50;
-        transform: rotate(5deg);
-        filter: blur(2px);
-    }
-    75% { 
-        background-color: #43A047;
-        transform: rotate(-3deg);
-        filter: blur(2.5px);
-    }
-    100% { 
-        background-color: #2E7D32;
-        transform: rotate(0);
-        filter: blur(3px);
+    100% {
+        transform: translateX(60%) rotate(-3deg);
     }
 }
 
-@keyframes pulseSuccess {
-    0% { 
-        background-color: #ff9130;
-        transform: translateY(0);
-        filter: blur(0);
+@keyframes bubbleRise {
+    0% {
+        transform: translateY(0) scale(0);
+        opacity: 0;
     }
-    25% { 
-        background-color: #66BB6A;
-        transform: translateY(-10px);
-        filter: blur(1px);
+    20% {
+        opacity: 1;
     }
-    50% { 
-        background-color: #4CAF50;
-        transform: translateY(5px);
-        filter: blur(2px);
-    }
-    75% { 
-        background-color: #43A047;
-        transform: translateY(-3px);
-        filter: blur(2.5px);
-    }
-    100% { 
-        background-color: #2E7D32;
-        transform: translateY(0);
-        filter: blur(3px);
+    100% {
+        transform: translateY(-100px) scale(1.2);
+        opacity: 0;
     }
 }
+
+.liquid-wave span {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    animation: bubbleRise 1.5s ease-out forwards;
+}
+
+
+.liquid-wave {
+    position: relative;
+    overflow: visible;
+}
+
+.liquid-wave .bubble {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    animation: bubbleRise 1.5s ease-out forwards;
+    pointer-events: none;
+    z-index: 1;
+}
+
+@keyframes bubbleRise {
+    0% { transform: translateY(0) scale(0); opacity: 0; }
+    20% { opacity: 1; }
+    100% { transform: translateY(-50px) scale(1.2); opacity: 0; }
+}
+
+
+
+.confetti-burst {
+    animation: confettiBurst 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
+}
+
+.gradient-wave {
+    animation: gradientWave 1.5s ease-in-out forwards !important;
+}
+
+.liquid-wave {
+    animation: liquidWave 1.4s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+}
+
+.neon-glow {
+    animation: neonGlow 1.3s ease-out forwards !important;
+}
+
+.flip-3d {
+    animation: flip3D 1.6s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards !important;
+}
+
