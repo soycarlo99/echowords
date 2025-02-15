@@ -339,7 +339,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     setTimeout(resumeTimer, 1500);
     if (gameState.wordList.length === 1) {
-      startGameCountdown();
+      //startGameCountdown();
     }
   }
 
