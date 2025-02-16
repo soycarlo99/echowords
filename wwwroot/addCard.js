@@ -8,12 +8,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
-  // Function to create a player card in the Lobby section
   function addPlayerCardLobby(username, playerIndex, avatarSeed) {
     const cardHolderLobby = document.querySelector(".cardHolder");
     if (!cardHolderLobby) return;
 
-    // Prevent duplicate entries
     if (Array.from(cardHolderLobby.children).some(
         (card) => card.querySelector("h4")?.textContent === username
     )) {
@@ -24,7 +22,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const storedSeed = avatarSeed || username;
     const avatarUrl = `https://api.dicebear.com/9.x/open-peeps/svg?seed=${encodeURIComponent(storedSeed)}`;
     const card = document.createElement("div");
-    card.classList.add("card", "fade-in"); // Add fade-in class
+    card.classList.add("card", "fade-in");
     card.innerHTML = `
       <img src="${avatarUrl}" alt="Avatar" style="width:100%">
       <div class="container">
@@ -34,7 +32,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     `;
     cardHolderLobby.appendChild(card);
     
-    // Trigger reflow to ensure animation plays
     card.offsetHeight;
 
     const randomizeBtn = card.querySelector(".randomizeBtn");
@@ -49,7 +46,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  // Function to retrieve and populate lobby players from the server
   async function populatePlayersLobby(lobbyId) {
     try {
       const response = await fetch(`/lobby/${lobbyId}/players`);
@@ -72,7 +68,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     const gridChildPlayers = document.querySelector(".grid-child-players");
     if (!gridChildPlayers) return;
 
-    // Prevent duplicate entries
     if (
       Array.from(gridChildPlayers.children).some(
         (card) => card.querySelector("h4")?.textContent === username,
@@ -96,7 +91,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     gridChildPlayers.appendChild(card);
 }
 
-  // Function to retrieve and populate game players from the server
   async function populatePlayersGame(lobbyId) {
     const gridChildPlayers = document.querySelector(".grid-child-players");
     if (!gridChildPlayers) return;
