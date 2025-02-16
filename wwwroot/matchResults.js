@@ -9,19 +9,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Connect to SignalR hub
     const connection = new signalR.HubConnectionBuilder()
-        .withUrl("/gameHub", {
-            skipNegotiation: true,
-            transport: signalR.HttpTransportType.WebSockets,
-            headers: { "X-Forwarded-Proto": "https" }
-        })
-        .withAutomaticReconnect()
-        .build();
+    .withUrl("/gameHub")
+    .withAutomaticReconnect([0, 2000, 5000, 10000])
+    .build();
 
     async function getMatchResults() {
         try {
             const response = await fetch(`/lobby/${lobbyId}/results`);
-            if (!response.ok) throw new Error("Failed to fetch match results");
-            return await response.json();
+            if (!response.ok) {
+                console.error(`Failed to fetch match results: ${response.status} ${response.statusText}`);
+                throw new Error(`Failed to fetch match results: ${response.status}`);
+            }
+            const data = await response.json();
+            console.log("Retrieved match results:", data);
+            return data;
         } catch (error) {
             console.error("Error fetching match results:", error);
             return null;
@@ -52,14 +53,24 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     function displayResults(results) {
+        if (!results || !results.players || !Array.isArray(results.players)) {
+            console.error("Invalid results data:", results);
+            return;
+        }
+    
         const podiumContainer = document.getElementById('podium');
         const otherPlayersContainer = document.getElementById('otherPlayers');
         
+        if (!podiumContainer || !otherPlayersContainer) {
+            console.error("Required containers not found in DOM");
+            return;
+        }
+    
         // Sort players by score
         const sortedPlayers = results.players.sort((a, b) => b.score - a.score);
         
-        document.getElementById('totalWords').textContent = results.totalWords;
-        document.getElementById('gameDuration').textContent = `${results.gameDuration}s`;
+        document.getElementById('totalWords').textContent = results.totalWords || 0;
+        document.getElementById('gameDuration').textContent = `${results.gameDuration || 0}s`;
         
         podiumContainer.innerHTML = sortedPlayers
             .slice(0, 3)

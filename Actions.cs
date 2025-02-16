@@ -194,7 +194,86 @@ public class Actions
                 return Results.StatusCode(500);
             }
         });
+
+        app.MapPost("/lobby/{lobbyId}/submit-results", async (string lobbyId, HttpContext context) => 
+        {
+            try 
+            {
+                var results = await context.Request.ReadFromJsonAsync<List<PlayerResult>>();
+                if (results == null) return Results.BadRequest("No results provided");
+
+                foreach (var result in results)
+                {
+                    await using var cmd = db.CreateCommand(@"
+                        INSERT INTO player_match_results (player_id, score, words_submitted, accuracy)
+                        SELECT id, @score, @wordsSubmitted, @accuracy
+                        FROM players 
+                        WHERE username = @username AND lobbyid = @lobbyId");
+
+                    cmd.Parameters.AddWithValue("@score", result.Score);
+                    cmd.Parameters.AddWithValue("@wordsSubmitted", result.WordsSubmitted);
+                    cmd.Parameters.AddWithValue("@accuracy", result.Accuracy);
+                    cmd.Parameters.AddWithValue("@username", result.Username);
+                    cmd.Parameters.AddWithValue("@lobbyId", lobbyId);
+
+                    await cmd.ExecuteNonQueryAsync();
+                }
+
+                return Results.Ok();
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error submitting match results: {ex}");
+                return Results.StatusCode(500);
+            }
+        });
+
+        
+
+        app.MapGet("/lobby/{lobbyId}/results", async (string lobbyId) => 
+        {
+            try 
+            {
+                await using var cmd = db.CreateCommand(@"
+                    SELECT p.username, p.avatarseed, 
+                        COALESCE(pw.score, 0) as score,
+                        COALESCE(pw.words_submitted, 0) as wordsSubmitted,
+                        COALESCE(pw.accuracy, 0) as accuracy
+                    FROM players p
+                    LEFT JOIN player_match_results pw ON p.id = pw.player_id
+                    WHERE p.lobbyid = $1");
+                cmd.Parameters.AddWithValue(lobbyId);
+                
+                var players = new List<dynamic>();
+                await using var reader = await cmd.ExecuteReaderAsync();
+                while (await reader.ReadAsync())
+                {
+                    players.Add(new
+                    {
+                        username = reader.GetString(0),
+                        avatarSeed = reader.IsDBNull(1) ? null : reader.GetString(1),
+                        score = reader.GetInt32(2),
+                        wordsSubmitted = reader.GetInt32(3),
+                        accuracy = reader.GetInt32(4)
+                    });
+                }
+
+                return Results.Ok(new
+                {
+                    players = players,
+                    totalWords = players.Sum(p => ((dynamic)p).wordsSubmitted),
+                    gameDuration = 300
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error fetching match results: {ex}");
+                return Results.StatusCode(500);
+            }
+        });
     }
+
+    
 
     public async Task<List<Player>> GetPlayersByLobbyAsync(string lobbyId)
     {
@@ -238,6 +317,8 @@ public class Actions
     //         return false;
     //     }
     // }
+
+    
 
     async Task<bool> NewWord(string word, string clientId)
     {

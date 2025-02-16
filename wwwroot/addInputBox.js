@@ -256,6 +256,11 @@ document.addEventListener("DOMContentLoaded", () => {
   // -------------------------------------------------------------------------
   function handleWordSubmission(input, index) {
     const enteredWord = input.value.trim().toLowerCase();
+    const playerIndex = gameState.currentPlayerIndex % document.querySelectorAll(".grid-child-players .card").length;
+    const playerCard = document.querySelectorAll(".grid-child-players .card")[playerIndex];
+
+    const currentAttempts = parseInt(playerCard.getAttribute("data-attempts") || "0");
+    playerCard.setAttribute("data-attempts", currentAttempts + 1);
 
     if (index < gameState.wordList.length) {
       if (enteredWord === gameState.wordList[index].toLowerCase()) {
@@ -418,7 +423,84 @@ document.addEventListener("DOMContentLoaded", () => {
   broadcastAnimation(index, animationClass);
 }
 
+  // -------------------------------------------------------------------------
+  // -------------------------------------------------------------------------
+  // 8. MATCH RESULT SYSTEM 
+  // -------------------------------------------------------------------------
+  function calculateGameResults() {
+    const playerElements = document.querySelectorAll(".grid-child-players .card");
+    const results = Array.from(playerElements).map(playerElement => {
+        const username = playerElement.querySelector("h4").textContent;
+        const scoreElement = playerElement.querySelector(".counter");
+        const score = parseInt(scoreElement.textContent.replace("Score: ", "")) || 0;
+        
+        const wordsSubmitted = gameState.wordList.filter((_, index) => 
+            index % playerElements.length === Array.from(playerElements).indexOf(playerElement)
+        ).length;
 
+        const totalAttempts = parseInt(playerElement.getAttribute("data-attempts")) || wordsSubmitted;
+        const accuracy = totalAttempts > 0 
+            ? Math.round((wordsSubmitted / totalAttempts) * 100)
+            : 100;
+
+        return {
+            username,
+            score,
+            wordsSubmitted,
+            accuracy
+        };
+    });
+
+    return results;
+}
+
+async function handleGameOver() {
+  const results = calculateGameResults();
+  
+  try {
+      const response = await fetch(`/lobby/${lobbyId}/submit-results`, {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(results)
+      });
+
+      if (!response.ok) {
+          throw new Error(`Failed to submit results: ${response.status}`);
+      }
+  } catch (error) {
+      console.error('Error submitting game results:', error);
+  }
+}
+
+async function submitGameResults() {
+    const lobbyId = new URLSearchParams(window.location.search).get("roomId");
+    if (!lobbyId) {
+        console.error("No lobby ID found");
+        return;
+    }
+
+    const results = calculateGameResults();
+
+    try {
+        const response = await fetch(`/lobby/${lobbyId}/submit-results`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(results)
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to submit results: ${response.status}`);
+        }
+
+        window.location.href = `matchResult.html?roomId=${lobbyId}`;
+    } catch (error) {
+        console.error('Error submitting game results:', error);
+    }
+}
 
 
   // -------------------------------------------------------------------------
@@ -566,14 +648,22 @@ document.addEventListener("DOMContentLoaded", () => {
         clearInterval(timerInterval);
         timerSpan.textContent = "Finished";
         timerElement.style.setProperty('--transform', 'scaleX(0)');
+
         const modal = document.getElementById('gameOverModal');
         if (modal) {
             const resultsBtn = modal.querySelector('#resultsBtn');
-            const urlParams = new URLSearchParams(window.location.search);
-            const lobbyId = urlParams.get("roomId");
-            if (resultsBtn && lobbyId) {
-                resultsBtn.onclick = () => {
+            const playAgainBtn = modal.querySelector('#playAgainBtn');
+            
+            if (resultsBtn) {
+                resultsBtn.onclick = async () => {
+                    await handleGameOver();
                     window.location.href = `matchResult.html?roomId=${lobbyId}`;
+                };
+            }
+            
+            if (playAgainBtn) {
+                playAgainBtn.onclick = () => {
+                    location.reload();
                 };
             }
             

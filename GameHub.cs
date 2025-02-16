@@ -35,6 +35,11 @@ namespace Wordapp
             }
         }
 
+        public async Task BroadcastDifficulty(string roomId, string difficulty)
+        {
+            await Clients.Group(roomId).SendAsync("ReceiveDifficultyUpdate", difficulty);
+        }
+
         public async Task BroadcastGameState(string lobbyId, object gameState)
         {
             await Clients.Group(lobbyId).SendAsync("ReceiveGameState", gameState);
