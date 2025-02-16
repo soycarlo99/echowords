@@ -14,7 +14,7 @@ public class Actions
         _hubContext = hubContext;
         db = database.Connection();
 
-        app.MapGet("/test-word/{word}", TestWord);
+        //app.MapGet("/test-word/{word}", TestWord);
 
         app.MapPost("/new-word", async (HttpContext context) =>
         {
@@ -218,27 +218,27 @@ public class Actions
         return players;
     }
     
-    async Task<bool> TestWord(string word)
-    {
-        try
-        {
-            await using var cmd = db.CreateCommand("SELECT EXISTS (SELECT 1 FROM words WHERE word = $1)");
-            cmd.Parameters.AddWithValue(word);
-            bool result = (bool)(await cmd.ExecuteScalarAsync() ?? false);
-            return result;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error testing word: {ex.Message}");
-            return false;
-        }
-    }
+    // async Task<bool> TestWord(string word)
+    // {
+    //     try
+    //     {
+    //         await using var cmd = db.CreateCommand("SELECT EXISTS (SELECT 1 FROM words WHERE word = $1)");
+    //         cmd.Parameters.AddWithValue(word);
+    //         bool result = (bool)(await cmd.ExecuteScalarAsync() ?? false);
+    //         return result;
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         Console.WriteLine($"Error testing word: {ex.Message}");
+    //         return false;
+    //     }
+    // }
 
     async Task<bool> NewWord(string word, string clientId)
     {
         try
         {
-            await using var cmd = db.CreateCommand("INSERT INTO testtable (wordinput, clientid) VALUES ($1, $2)");
+            await using var cmd = db.CreateCommand("INSERT INTO playerwords (wordinput, clientid) VALUES ($1, $2)");
             cmd.Parameters.AddWithValue(word);
             cmd.Parameters.AddWithValue(clientId);
             int rowsAffected = await cmd.ExecuteNonQueryAsync();
@@ -318,7 +318,7 @@ public class Actions
         try
         {
             var wordList = new List<string>();
-            await using var cmd = db.CreateCommand("SELECT wordinput FROM testtable ORDER BY id");
+            await using var cmd = db.CreateCommand("SELECT wordinput FROM playerwords ORDER BY id");
             await using var reader = await cmd.ExecuteReaderAsync();
             while (await reader.ReadAsync())
             {
