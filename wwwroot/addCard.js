@@ -114,12 +114,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  // Populate Lobby Section if on a page with .cardHolder
   if (document.querySelector(".cardHolder")) {
     await populatePlayersLobby(lobbyId);
   }
 
-  // Populate Game Section if on a page with .grid-child-players
   if (document.querySelector(".grid-child-players")) {
     await populatePlayersGame(lobbyId);
   }
@@ -137,7 +135,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-// SignalR integration for real-time updates
 let connection = new signalR.HubConnectionBuilder()
   .withUrl("/gameHub", {
     skipNegotiation: true,
@@ -168,7 +165,7 @@ async function initializeSignalR() {
     }
   } catch (err) {
     console.error(err);
-    setTimeout(initializeSignalR, 5000); // Retry connection after 5 seconds
+    setTimeout(initializeSignalR, 5000);
   }
 }
 

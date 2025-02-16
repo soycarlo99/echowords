@@ -529,7 +529,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const timerElement = document.getElementById("timer");
       let timerSpan = timerElement.querySelector('span');
 
-      // Create span if it doesn't exist
       if (!timerSpan) {
           timerSpan = document.createElement('span');
           timerElement.appendChild(timerSpan);
