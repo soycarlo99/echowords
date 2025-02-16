@@ -38,13 +38,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     card.offsetHeight;
 
     const randomizeBtn = card.querySelector(".randomizeBtn");
-    randomizeBtn.addEventListener("click", () => {
+    randomizeBtn.addEventListener("click", async () => {
       const randomSeed = Math.random().toString(36).substring(2, 12);
       const newAvatarUrl = `https://api.dicebear.com/9.x/open-peeps/svg?seed=${encodeURIComponent(randomSeed)}`;
       const img = card.querySelector('img[alt="Avatar"]');
       if (img) {
         img.src = newAvatarUrl;
-        //I will add later: notify server of avatar change for this user
+        await connection.invoke("UpdateAvatar", lobbyId, username, randomSeed);
       }
     });
   }
@@ -152,6 +152,20 @@ connection.on("PlayerJoined", (player) => {
   if (document.querySelector(".cardHolder")) {
     addPlayerCardLobby(player.username, document.querySelectorAll(".cardHolder .card").length, player.avatarSeed);
   }
+});
+
+connection.on("AvatarUpdated", (username, newSeed) => {
+  console.log("Avatar updated for:", username, "with seed:", newSeed);
+  const cards = document.querySelectorAll(".card");
+  cards.forEach(card => {
+    const usernameElement = card.querySelector("h4");
+    if (usernameElement?.textContent === username) {
+      const img = card.querySelector('img[alt="Avatar"]');
+      if (img) {
+        img.src = `https://api.dicebear.com/9.x/open-peeps/svg?seed=${encodeURIComponent(newSeed)}`;
+      }
+    }
+  });
 });
 
 async function initializeSignalR() {

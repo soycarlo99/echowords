@@ -84,5 +84,10 @@ namespace Wordapp
         {
             await Clients.Group(roomId).SendAsync("RedirectToGame");
         }
+
+        public async Task UpdateAvatar(string lobbyId, string username, string newSeed)
+        {
+            await Clients.Group(lobbyId).SendAsync("AvatarUpdated", username, newSeed);
+        }
     }
 }
