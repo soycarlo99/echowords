@@ -4,8 +4,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Welcome</title>
     <link rel="stylesheet" href="startpage.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js" defer></script>
     <script src="darkmode.JS" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" defer></script>
+    <script src="usernameStartpage.js" defer></script>
     <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
@@ -43,10 +45,32 @@
         </p>
       </div>
     </main>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script src="usernameStartpage.js" defer></script>
     <script>
+      document.addEventListener("DOMContentLoaded", async () => {
+          const connection = new signalR.HubConnectionBuilder()
+              .withUrl("/gameHub")
+              .withAutomaticReconnect([0, 2000, 5000, 10000])
+              .build();
 
-    </script>
+          connection.onreconnecting((error) => {
+              console.log('Reconnecting to hub...', error);
+          });
+
+          connection.onreconnected((connectionId) => {
+              console.log('Reconnected to hub.', connectionId);
+          });
+
+          connection.onclose((error) => {
+              console.log('Connection closed.', error);
+          });
+
+          try {
+              await connection.start();
+              console.log("Connected to SignalR hub");
+          } catch (error) {
+              console.error("Error starting SignalR connection:", error);
+          }
+      });
+  </script>
   </body>
 </html>

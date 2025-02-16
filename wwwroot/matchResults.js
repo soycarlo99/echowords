@@ -77,7 +77,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     document.getElementById('quitButton').addEventListener('click', () => {
-        window.location.href = `/lobby.html?roomId=${lobbyId}`;
+        window.location.href = `/preGame.html?roomId=${lobbyId}`;
     });
 
 

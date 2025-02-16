@@ -1,18 +1,26 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // -------------------------------------------------------------------------
-  // 1. SIGNALR CONNECTION SETUP (Server-Side Communication)
-  // -------------------------------------------------------------------------
+  const lobbyId = new URLSearchParams(window.location.search).get("roomId");
+
   const connection = new signalR.HubConnectionBuilder()
-  .withUrl("/gameHub", {
-    skipNegotiation: true,
-    transport: signalR.HttpTransportType.WebSockets,
-    headers: {
-      "X-Forwarded-Proto": "https",
-    },
-  })
-  .withAutomaticReconnect([0, 2000, 5000, 10000, 20000])
-  .configureLogging(signalR.LogLevel.Information)
-  .build();
+    .withUrl("/gameHub", {
+      skipNegotiation: true,
+      transport: signalR.HttpTransportType.WebSockets,
+      headers: {
+        "X-Forwarded-Proto": "https",
+      },
+    })
+    .withAutomaticReconnect([0, 2000, 5000, 10000, 20000])
+    .configureLogging(signalR.LogLevel.Information)
+    .build();
+
+  connection.start()
+    .then(() => {
+      console.log("Connected to SignalR hub.");
+      connection.invoke("JoinLobby", lobbyId)
+        .catch(err => console.error("Error joining lobby:", err));
+    })
+    .catch((err) => console.error("SignalR Connection Error:", err));
+
 
   // -------------------------------------------------------------------------
   // 2. GLOBAL GAME STATE & VARIABLES (Client-Side)
@@ -34,12 +42,12 @@ document.addEventListener("DOMContentLoaded", () => {
   // -------------------------------------------------------------------------
   // 3. START THE CONNECTION (Server-Side)
   // -------------------------------------------------------------------------
-  connection
-    .start()
-    .then(() => {
-      console.log("Connected to SignalR hub.");
-    })
-    .catch((err) => console.error("SignalR Connection Error:", err));
+  // connection
+  //   .start()
+  //   .then(() => {
+  //     console.log("Connected to SignalR hub.");
+  //   })
+  //   .catch((err) => console.error("SignalR Connection Error:", err));
 
   // -------------------------------------------------------------------------
   // 4. SIGNALR SERVER -> CLIENT HANDLERS (Server-Side -> Client)
@@ -49,6 +57,19 @@ document.addEventListener("DOMContentLoaded", () => {
     gameState = { ...gameState, ...newState };
     previousWordListLength = oldLength;
     updateUI();
+  });
+
+  // connection.on("ReceiveGameState", (newState) => {
+  //   const oldLength = gameState.wordList.length;
+  //   gameState = { ...gameState, ...newState };
+  //   previousWordListLength = oldLength;
+  //   updateUI();
+  // });
+
+  connection.on("ReceiveTimerSync", (remainingTime) => {
+    gameState.remainingSeconds = remainingTime;
+    clearInterval(timerInterval);
+    startTimerWithoutBroadcast();
   });
 
   connection.on("ReceiveUserInput", (index, input) => {
@@ -100,27 +121,27 @@ document.addEventListener("DOMContentLoaded", () => {
   function broadcastGameState() {
     const gameStateWithoutTimer = { ...gameState };
     delete gameStateWithoutTimer.remainingSeconds;
-    connection.invoke("BroadcastGameState", gameStateWithoutTimer)
+    connection.invoke("BroadcastGameState", lobbyId, gameStateWithoutTimer)
       .catch(err => console.error("Error broadcasting game state:", err));
   }
 
   function broadcastUserInput(index, input) {
-    connection.invoke("BroadcastUserInput", index, input)
+    connection.invoke("BroadcastUserInput", lobbyId, index, input)
       .catch(err => console.error("Error broadcasting user input:", err));
   }
 
   function broadcastAnimation(index, animationType) {
-    connection.invoke("BroadcastAnimation", index, animationType)
+    connection.invoke("BroadcastAnimation", lobbyId, index, animationType)
       .catch(err => console.error("Error broadcasting animation:", err));
   }
 
   function broadcastTimerSync(remainingTime) {
-    connection.invoke("BroadcastTimerSync", remainingTime)
+    connection.invoke("BroadcastTimerSync", lobbyId, remainingTime)
       .catch(err => console.error("Error broadcasting timer sync:", err));
   }
 
   function broadcastTimerStart(initialTime) {
-    connection.invoke("BroadcastTimerStart", initialTime)
+    connection.invoke("BroadcastTimerStart", lobbyId, initialTime)
       .catch(err => console.error("Error broadcasting timer start:", err));
   }
 
@@ -133,7 +154,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (gameState.wordList.length === 1 && previousWordListLength === 0) {
       console.log("Broadcasting game start");
-      connection.invoke("BroadcastGameStart")
+      connection.invoke("BroadcastGameStart", lobbyId)
         .catch(err => console.error("Error broadcasting game start:", err));
     }
 
@@ -145,6 +166,7 @@ document.addEventListener("DOMContentLoaded", () => {
         updateScore();
       }, 3100);
     } else if (gameState.wordList.length > previousWordListLength) {
+      updateTimer();
       setTimeout(() => {
         renderWordBoxes();
         highlightCurrentPlayer();
@@ -680,14 +702,14 @@ document.addEventListener("DOMContentLoaded", () => {
 function pauseTimer() {
   clearInterval(timerInterval);
   isInCountdown = true;
-  connection.invoke("BroadcastTimerPause")
+  connection.invoke("BroadcastTimerPause" ,lobbyId)
     .catch(err => console.error("Error pausing timer:", err));
 }
 
 function resumeTimer() {
   isInCountdown = false;
   startTimerWithoutBroadcast();
-  connection.invoke("BroadcastTimerResume", gameState.remainingSeconds)
+  connection.invoke("BroadcastTimerResume",lobbyId,  gameState.remainingSeconds)
     .catch(err => console.error("Error resuming timer:", err));
 }
 
