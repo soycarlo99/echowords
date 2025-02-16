@@ -22,10 +22,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 case 'gradient':
                     animationName = 'gradientWave';
                     break;
-                    case 'wave':
-                        animationClass = 'liquid-wave';
-                        addBubbles(input);
-                        break;
+                case 'wave':
+                    animationName = 'liquidWave';
+                    break;
                 case 'neon':
                     animationName = 'neonGlow';
                     break;
