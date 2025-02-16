@@ -330,8 +330,8 @@ public class Actions
             int rowsAffected = await cmd.ExecuteNonQueryAsync();
             if (rowsAffected > 0)
             {
-                var updatedWordList = await GetWordList();
-                await _hubContext.Clients.All.SendAsync("ReceiveNewWord", word, updatedWordList);
+                //var updatedWordList = await GetWordList();
+                //await _hubContext.Clients.All.SendAsync("ReceiveNewWord", word, updatedWordList);
                 return true;
             }
             return false;
@@ -399,23 +399,23 @@ public class Actions
         }
     }
 
-    async Task<List<string>> GetWordList()
-    {
-        try
-        {
-            var wordList = new List<string>();
-            await using var cmd = db.CreateCommand("SELECT wordinput FROM playerwords ORDER BY id");
-            await using var reader = await cmd.ExecuteReaderAsync();
-            while (await reader.ReadAsync())
-            {
-                wordList.Add(reader.GetString(0));
-            }
-            return wordList;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error retrieving word list: {ex.Message}");
-            return new List<string>();
-        }
-    }
+    // async Task<List<string>> GetWordList()
+    // {
+    //     try
+    //     {
+    //         var wordList = new List<string>();
+    //         await using var cmd = db.CreateCommand("SELECT wordinput FROM playerwords ORDER BY id");
+    //         await using var reader = await cmd.ExecuteReaderAsync();
+    //         while (await reader.ReadAsync())
+    //         {
+    //             wordList.Add(reader.GetString(0));
+    //         }
+    //         return wordList;
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         Console.WriteLine($"Error retrieving word list: {ex.Message}");
+    //         return new List<string>();
+    //     }
+    // }
 }
