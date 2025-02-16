@@ -1,7 +1,3 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.SignalR;
 using System.Security.Cryptography;
 using Wordapp;
@@ -16,19 +12,21 @@ builder.Services.AddSignalR(options =>
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowSpecificOrigins", policy =>
+    options.AddPolicy("AllowAll", policy =>
     {
-        policy.WithOrigins("https://echowords.xyz")
-              .AllowAnyMethod()
-              .AllowAnyHeader()
-              .AllowCredentials();
+        policy
+            .SetIsOriginAllowed(_ => true)
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials();
     });
 });
 
 var app = builder.Build();
 
-app.UseCors("AllowSpecificOrigins");
+app.UseCors("AllowAll");
 
+// Handle forwarded headers (e.g., X-Forwarded-Proto)
 app.Use((context, next) =>
 {
     var forwardedProto = context.Request.Headers["X-Forwarded-Proto"].FirstOrDefault();
@@ -74,4 +72,11 @@ static string GenerateUniqueClientId()
 var hubContext = app.Services.GetRequiredService<IHubContext<GameHub>>();
 var actions = new Actions(app, hubContext);
 
-app.Run();
+try
+{
+    app.Run();
+}
+catch (Exception ex)
+{
+    Console.WriteLine("Unhandled exception: " + ex.ToString());
+}
