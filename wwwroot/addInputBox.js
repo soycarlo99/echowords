@@ -172,7 +172,7 @@ document.addEventListener("DOMContentLoaded", () => {
         highlightCurrentPlayer();
         updateScore();
         updateTimer();
-      }, 1500);
+      }, 1700);
     } else {
       renderWordBoxes();
       highlightCurrentPlayer();

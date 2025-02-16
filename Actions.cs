@@ -56,7 +56,12 @@ public class Actions
             int attempts = 0;
             do
             {
-                lobbyId = new Random().Next(1000, 10000).ToString();
+                // Generate a 4-character alphanumeric code
+                const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+                var random = new Random();
+                lobbyId = new string(Enumerable.Repeat(chars, 4)
+                    .Select(s => s[random.Next(s.Length)]).ToArray());
+                
                 attempts++;
                 if(attempts > 10) 
                 {

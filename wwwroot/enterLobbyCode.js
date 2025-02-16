@@ -7,6 +7,10 @@ document.addEventListener("DOMContentLoaded", () => {
       "keyup",
       function (event) {
         var target = event.srcElement;
+        
+        // Convert input to uppercase and restrict to alphanumeric
+        target.value = target.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+        
         var maxLength = parseInt(target.getAttribute("maxlength"), 10);
         var myLength = target.value.length;
 
@@ -102,10 +106,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const spinner = document.getElementById("loadingSpinner");
     const joinButton = document.getElementById("joinButton");
     
-    const lobbyCode = getLobbyCode();
+    const lobbyCode = getLobbyCode().toUpperCase();
     console.log(`Lobby code entered: ${lobbyCode}`);
     if (lobbyCode.length < 4) {
-      alert("Please enter a complete 4-digit lobby code.");
+      alert("Please enter a complete 4-character lobby code.");
       return;
     }
 
