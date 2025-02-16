@@ -3,16 +3,16 @@ document.addEventListener("DOMContentLoaded", () => {
   // 1. SIGNALR CONNECTION SETUP (Server-Side Communication)
   // -------------------------------------------------------------------------
   const connection = new signalR.HubConnectionBuilder()
-    .withUrl("/gameHub", {
-      skipNegotiation: true,
-      transport: signalR.HttpTransportType.WebSockets,
-      headers: {
-        "X-Forwarded-Proto": "https",
-      },
-    })
-    .withAutomaticReconnect()
-    .configureLogging(signalR.LogLevel.Debug)
-    .build();
+  .withUrl("/gameHub", {
+    skipNegotiation: true,
+    transport: signalR.HttpTransportType.WebSockets,
+    headers: {
+      "X-Forwarded-Proto": "https",
+    },
+  })
+  .withAutomaticReconnect([0, 2000, 5000, 10000, 20000])
+  .configureLogging(signalR.LogLevel.Information)
+  .build();
 
   // -------------------------------------------------------------------------
   // 2. GLOBAL GAME STATE & VARIABLES (Client-Side)
@@ -541,15 +541,28 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
       }
 
-      if (gameState.remainingSeconds <= 0) {
-          clearInterval(timerInterval);
-          timerSpan.textContent = "Finished";
-          timerElement.style.setProperty('--transform', 'scaleX(0)');
-          const modal = document.getElementById('gameOverModal');
-          modal.style.display = 'flex';
-          document.querySelectorAll(".wordInput")
-              .forEach((input) => (input.disabled = true));
-      } else {
+      if (gameState.remainingSeconds <= 0 && gameState.wordList.length > 1) {
+        clearInterval(timerInterval);
+        timerSpan.textContent = "Finished";
+        timerElement.style.setProperty('--transform', 'scaleX(0)');
+        const modal = document.getElementById('gameOverModal');
+        if (modal) {
+            const resultsBtn = modal.querySelector('#resultsBtn');
+            const urlParams = new URLSearchParams(window.location.search);
+            const lobbyId = urlParams.get("roomId");
+            if (resultsBtn && lobbyId) {
+                resultsBtn.onclick = () => {
+                    window.location.href = `matchResult.html?roomId=${lobbyId}`;
+                };
+            }
+            
+            modal.style.display = 'flex';
+            document.querySelectorAll(".wordInput")
+                .forEach((input) => (input.disabled = true));
+        } else {
+            console.error("Game over modal not found in the DOM");
+        }
+    } else {
           timerSpan.textContent = gameState.remainingSeconds.toFixed(1);
 
           const initialTime = getDifficultySettings().initialTime;
