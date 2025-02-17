@@ -9,8 +9,10 @@ document.addEventListener("DOMContentLoaded", () => {
         "X-Forwarded-Proto": "https",
       },
     })
-    .withAutomaticReconnect([0, 2000, 5000, 10000, 20000])
+    //.withAutomaticReconnect([0, 2000, 5000, 10000, 20000])
+    .withAutomaticReconnect()
     .configureLogging(signalR.LogLevel.Information)
+    .configureLogging(signalR.LogLevel.Debug)
     .build();
 
   connection.start()
@@ -166,7 +168,7 @@ document.addEventListener("DOMContentLoaded", () => {
         updateScore();
       }, 3100);
     } else if (gameState.wordList.length > previousWordListLength) {
-      updateTimer();
+      //updateTimer();
       setTimeout(() => {
         renderWordBoxes();
         highlightCurrentPlayer();
@@ -901,27 +903,27 @@ function resumeTimer() {
   }
 
   const style = document.createElement('style');
-style.textContent = `
-    .score-popup {
-        position: absolute;
-        color: #2ecc71;
-        font-size: 1.2em;
-        font-weight: bold;
-        animation: scorePopup 1s ease-out forwards;
-        pointer-events: none;
-    }
+  style.textContent = `
+      .score-popup {
+          position: absolute;
+          color: #2ecc71;
+          font-size: 1.2em;
+          font-weight: bold;
+          animation: scorePopup 1s ease-out forwards;
+          pointer-events: none;
+      }
 
-    @keyframes scorePopup {
-        0% {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        100% {
-            opacity: 0;
-            transform: translateY(-20px);
-        }
-    }
-`;
-document.head.appendChild(style);
+      @keyframes scorePopup {
+          0% {
+              opacity: 1;
+              transform: translateY(0);
+          }
+          100% {
+              opacity: 0;
+              transform: translateY(-20px);
+          }
+      }
+  `;
+  document.head.appendChild(style);
   
 });
