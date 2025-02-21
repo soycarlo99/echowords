@@ -15,14 +15,15 @@ document.addEventListener("DOMContentLoaded", () => {
     .configureLogging(signalR.LogLevel.Debug)
     .build();
 
-  connection.start()
+  connection
+    .start()
     .then(() => {
       console.log("Connected to SignalR hub.");
-      connection.invoke("JoinLobby", lobbyId)
-        .catch(err => console.error("Error joining lobby:", err));
+      connection
+        .invoke("JoinLobby", lobbyId)
+        .catch((err) => console.error("Error joining lobby:", err));
     })
     .catch((err) => console.error("SignalR Connection Error:", err));
-
 
   // -------------------------------------------------------------------------
   // 2. GLOBAL GAME STATE & VARIABLES (Client-Side)
@@ -60,13 +61,6 @@ document.addEventListener("DOMContentLoaded", () => {
     previousWordListLength = oldLength;
     updateUI();
   });
-
-  // connection.on("ReceiveGameState", (newState) => {
-  //   const oldLength = gameState.wordList.length;
-  //   gameState = { ...gameState, ...newState };
-  //   previousWordListLength = oldLength;
-  //   updateUI();
-  // });
 
   connection.on("ReceiveTimerSync", (remainingTime) => {
     gameState.remainingSeconds = remainingTime;
@@ -110,7 +104,7 @@ document.addEventListener("DOMContentLoaded", () => {
     clearInterval(timerInterval);
     isInCountdown = true;
   });
-  
+
   connection.on("ReceiveTimerResume", (remainingTime) => {
     gameState.remainingSeconds = remainingTime;
     isInCountdown = false;
@@ -123,41 +117,52 @@ document.addEventListener("DOMContentLoaded", () => {
   function broadcastGameState() {
     const gameStateWithoutTimer = { ...gameState };
     delete gameStateWithoutTimer.remainingSeconds;
-    connection.invoke("BroadcastGameState", lobbyId, gameStateWithoutTimer)
-      .catch(err => console.error("Error broadcasting game state:", err));
+    connection
+      .invoke("BroadcastGameState", lobbyId, gameStateWithoutTimer)
+      .catch((err) => console.error("Error broadcasting game state:", err));
   }
 
   function broadcastUserInput(index, input) {
-    connection.invoke("BroadcastUserInput", lobbyId, index, input)
-      .catch(err => console.error("Error broadcasting user input:", err));
+    connection
+      .invoke("BroadcastUserInput", lobbyId, index, input)
+      .catch((err) => console.error("Error broadcasting user input:", err));
   }
 
   function broadcastAnimation(index, animationType) {
-    connection.invoke("BroadcastAnimation", lobbyId, index, animationType)
-      .catch(err => console.error("Error broadcasting animation:", err));
+    connection
+      .invoke("BroadcastAnimation", lobbyId, index, animationType)
+      .catch((err) => console.error("Error broadcasting animation:", err));
   }
 
   function broadcastTimerSync(remainingTime) {
-    connection.invoke("BroadcastTimerSync", lobbyId, remainingTime)
-      .catch(err => console.error("Error broadcasting timer sync:", err));
+    connection
+      .invoke("BroadcastTimerSync", lobbyId, remainingTime)
+      .catch((err) => console.error("Error broadcasting timer sync:", err));
   }
 
   function broadcastTimerStart(initialTime) {
-    connection.invoke("BroadcastTimerStart", lobbyId, initialTime)
-      .catch(err => console.error("Error broadcasting timer start:", err));
+    connection
+      .invoke("BroadcastTimerStart", lobbyId, initialTime)
+      .catch((err) => console.error("Error broadcasting timer start:", err));
   }
 
   // -------------------------------------------------------------------------
   // 6. UI & RENDERING LOGIC (Client-Side)
   // -------------------------------------------------------------------------
   function updateUI() {
-    console.log("updateUI called, wordList length:", gameState.wordList.length, "previous length:", previousWordListLength);
+    console.log(
+      "updateUI called, wordList length:",
+      gameState.wordList.length,
+      "previous length:",
+      previousWordListLength,
+    );
     console.log("Current gameState:", gameState);
 
     if (gameState.wordList.length === 1 && previousWordListLength === 0) {
       console.log("Broadcasting game start");
-      connection.invoke("BroadcastGameStart", lobbyId)
-        .catch(err => console.error("Error broadcasting game start:", err));
+      connection
+        .invoke("BroadcastGameStart", lobbyId)
+        .catch((err) => console.error("Error broadcasting game start:", err));
     }
 
     if (gameState.wordList.length === 1) {
@@ -198,7 +203,9 @@ document.addEventListener("DOMContentLoaded", () => {
     gameContainer.appendChild(newWordBox);
 
     setTimeout(() => {
-      const firstInput = gameContainer.querySelector(".wordInput:not([disabled])");
+      const firstInput = gameContainer.querySelector(
+        ".wordInput:not([disabled])",
+      );
       if (firstInput) {
         firstInput.focus();
         const length = firstInput.value.length;
@@ -225,7 +232,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const input = box.querySelector(".wordInput");
     updateInputSize(input);
 
-    input.addEventListener('paste', (e) => {
+    input.addEventListener("paste", (e) => {
       e.preventDefault();
       return false;
     });
@@ -258,10 +265,16 @@ document.addEventListener("DOMContentLoaded", () => {
   // -------------------------------------------------------------------------
   function handleWordSubmission(input, index) {
     const enteredWord = input.value.trim().toLowerCase();
-    const playerIndex = gameState.currentPlayerIndex % document.querySelectorAll(".grid-child-players .card").length;
-    const playerCard = document.querySelectorAll(".grid-child-players .card")[playerIndex];
+    const playerIndex =
+      gameState.currentPlayerIndex %
+      document.querySelectorAll(".grid-child-players .card").length;
+    const playerCard = document.querySelectorAll(".grid-child-players .card")[
+      playerIndex
+    ];
 
-    const currentAttempts = parseInt(playerCard.getAttribute("data-attempts") || "0");
+    const currentAttempts = parseInt(
+      playerCard.getAttribute("data-attempts") || "0",
+    );
     playerCard.setAttribute("data-attempts", currentAttempts + 1);
 
     if (index < gameState.wordList.length) {
@@ -286,41 +299,49 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function isLikelyGibberish(word) {
     word = word.toLowerCase();
-    
+
     if (/(.)\1{2,}/.test(word)) {
-        showNotification("Too many repeated characters.");
-        return true;
+      showNotification("Too many repeated characters.");
+      return true;
     }
 
     const vowels = (word.match(/[aeiou]/gi) || []).length;
     const consonants = word.length - vowels;
     if (consonants / word.length > 0.85) {
-        showNotification("Too many consonants. This doesn't look like a real word.");
-        return true;
+      showNotification(
+        "Too many consonants. This doesn't look like a real word.",
+      );
+      return true;
     }
-    
+
     const unlikelyCombos = /[qwx]{2}|[jvk]{2}|[mqz]{2}/;
     if (unlikelyCombos.test(word)) {
-        showNotification("Invalid character combination.");
-        return true;
+      showNotification("Invalid character combination.");
+      return true;
     }
-    
+
     return false;
   }
 
   function isValidNewWord(word) {
-
-    return word && 
-           checkWordStart(word) && 
-           !isWordDuplicate(word) && 
-           isAlphabetic(word) && 
-           !isLikelyGibberish(word);
+    return (
+      word &&
+      checkWordStart(word) &&
+      !isWordDuplicate(word) &&
+      isAlphabetic(word) &&
+      !isLikelyGibberish(word)
+    );
   }
 
   function checkWordStart(word) {
     if (!gameState.lastWord) return true;
-    if (word.charAt(0).toLowerCase() !== gameState.lastWord.slice(-1).toLowerCase()) {
-      showNotification("The word must start with the last letter of the previous word.");
+    if (
+      word.charAt(0).toLowerCase() !==
+      gameState.lastWord.slice(-1).toLowerCase()
+    ) {
+      showNotification(
+        "The word must start with the last letter of the previous word.",
+      );
       return false;
     }
     return true;
@@ -335,7 +356,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function isAlphabetic(word) {
-    if (/[^a-zA-Z\u00E0-\u00FC\u00C0-\u00DC\u00D8-\u00F6\u00F8-\u02AF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD]/.test(word)) {
+    if (
+      /[^a-zA-Z\u00E0-\u00FC\u00C0-\u00DC\u00D8-\u00F6\u00F8-\u02AF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD]/.test(
+        word,
+      )
+    ) {
       showNotification("Please enter only alphabetic characters.");
       return false;
     }
@@ -344,8 +369,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function submitNewWord(word, input, index) {
     const basePoints = calculateWordScore(word, input);
-    const currentPlayer = gameState.currentPlayerIndex % document.querySelectorAll(".grid-child-players .card").length;
-    gameState.scores[currentPlayer] = (gameState.scores[currentPlayer] || 0) + basePoints;
+    const currentPlayer =
+      gameState.currentPlayerIndex %
+      document.querySelectorAll(".grid-child-players .card").length;
+    gameState.scores[currentPlayer] =
+      (gameState.scores[currentPlayer] || 0) + basePoints;
     gameState.wordList.push(word);
     gameState.lastWord = word;
     gameState.currentPlayerIndex++;
@@ -382,130 +410,134 @@ document.addEventListener("DOMContentLoaded", () => {
   function markWordAsCorrect(input, index) {
     correctSound.play();
     input.disabled = true;
-    
-    const selectedAnimation = localStorage.getItem('selectedAnimation') || 'default';
-    
-    // Map to actual CSS class names
+
+    const selectedAnimation =
+      localStorage.getItem("selectedAnimation") || "default";
+
     let animationClass;
-    switch(selectedAnimation) {
-        case 'confetti':
-            animationClass = 'confetti-burst';
-            break;
-        case 'gradient':
-            animationClass = 'gradient-wave';
-            break;
-        case 'wave':
-          animationClass = 'liquid-wave';
-          addBubbles(input);
-          break;
-        case 'neon':
-            animationClass = 'neon-glow';
-            break;
-        case 'flip':
-            animationClass = 'flip-3d';
-            break;
-        default:
-            animationClass = 'startAnimation';
+    switch (selectedAnimation) {
+      case "confetti":
+        animationClass = "confetti-burst";
+        break;
+      case "gradient":
+        animationClass = "gradient-wave";
+        break;
+      case "wave":
+        animationClass = "liquid-wave";
+        addBubbles(input);
+        break;
+      case "neon":
+        animationClass = "neon-glow";
+        break;
+      case "flip":
+        animationClass = "flip-3d";
+        break;
+      default:
+        animationClass = "startAnimation";
     }
 
     function addBubbles(element) {
       const container = element.parentElement;
-      for(let i = 0; i < 12; i++) {
-          const bubble = document.createElement('div');
-          bubble.className = 'bubble';
-          bubble.style.left = `${Math.random() * 100}%`;
-          bubble.style.width = bubble.style.height = 
-              `${Math.random() * 4 + 2}px`;
-          bubble.style.animationDelay = `${Math.random() * 0.5}s`;
-          container.appendChild(bubble);
+      for (let i = 0; i < 12; i++) {
+        const bubble = document.createElement("div");
+        bubble.className = "bubble";
+        bubble.style.left = `${Math.random() * 100}%`;
+        bubble.style.width = bubble.style.height = `${Math.random() * 4 + 2}px`;
+        bubble.style.animationDelay = `${Math.random() * 0.5}s`;
+        container.appendChild(bubble);
       }
+    }
+
+    input.classList.add("correct", animationClass);
+    broadcastAnimation(index, animationClass);
   }
-    
-  input.classList.add('correct', animationClass);
-  broadcastAnimation(index, animationClass);
-}
 
   // -------------------------------------------------------------------------
   // -------------------------------------------------------------------------
-  // 8. MATCH RESULT SYSTEM 
+  // 8. MATCH RESULT SYSTEM
   // -------------------------------------------------------------------------
   function calculateGameResults() {
-    const playerElements = document.querySelectorAll(".grid-child-players .card");
-    const results = Array.from(playerElements).map(playerElement => {
-        const username = playerElement.querySelector("h4").textContent;
-        const scoreElement = playerElement.querySelector(".counter");
-        const score = parseInt(scoreElement.textContent.replace("Score: ", "")) || 0;
-        
-        const wordsSubmitted = gameState.wordList.filter((_, index) => 
-            index % playerElements.length === Array.from(playerElements).indexOf(playerElement)
-        ).length;
+    const playerElements = document.querySelectorAll(
+      ".grid-child-players .card",
+    );
+    const results = Array.from(playerElements).map((playerElement) => {
+      const username = playerElement.querySelector("h4").textContent;
+      const scoreElement = playerElement.querySelector(".counter");
+      const score =
+        parseInt(scoreElement.textContent.replace("Score: ", "")) || 0;
 
-        const totalAttempts = parseInt(playerElement.getAttribute("data-attempts")) || wordsSubmitted;
-        const accuracy = totalAttempts > 0 
-            ? Math.round((wordsSubmitted / totalAttempts) * 100)
-            : 100;
+      const wordsSubmitted = gameState.wordList.filter(
+        (_, index) =>
+          index % playerElements.length ===
+          Array.from(playerElements).indexOf(playerElement),
+      ).length;
 
-        return {
-            username,
-            score,
-            wordsSubmitted,
-            accuracy
-        };
+      const totalAttempts =
+        parseInt(playerElement.getAttribute("data-attempts")) || wordsSubmitted;
+      const accuracy =
+        totalAttempts > 0
+          ? Math.round((wordsSubmitted / totalAttempts) * 100)
+          : 100;
+
+      return {
+        username,
+        score,
+        wordsSubmitted,
+        accuracy,
+      };
     });
 
     return results;
-}
+  }
 
-async function handleGameOver() {
-  const results = calculateGameResults();
-  
-  try {
+  async function handleGameOver() {
+    const results = calculateGameResults();
+
+    try {
       const response = await fetch(`/lobby/${lobbyId}/submit-results`, {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(results)
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(results),
       });
 
       if (!response.ok) {
-          throw new Error(`Failed to submit results: ${response.status}`);
+        throw new Error(`Failed to submit results: ${response.status}`);
       }
-  } catch (error) {
-      console.error('Error submitting game results:', error);
+    } catch (error) {
+      console.error("Error submitting game results:", error);
+    }
   }
-}
 
-async function submitGameResults() {
+  async function submitGameResults() {
     const lobbyId = new URLSearchParams(window.location.search).get("roomId");
     if (!lobbyId) {
-        console.error("No lobby ID found");
-        return;
+      console.error("No lobby ID found");
+      return;
     }
 
     const results = calculateGameResults();
 
     try {
-        const response = await fetch(`/lobby/${lobbyId}/submit-results`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(results)
-        });
+      const response = await fetch(`/lobby/${lobbyId}/submit-results`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(results),
+      });
 
-        if (!response.ok) {
-            throw new Error(`Failed to submit results: ${response.status}`);
-        }
+      if (!response.ok) {
+        throw new Error(`Failed to submit results: ${response.status}`);
+      }
 
-        window.location.href = `matchResult.html?roomId=${lobbyId}`;
+      window.location.href = `matchResult.html?roomId=${lobbyId}`;
     } catch (error) {
-        console.error('Error submitting game results:', error);
+      console.error("Error submitting game results:", error);
     }
-}
+  }
 
-
-  // -------------------------------------------------------------------------
   // -------------------------------------------------------------------------
   // 8. SCORING SYSTEM (Client-Side)
   // -------------------------------------------------------------------------
@@ -513,16 +545,21 @@ async function submitGameResults() {
     const lengthPoints = word.length * 100;
     const typingSpeed = calculateTypingSpeed(input);
     const speedMultiplier = Math.max(1, typingSpeed / 2);
-    const timeRemainingMultiplier = 1 + (gameState.remainingSeconds / 60);
+    const timeRemainingMultiplier = 1 + gameState.remainingSeconds / 60;
     const difficultyMultiplier = getDifficultyMultiplier();
-    const finalScore = Math.round(lengthPoints * speedMultiplier * timeRemainingMultiplier * difficultyMultiplier);
+    const finalScore = Math.round(
+      lengthPoints *
+        speedMultiplier *
+        timeRemainingMultiplier *
+        difficultyMultiplier,
+    );
     showScoreAnimation(finalScore, input);
     return finalScore;
   }
 
   function calculateTypingSpeed(input) {
     const timeElapsed = (Date.now() - input.dataset.firstKeystroke) / 1000;
-    const wordsPerMinute = (input.value.length / 5) / (timeElapsed / 60);
+    const wordsPerMinute = input.value.length / 5 / (timeElapsed / 60);
     return Math.min(wordsPerMinute / 30, 2);
   }
 
@@ -532,14 +569,14 @@ async function submitGameResults() {
       easy: 1,
       medium: 1.5,
       hard: 2,
-      extreme: 3
+      extreme: 3,
     };
     return multipliers[difficulty];
   }
 
   function showScoreAnimation(score, input) {
-    const scorePopup = document.createElement('div');
-    scorePopup.classList.add('score-popup');
+    const scorePopup = document.createElement("div");
+    scorePopup.classList.add("score-popup");
     scorePopup.textContent = `+${score}`;
     input.parentElement.appendChild(scorePopup);
     setTimeout(() => {
@@ -584,8 +621,8 @@ async function submitGameResults() {
     }
   }
 
-  const errorSound = new SoundPlayer('soundEffects/wrong.mp3', 0.08, 3);
-  const correctSound = new SoundPlayer('soundEffects/correct.wav', 0.3, 3);
+  const errorSound = new SoundPlayer("soundEffects/wrong.mp3", 0.08, 3);
+  const correctSound = new SoundPlayer("soundEffects/correct.wav", 0.3, 3);
 
   function showIncorrectWordAnimation(input, index) {
     errorSound.play();
@@ -611,7 +648,10 @@ async function submitGameResults() {
 
   function updateInputSize(input) {
     const maxChars = 20;
-    input.size = Math.min(Math.max(input.value.length, input.placeholder.length, 1), maxChars);
+    input.size = Math.min(
+      Math.max(input.value.length, input.placeholder.length, 1),
+      maxChars,
+    );
   }
 
   // -------------------------------------------------------------------------
@@ -621,90 +661,91 @@ async function submitGameResults() {
     const players = document.querySelectorAll(".grid-child-players .card");
     if (players.length === 0) return;
     players.forEach((player) => player.classList.remove("green-shadow"));
-    players[gameState.currentPlayerIndex % players.length].classList.add("green-shadow");
+    players[gameState.currentPlayerIndex % players.length].classList.add(
+      "green-shadow",
+    );
   }
 
   // -------------------------------------------------------------------------
   // 11. TIMER LOGIC (Client-Side)
   // -------------------------------------------------------------------------
-    function updateTimer() {
-      if (isInCountdown) {
-          return;
-      }
+  function updateTimer() {
+    if (isInCountdown) {
+      return;
+    }
 
-      const timerElement = document.getElementById("timer");
-      let timerSpan = timerElement.querySelector('span');
+    const timerElement = document.getElementById("timer");
+    let timerSpan = timerElement.querySelector("span");
 
-      if (!timerSpan) {
-          timerSpan = document.createElement('span');
-          timerElement.appendChild(timerSpan);
-      }
+    if (!timerSpan) {
+      timerSpan = document.createElement("span");
+      timerElement.appendChild(timerSpan);
+    }
 
-      if (!gameState.wordList.length) {
-          timerSpan.textContent = "Please write the first word for the game to start";
-          timerElement.style.setProperty('--transform', 'scaleX(1)');
-          return;
-      }
+    if (!gameState.wordList.length) {
+      timerSpan.textContent =
+        "Please write the first word for the game to start";
+      timerElement.style.setProperty("--transform", "scaleX(1)");
+      return;
+    }
 
-      if (gameState.remainingSeconds <= 0 && gameState.wordList.length > 1) {
-        clearInterval(timerInterval);
-        timerSpan.textContent = "Finished";
-        timerElement.style.setProperty('--transform', 'scaleX(0)');
+    if (gameState.remainingSeconds <= 0 && gameState.wordList.length > 1) {
+      clearInterval(timerInterval);
+      timerSpan.textContent = "Finished";
+      timerElement.style.setProperty("--transform", "scaleX(0)");
 
-        const modal = document.getElementById('gameOverModal');
-        if (modal) {
-            const resultsBtn = modal.querySelector('#resultsBtn');
-            const playAgainBtn = modal.querySelector('#playAgainBtn');
-            
-            if (resultsBtn) {
-                resultsBtn.onclick = async () => {
-                    await handleGameOver();
-                    window.location.href = `matchResult.html?roomId=${lobbyId}`;
-                };
-            }
-            
-            if (playAgainBtn) {
-                playAgainBtn.onclick = () => {
-                    location.reload();
-                };
-            }
-            
-            modal.style.display = 'flex';
-            document.querySelectorAll(".wordInput")
-                .forEach((input) => (input.disabled = true));
-        } else {
-            console.error("Game over modal not found in the DOM");
+      const modal = document.getElementById("gameOverModal");
+      if (modal) {
+        const resultsBtn = modal.querySelector("#resultsBtn");
+        const playAgainBtn = modal.querySelector("#playAgainBtn");
+
+        if (resultsBtn) {
+          resultsBtn.onclick = async () => {
+            await handleGameOver();
+            window.location.href = `matchResult.html?roomId=${lobbyId}`;
+          };
         }
-    } else {
-          timerSpan.textContent = gameState.remainingSeconds.toFixed(1);
 
-          const initialTime = getDifficultySettings().initialTime;
-          const progress = (gameState.remainingSeconds / initialTime);
+        if (playAgainBtn) {
+          playAgainBtn.onclick = () => {
+            location.reload();
+          };
+        }
 
-          timerElement.style.setProperty('--transform', `scaleX(${progress})`);
-
-          timerElement.classList.remove('warning', 'danger');
-          if (gameState.remainingSeconds <= 5) {
-              timerElement.classList.add('danger');
-          } else if (gameState.remainingSeconds <= 8) {
-              timerElement.classList.add('warning');
-          }
+        modal.style.display = "flex";
+        document
+          .querySelectorAll(".wordInput")
+          .forEach((input) => (input.disabled = true));
+      } else {
+        console.error("Game over modal not found in the DOM");
       }
-  }
+    } else {
+      timerSpan.textContent = gameState.remainingSeconds.toFixed(1);
 
+      const initialTime = getDifficultySettings().initialTime;
+      const progress = gameState.remainingSeconds / initialTime;
+
+      timerElement.style.setProperty("--transform", `scaleX(${progress})`);
+
+      timerElement.classList.remove("warning", "danger");
+      if (gameState.remainingSeconds <= 5) {
+        timerElement.classList.add("danger");
+      } else if (gameState.remainingSeconds <= 8) {
+        timerElement.classList.add("warning");
+      }
+    }
+  }
 
   function getDifficultySettings() {
     const difficulty = localStorage.getItem("gameDifficulty") || "medium";
     const difficultySettings = {
-        easy: { initialTime: 60 },
-        medium: { initialTime: 30 },
-        hard: { initialTime: 15 },
-        extreme: { initialTime: 10 }
+      easy: { initialTime: 60 },
+      medium: { initialTime: 30 },
+      hard: { initialTime: 15 },
+      extreme: { initialTime: 10 },
     };
     return difficultySettings[difficulty];
   }
-
-
 
   function startGameCountdown() {
     const timerElement = document.getElementById("timer");
@@ -714,26 +755,27 @@ async function submitGameResults() {
     isInCountdown = true;
 
     timerElement.innerHTML = '<div class="countdown-display"></div>';
-    const countdownDisplay = timerElement.querySelector('.countdown-display');
-    
-    timerElement.classList.remove('warning', 'danger');
-    timerElement.style.setProperty('--transform', 'scaleX(1)');
+    const countdownDisplay = timerElement.querySelector(".countdown-display");
+
+    timerElement.classList.remove("warning", "danger");
+    timerElement.style.setProperty("--transform", "scaleX(1)");
 
     function updateCountdown() {
-        if (countdown > 0) {
-            countdownDisplay.textContent = countdown;
-            countdownDisplay.classList.add('countdown-active');
-            countdown--;
-            setTimeout(updateCountdown, 1000);
-        } else {
-            countdownDisplay.textContent = "Go!";
-            setTimeout(() => {
-                isInCountdown = false;
-                initializeGameSettings();
-                startTimer();
-                timerElement.innerHTML = '<span>' + gameState.remainingSeconds.toFixed(1) + '</span>';
-            }, 1000);
-        }
+      if (countdown > 0) {
+        countdownDisplay.textContent = countdown;
+        countdownDisplay.classList.add("countdown-active");
+        countdown--;
+        setTimeout(updateCountdown, 1000);
+      } else {
+        countdownDisplay.textContent = "Go!";
+        setTimeout(() => {
+          isInCountdown = false;
+          initializeGameSettings();
+          startTimer();
+          timerElement.innerHTML =
+            "<span>" + gameState.remainingSeconds.toFixed(1) + "</span>";
+        }, 1000);
+      }
     }
 
     updateCountdown();
@@ -758,7 +800,10 @@ async function submitGameResults() {
       lastUpdate = now;
 
       const previousSeconds = Math.floor(gameState.remainingSeconds);
-      gameState.remainingSeconds = Math.max(0, gameState.remainingSeconds - delta);
+      gameState.remainingSeconds = Math.max(
+        0,
+        gameState.remainingSeconds - delta,
+      );
       const currentSeconds = Math.floor(gameState.remainingSeconds);
 
       updateTimer();
@@ -784,33 +829,37 @@ async function submitGameResults() {
   }
 
   function addTimeToTimer(isRewrite) {
-    const bonusTime = isRewrite ? gameState.rewriteWordBonus : gameState.correctWordBonus;
+    const bonusTime = isRewrite
+      ? gameState.rewriteWordBonus
+      : gameState.correctWordBonus;
     gameState.remainingSeconds += bonusTime;
     broadcastTimerSync(gameState.remainingSeconds);
     updateTimer();
   }
 
+  function pauseTimer() {
+    clearInterval(timerInterval);
+    isInCountdown = true;
+    connection
+      .invoke("BroadcastTimerPause", lobbyId)
+      .catch((err) => console.error("Error pausing timer:", err));
+  }
 
-function pauseTimer() {
-  clearInterval(timerInterval);
-  isInCountdown = true;
-  connection.invoke("BroadcastTimerPause" ,lobbyId)
-    .catch(err => console.error("Error pausing timer:", err));
-}
-
-function resumeTimer() {
-  isInCountdown = false;
-  startTimerWithoutBroadcast();
-  connection.invoke("BroadcastTimerResume",lobbyId,  gameState.remainingSeconds)
-    .catch(err => console.error("Error resuming timer:", err));
-}
-
+  function resumeTimer() {
+    isInCountdown = false;
+    startTimerWithoutBroadcast();
+    connection
+      .invoke("BroadcastTimerResume", lobbyId, gameState.remainingSeconds)
+      .catch((err) => console.error("Error resuming timer:", err));
+  }
 
   // -------------------------------------------------------------------------
   // 12. UTILITY FUNCTIONS (Client-Side)
   // -------------------------------------------------------------------------
   function focusNextInput(currentInput) {
-    const nextInput = currentInput.closest(".wordCard").nextElementSibling?.querySelector(".wordInput");
+    const nextInput = currentInput
+      .closest(".wordCard")
+      .nextElementSibling?.querySelector(".wordInput");
     if (nextInput) nextInput.focus();
   }
 
@@ -880,8 +929,6 @@ function resumeTimer() {
     }
   });
 
-
-
   // -------------------------------------------------------------------------
   // 14. Notification handeling
   // -------------------------------------------------------------------------
@@ -902,7 +949,7 @@ function resumeTimer() {
     }, 2000);
   }
 
-  const style = document.createElement('style');
+  const style = document.createElement("style");
   style.textContent = `
       .score-popup {
           position: absolute;
@@ -925,5 +972,5 @@ function resumeTimer() {
       }
   `;
   document.head.appendChild(style);
-  
 });
+

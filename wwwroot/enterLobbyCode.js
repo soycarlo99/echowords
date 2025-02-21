@@ -7,10 +7,9 @@ document.addEventListener("DOMContentLoaded", () => {
       "keyup",
       function (event) {
         var target = event.srcElement;
-        
-        // Convert input to uppercase and restrict to alphanumeric
-        target.value = target.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
-        
+
+        target.value = target.value.replace(/[^A-Za-z0-9]/g, "").toUpperCase();
+
         var maxLength = parseInt(target.getAttribute("maxlength"), 10);
         var myLength = target.value.length;
 
@@ -67,31 +66,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function joinLobby(lobbyId) {
     let connection = new signalR.HubConnectionBuilder()
-    .withUrl("http://localhost:5185/gameHub")
-    .build();
+      .withUrl("http://localhost:5185/gameHub")
+      .build();
 
     try {
-        await connection.start();
-        console.log("Connected to SignalR");
-        await connection.invoke("JoinLobby", lobbyId);
-        console.log(`Joined lobby ${lobbyId}`);
+      await connection.start();
+      console.log("Connected to SignalR");
+      await connection.invoke("JoinLobby", lobbyId);
+      console.log(`Joined lobby ${lobbyId}`);
     } catch (err) {
-        console.error("Error joining lobby:", err);
+      console.error("Error joining lobby:", err);
     }
-}
+  }
 
   async function updatePlayerLobby(lobbyId) {
     const payload = { LobbyId: lobbyId };
     try {
-      const response = await fetch(
-        "/update-player-lobby",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify(payload),
-        },
-      );
+      const response = await fetch("/update-player-lobby", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(payload),
+      });
 
       console.log(`Update player lobby response status: ${response.status}`);
       if (!response.ok) throw new Error(`Server error: ${response.statusText}`);
@@ -105,7 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("joinButton").addEventListener("click", async () => {
     const spinner = document.getElementById("loadingSpinner");
     const joinButton = document.getElementById("joinButton");
-    
+
     const lobbyCode = getLobbyCode().toUpperCase();
     console.log(`Lobby code entered: ${lobbyCode}`);
     if (lobbyCode.length < 4) {
@@ -118,10 +114,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       console.log(`Attempting to join lobby: ${lobbyCode}`);
-      
+
       const delay = Math.random() * 1000 + 1000;
-      await new Promise(resolve => setTimeout(resolve, delay));
-      
+      await new Promise((resolve) => setTimeout(resolve, delay));
+
       await joinLobby(lobbyCode);
       await updatePlayerLobby(lobbyCode);
       console.log("Redirecting to preGame.html...");
@@ -134,4 +130,3 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
-

@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", async () => {
-  // Parse the lobbyId from URL query parameters
   const urlParams = new URLSearchParams(window.location.search);
   const lobbyId = urlParams.get("roomId");
 
@@ -12,11 +11,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     const cardHolderLobby = document.querySelector(".cardHolder");
     if (!cardHolderLobby) return;
 
-    if (Array.from(cardHolderLobby.children).some(
-        (card) => card.querySelector("h4")?.textContent === username
-    )) {
-        console.warn(`Player "${username}" already exists.`);
-        return;
+    if (
+      Array.from(cardHolderLobby.children).some(
+        (card) => card.querySelector("h4")?.textContent === username,
+      )
+    ) {
+      console.warn(`Player "${username}" already exists.`);
+      return;
     }
 
     const storedSeed = avatarSeed || username;
@@ -31,7 +32,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       </div>
     `;
     cardHolderLobby.appendChild(card);
-    
+
     card.offsetHeight;
 
     const randomizeBtn = card.querySelector(".randomizeBtn");
@@ -89,7 +90,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       </div>
     `;
     gridChildPlayers.appendChild(card);
-}
+  }
 
   async function populatePlayersGame(lobbyId) {
     const gridChildPlayers = document.querySelector(".grid-child-players");
@@ -116,7 +117,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     await populatePlayersGame(lobbyId);
   }
 
-  // Randomize Avatars
   const randomizeBtn = document.getElementById("randomizeAvatars");
   if (randomizeBtn) {
     randomizeBtn.addEventListener("click", () => {
@@ -129,54 +129,57 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-let connection = new signalR.HubConnectionBuilder()
-  .withUrl("/gameHub", {
-    skipNegotiation: true,
-    transport: signalR.HttpTransportType.WebSockets,
-    headers: {
-      "X-Forwarded-Proto": "https",
-    },
-  })
-  .withAutomaticReconnect()
-  .configureLogging(signalR.LogLevel.Debug)
-  .build();
+  let connection = new signalR.HubConnectionBuilder()
+    .withUrl("/gameHub", {
+      skipNegotiation: true,
+      transport: signalR.HttpTransportType.WebSockets,
+      headers: {
+        "X-Forwarded-Proto": "https",
+      },
+    })
+    .withAutomaticReconnect()
+    .configureLogging(signalR.LogLevel.Debug)
+    .build();
 
-connection.on("PlayerJoined", (player) => {
-  console.log("A new player joined:", player);
-  if (document.querySelector(".cardHolder")) {
-    addPlayerCardLobby(player.username, document.querySelectorAll(".cardHolder .card").length, player.avatarSeed);
-  }
-});
-
-connection.on("AvatarUpdated", (username, newSeed) => {
-  console.log("Avatar updated for:", username, "with seed:", newSeed);
-  const cards = document.querySelectorAll(".card");
-  cards.forEach(card => {
-    const usernameElement = card.querySelector("h4");
-    if (usernameElement?.textContent === username) {
-      const img = card.querySelector('img[alt="Avatar"]');
-      if (img) {
-        img.src = `https://api.dicebear.com/9.x/open-peeps/svg?seed=${encodeURIComponent(newSeed)}`;
-      }
+  connection.on("PlayerJoined", (player) => {
+    console.log("A new player joined:", player);
+    if (document.querySelector(".cardHolder")) {
+      addPlayerCardLobby(
+        player.username,
+        document.querySelectorAll(".cardHolder .card").length,
+        player.avatarSeed,
+      );
     }
   });
-});
 
-async function initializeSignalR() {
-  try {
-    await connection.start();
-    console.log("Connected to SignalR for real-time updates");
-    const urlParams = new URLSearchParams(window.location.search);
-    const lobbyId = urlParams.get("roomId");
-    if (lobbyId) {
-      await connection.invoke("JoinLobby", lobbyId);
+  connection.on("AvatarUpdated", (username, newSeed) => {
+    console.log("Avatar updated for:", username, "with seed:", newSeed);
+    const cards = document.querySelectorAll(".card");
+    cards.forEach((card) => {
+      const usernameElement = card.querySelector("h4");
+      if (usernameElement?.textContent === username) {
+        const img = card.querySelector('img[alt="Avatar"]');
+        if (img) {
+          img.src = `https://api.dicebear.com/9.x/open-peeps/svg?seed=${encodeURIComponent(newSeed)}`;
+        }
+      }
+    });
+  });
+
+  async function initializeSignalR() {
+    try {
+      await connection.start();
+      console.log("Connected to SignalR for real-time updates");
+      const urlParams = new URLSearchParams(window.location.search);
+      const lobbyId = urlParams.get("roomId");
+      if (lobbyId) {
+        await connection.invoke("JoinLobby", lobbyId);
+      }
+    } catch (err) {
+      console.error(err);
+      setTimeout(initializeSignalR, 5000);
     }
-  } catch (err) {
-    console.error(err);
-    setTimeout(initializeSignalR, 5000);
   }
-}
 
-initializeSignalR();
+  initializeSignalR();
 });
-
