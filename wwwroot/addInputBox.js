@@ -453,7 +453,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // -------------------------------------------------------------------------
-  // -------------------------------------------------------------------------
   // 8. MATCH RESULT SYSTEM
   // -------------------------------------------------------------------------
   function calculateGameResults() {
@@ -973,4 +972,3 @@ document.addEventListener("DOMContentLoaded", () => {
   `;
   document.head.appendChild(style);
 });
-
