@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>echo words - lobby</title>
     <link rel="stylesheet" href="startpage.css" />
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script> -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script>
     <script src="darkmode.JS" defer></script>
     <script src="createLobby.js" defer></script>
@@ -16,10 +15,9 @@
     <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
     <link rel="manifest" href="favicon/site.webmanifest">
-    <!-- <script src="lobbyUpdates.js" defer></script> -->
   </head>
   <body>
-    <nav class="nav">
+ 
         <div><a style="text-decoration: none;" onclick="history.back()" href="#"><h1>< Echo Words</h1></a></div>
       <div>
         <button id="darkModeToggle">Toggle Dark Mode</button>
@@ -133,7 +131,6 @@
       </div>
     </main>
     <script>
-      //updates roomID and gameLink href
       const urlParams = new URLSearchParams(window.location.search);
       const roomId = urlParams.get("roomId");
       if (roomId) {
