@@ -47,7 +47,7 @@ namespace Wordapp
 
         public async Task BroadcastUserInput(string lobbyId, int index, string input)
         {
-            await Clients.Group(lobbyId).SendAsync("ReceiveUserInput", index, input);
+            await Clients.OthersInGroup(lobbyId).SendAsync("ReceiveUserInput", index, input);
         }
 
         public async Task BroadcastAnimation(string lobbyId, int index, string animationType)
