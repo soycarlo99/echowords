@@ -85,6 +85,39 @@
     </nav>
     <main>
       <div class="preGameText">
+        <div
+          class="invite-section"
+          style="text-align: center; margin-top: 2rem; margin-bottom: 2rem"
+        >
+          <p>Invite others with this link:</p>
+          <input
+            type="text"
+            id="inviteLinkInput"
+            readonly
+            style="
+              width: 70%;
+              padding: 8px;
+              border-radius: 5px;
+              border: 1px solid #ccc;
+              background-color: #eee;
+              color: #333;
+              text-align: center;
+            "
+          />
+          <button
+            id="copyInviteLinkButton"
+            class="button"
+            style="padding: 8px 15px; font-size: 1rem; margin-left: 10px"
+          >
+            Copy
+          </button>
+          <p
+            id="copyStatus"
+            style="color: green; display: none; margin-top: 5px"
+          >
+            Link copied!
+          </p>
+        </div>
         <p id="inviteFriendsText">Invite friends to start 🎉</p>
         <p id="instructionsText">
           Need <span style="color: red">minimum 2 </span>players and max 8
@@ -149,22 +182,74 @@
       </div>
     </main>
     <script>
-      const urlParams = new URLSearchParams(window.location.search);
-      const roomId = urlParams.get("roomId");
-      if (roomId) {
-        const roomIDElement = document.getElementById("roomID");
-        if (roomIDElement) {
-          roomIDElement.textContent = `Room ID: ${roomId}`;
+      document.addEventListener("DOMContentLoaded", () => {
+        const inviteLinkInput = document.getElementById("inviteLinkInput");
+        const copyButton = document.getElementById("copyInviteLinkButton");
+        const copyStatus = document.getElementById("copyStatus");
+        const urlParams = new URLSearchParams(window.location.search);
+        const roomId = urlParams.get("roomId");
+        if (roomId) {
+          const roomIDElement = document.getElementById("roomID");
+          if (roomIDElement) {
+            roomIDElement.textContent = `Room ID: ${roomId}`;
+          }
+          console.log("Received roomId:", roomId);
+          const gameLink = document.getElementById("gameLink");
+          if (gameLink) {
+            gameLink.href = `gamePage.html?roomId=${roomId}`;
+            console.log("Updated gameLink href to:", gameLink.href);
+          }
+        } else {
+          console.error("No roomId found in URL.");
         }
-        console.log("Received roomId:", roomId);
-        const gameLink = document.getElementById("gameLink");
-        if (gameLink) {
-          gameLink.href = `gamePage.html?roomId=${roomId}`;
-          console.log("Updated gameLink href to:", gameLink.href);
+
+        const currentRoomId = new URLSearchParams(window.location.search).get(
+          "roomId",
+        );
+
+        if (currentRoomId && inviteLinkInput) {
+          const baseUrl = window.location.origin;
+          const inviteLink = `${baseUrl}/joinViaInvite.html?roomId=${currentRoomId}`;
+          inviteLinkInput.value = inviteLink;
+
+          if (copyButton) {
+            copyButton.addEventListener("click", () => {
+              inviteLinkInput.select();
+              try {
+                navigator.clipboard
+                  .writeText(inviteLink)
+                  .then(() => {
+                    console.log("Invite link copied to clipboard!");
+                    copyStatus.style.display = "block";
+                    setTimeout(() => {
+                      copyStatus.style.display = "none";
+                    }, 2000);
+                  })
+                  .catch((err) => {
+                    console.error("Failed to copy invite link: ", err);
+                    try {
+                      document.execCommand("copy");
+                      copyStatus.style.display = "block";
+                      setTimeout(() => {
+                        copyStatus.style.display = "none";
+                      }, 2000);
+                    } catch (fallbackErr) {
+                      console.error("Fallback copy failed:", fallbackErr);
+                      alert("Failed to copy link. Please copy it manually.");
+                    }
+                  });
+              } catch (err) {
+                console.error("Clipboard API not available:", err);
+                alert("Failed to copy link. Please copy it manually.");
+              }
+            });
+          }
+        } else {
+          if (inviteLinkInput) inviteLinkInput.value = "Error generating link.";
+          if (copyButton) copyButton.disabled = true;
+          console.error("Could not find roomId or invite link input element.");
         }
-      } else {
-        console.error("No roomId found in URL.");
-      }
+      });
     </script>
   </body>
 </html>
