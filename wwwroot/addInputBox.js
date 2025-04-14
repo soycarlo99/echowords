@@ -821,9 +821,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function restartClock() {
-    initializeGameSettings();
     clearInterval(timerInterval);
-    startTimer();
+    initializeGameSettings();
+    broadcastTimerStart(gameState.remainingSeconds);
+    startTimerWithoutBroadcast();
     broadcastGameState();
   }
 
