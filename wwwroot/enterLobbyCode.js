@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function joinLobby(lobbyId) {
     let connection = new signalR.HubConnectionBuilder()
-      .withUrl("http://localhost:5185/gameHub")
+      .withUrl("/gameHub")
       .build();
 
     try {

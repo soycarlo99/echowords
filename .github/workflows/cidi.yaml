@@ -28,9 +28,9 @@ jobs:
             dotnet build
             pm2 stop echowords
             pm2 delete echowords
-            export PG_PASSWORD="${{ secrets.PG_PASSWORD }}"
+            export ECHO_PG_PORT="${{ secrets.PG_PORT }}"
+            export ECHO_PG_HOST="${{ secrets.PG_HOST }}"
+            export ECHO_PG_USER="${{ secrets.PG_USER }}"
+            export ECHO_PG_PASSWORD="${{ secrets.PG_PASSWORD }}"
             export ECHO_DB_NAME="${{ secrets.ECHO_DB_NAME }}"
-            export PG_PORT="${{ secrets.PG_PORT }}"
-            export PG_HOST="${{ secrets.PG_HOST }}"
-            export PG_USER="${{ secrets.PG_USER }}"
             pm2 start "dotnet run --runtime linux-x64" --name echowords
