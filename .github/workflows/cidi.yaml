@@ -1,0 +1,32 @@
+name: CI/CD pipeline
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+jobs:
+  deploy:
+    name: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy App
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          port: ${{ secrets.PORT }}
+          script: |
+            source /root/.nvm/nvm.sh
+            source ~/.bashrc
+            nvm use v22
+            npm install -g pm2
+            cd /srv/www/echowords
+            git pull
+            npm ci
+            npm run build
+            dotnet restore
+            dotnet build
+            pm2 stop echowords
+            pm2 delete echowords
+            pm2 start "dotnet run --runtime linux-x64" --name echowords

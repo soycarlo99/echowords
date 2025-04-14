@@ -24,8 +24,8 @@ public class Database
 
         _host = Environment.GetEnvironmentVariable("PG_HOST") ?? "localhost";
         _port = Environment.GetEnvironmentVariable("PG_PORT") ?? "5432";
-        _username = Environment.GetEnvironmentVariable("ECHO_DB_USERNAME") ?? "postgres";
-        _password = Environment.GetEnvironmentVariable("ECHO_DB_PASSWORD") ?? "postgres";
+        _username = Environment.GetEnvironmentVariable("PG_USER") ?? "postgres";
+        _password = Environment.GetEnvironmentVariable("PG_PASSWORD") ?? "postgres";
         _database = Environment.GetEnvironmentVariable("ECHO_DB_NAME") ?? "echowords";
 
         string connectionString =
