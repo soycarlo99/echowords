@@ -22,11 +22,11 @@ public class Database
     {
         Env.Load();
 
-        _host = Environment.GetEnvironmentVariable("PG_HOST") ?? "localhost";
-        _port = Environment.GetEnvironmentVariable("PG_PORT") ?? "5432";
-        _username = Environment.GetEnvironmentVariable("PG_USER") ?? "postgres";
-        _password = Environment.GetEnvironmentVariable("PG_PASSWORD") ?? "postgres";
-        _database = Environment.GetEnvironmentVariable("ECHO_DB_NAME") ?? "echowords";
+        _host = Environment.GetEnvironmentVariable("PG_HOST");
+        _port = Environment.GetEnvironmentVariable("PG_PORT");
+        _username = Environment.GetEnvironmentVariable("PG_USER");
+        _password = Environment.GetEnvironmentVariable("PG_PASSWORD");
+        _database = Environment.GetEnvironmentVariable("ECHO_DB_NAME");
 
         string connectionString =
             $"Host={_host};Port={_port};Username={_username};Password={_password};Database={_database}";
