@@ -19,11 +19,11 @@ jobs:
           script: |
             source /root/.nvm/nvm.sh
             source ~/.bashrc
-            nvm use v22
+            # nvm use v22
             npm install -g pm2
             cd /srv/www/echowords
             git pull
-            npm ci
+            # npm ci
             dotnet restore
             dotnet build
             pm2 stop echowords
