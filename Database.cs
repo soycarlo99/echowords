@@ -1,7 +1,7 @@
 namespace Wordapp;
 
-using Npgsql;
 using DotNetEnv;
+using Npgsql;
 
 public class Database
 {
@@ -12,6 +12,7 @@ public class Database
     private readonly string _database;
 
     private NpgsqlDataSource _connection;
+
     public NpgsqlDataSource Connection()
     {
         return _connection;
@@ -20,14 +21,16 @@ public class Database
     public Database()
     {
         Env.Load();
-        
-        _host = Environment.GetEnvironmentVariable("DB_HOST") ?? "localhost";
-        _port = Environment.GetEnvironmentVariable("DB_PORT") ?? "5432";
-        _username = Environment.GetEnvironmentVariable("DB_USERNAME") ?? "postgres";
-        _password = Environment.GetEnvironmentVariable("DB_PASSWORD") ?? "postgres";
-        _database = Environment.GetEnvironmentVariable("DB_NAME") ?? "database_for_echowords";
 
-        string connectionString = $"Host={_host};Port={_port};Username={_username};Password={_password};Database={_database}";
+        _host = Environment.GetEnvironmentVariable("PG_HOST") ?? "localhost";
+        _port = Environment.GetEnvironmentVariable("PG_PORT") ?? "5432";
+        _username = Environment.GetEnvironmentVariable("ECHO_DB_USERNAME") ?? "postgres";
+        _password = Environment.GetEnvironmentVariable("ECHO_DB_PASSWORD") ?? "postgres";
+        _database = Environment.GetEnvironmentVariable("ECHO_DB_NAME") ?? "echowords";
+
+        string connectionString =
+            $"Host={_host};Port={_port};Username={_username};Password={_password};Database={_database}";
         _connection = NpgsqlDataSource.Create(connectionString);
     }
 }
+
