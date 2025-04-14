@@ -24,7 +24,6 @@ jobs:
             cd /srv/www/echowords
             git pull
             npm ci
-            npm run build
             dotnet restore
             dotnet build
             pm2 stop echowords
