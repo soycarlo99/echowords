@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
         "X-Forwarded-Proto": "https",
       },
     })
-    //.withAutomaticReconnect([0, 2000, 5000, 10000, 20000])
+    //..withAutomaticReconnect([0, 2000, 5000, 10000, 20000])
     .withAutomaticReconnect()
     .configureLogging(signalR.LogLevel.Information)
     .configureLogging(signalR.LogLevel.Debug)
@@ -387,8 +387,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if (index === gameState.wordList.length - 1) {
       pauseTimer();
       setTimeout(() => {
+        initializeGameSettings();
         updateUI();
         broadcastGameState();
+        broadcastTimerStart(gameState.remainingSeconds);
+        startTimerWithoutBroadcast();
       }, 1500);
     } else {
       updateUI();
