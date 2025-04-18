@@ -382,7 +382,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (index === gameState.wordList.length - 1) {
       pauseTimer();
       setTimeout(() => {
-        initializeGameSettings();
+        // initializeGameSettings();
         updateUI();
         broadcastGameState();
         broadcastTimerStart(gameState.remainingSeconds);
