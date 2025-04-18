@@ -62,11 +62,11 @@ document.addEventListener("DOMContentLoaded", () => {
     updateUI();
   });
 
-  connection.on("ReceiveTimerSync", (remainingTime) => {
-    gameState.remainingSeconds = remainingTime;
-    clearInterval(timerInterval);
-    startTimerWithoutBroadcast();
-  });
+  // connection.on("ReceiveTimerSync", (remainingTime) => {
+  //   gameState.remainingSeconds = remainingTime;
+  //   clearInterval(timerInterval);
+  //   startTimerWithoutBroadcast();
+  // });
 
   connection.on("ReceiveUserInput", (index, input) => {
     const inputs = document.querySelectorAll(".wordInput");
@@ -81,12 +81,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (inputs[index]) {
       inputs[index].classList.add(animationType);
     }
-  });
-
-  connection.on("ReceiveTimerSync", (remainingTime) => {
-    gameState.remainingSeconds = remainingTime;
-    clearInterval(timerInterval);
-    startTimerWithoutBroadcast();
   });
 
   connection.on("ReceiveTimerStart", (initialTime) => {
@@ -180,6 +174,7 @@ document.addEventListener("DOMContentLoaded", () => {
         updateScore();
         updateTimer();
       }, 1700);
+      restartClock(); //Added now
     } else {
       renderWordBoxes();
       highlightCurrentPlayer();
