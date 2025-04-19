@@ -980,7 +980,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // -------------------------------------------------------------------------
   setTimeout(() => {
     highlightCurrentPlayer();
-  }, 100);
+  }, 500);
   updateUI();
 
   connection.onreconnecting((error) => {
