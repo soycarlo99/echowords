@@ -11,7 +11,7 @@
   "profiles": {
     "http": {
       "commandName": "Project",
-      "launchBrowser": true,
+      "launchBrowser": false,
       "launchUrl": "http://localhost:5185/index.html",
       "applicationUrl": "http://localhost:5185",
       "environmentVariables": {
@@ -38,3 +38,4 @@
     }
   }
 }
+

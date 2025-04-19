@@ -62,11 +62,11 @@ document.addEventListener("DOMContentLoaded", () => {
     updateUI();
   });
 
-  // connection.on("ReceiveTimerSync", (remainingTime) => {
-  //   gameState.remainingSeconds = remainingTime;
-  //   clearInterval(timerInterval);
-  //   startTimerWithoutBroadcast();
-  // });
+  connection.on("ReceiveTimerSync", (remainingTime) => {
+    gameState.remainingSeconds = remainingTime;
+    clearInterval(timerInterval);
+    startTimerWithoutBroadcast();
+  });
 
   connection.on("ReceiveUserInput", (index, input) => {
     const inputs = document.querySelectorAll(".wordInput");
@@ -367,35 +367,38 @@ document.addEventListener("DOMContentLoaded", () => {
     const currentPlayer =
       gameState.currentPlayerIndex %
       document.querySelectorAll(".grid-child-players .card").length;
+
     gameState.scores[currentPlayer] =
       (gameState.scores[currentPlayer] || 0) + basePoints;
+
     gameState.wordList.push(word);
     gameState.lastWord = word;
     gameState.currentPlayerIndex++;
+
     saveWord(word);
+
     markWordAsCorrect(input, index);
 
     const bonusTime = gameState.correctWordBonus;
     gameState.remainingSeconds += bonusTime;
     broadcastTimerSync(gameState.remainingSeconds);
 
-    if (index === gameState.wordList.length - 1) {
-      pauseTimer();
-      setTimeout(() => {
-        // initializeGameSettings();
-        updateUI();
-        broadcastGameState();
-        broadcastTimerStart(gameState.remainingSeconds);
-        startTimerWithoutBroadcast();
-      }, 1500);
-    } else {
+    pauseTimer();
+
+    setTimeout(() => {
       updateUI();
       broadcastGameState();
-    }
-    setTimeout(resumeTimer, 1500);
-    if (gameState.wordList.length === 1) {
-      //startGameCountdown();
-    }
+
+      if (gameState.wordList.length > 1) {
+        initializeGameSettings();
+        broadcastTimerStart(gameState.remainingSeconds);
+
+        clearInterval(timerInterval);
+        startTimerWithoutBroadcast();
+      }
+
+      resumeTimer();
+    }, 1700);
   }
 
   // function markWordAsCorrect(input, index) {
@@ -818,6 +821,43 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 50);
   }
 
+  function updateUI() {
+    console.log(
+      "updateUI called, wordList length:",
+      gameState.wordList.length,
+      "previous length:",
+      previousWordListLength,
+    );
+
+    if (gameState.wordList.length === 1 && previousWordListLength === 0) {
+      console.log("Broadcasting game start");
+      connection
+        .invoke("BroadcastGameStart", lobbyId)
+        .catch((err) => console.error("Error broadcasting game start:", err));
+
+      updateTimer();
+      setTimeout(() => {
+        renderWordBoxes();
+        highlightCurrentPlayer();
+        updateScore();
+      }, 3100);
+    } else if (gameState.wordList.length > previousWordListLength) {
+      setTimeout(() => {
+        renderWordBoxes();
+        highlightCurrentPlayer();
+        updateScore();
+        updateTimer();
+      }, 1700);
+    } else {
+      renderWordBoxes();
+      highlightCurrentPlayer();
+      updateScore();
+      updateTimer();
+    }
+
+    previousWordListLength = gameState.wordList.length;
+  }
+
   function restartClock() {
     clearInterval(timerInterval);
     initializeGameSettings();
@@ -830,10 +870,39 @@ document.addEventListener("DOMContentLoaded", () => {
     const bonusTime = isRewrite
       ? gameState.rewriteWordBonus
       : gameState.correctWordBonus;
+
     gameState.remainingSeconds += bonusTime;
-    broadcastTimerSync(gameState.remainingSeconds);
+
+    const timerElement = document.getElementById("timer");
+    timerElement.classList.add("time-bonus");
+    setTimeout(() => timerElement.classList.remove("time-bonus"), 500);
+
     updateTimer();
+
+    broadcastTimerSync(gameState.remainingSeconds);
   }
+
+  function broadcastTimerSync(remainingTime) {
+    setTimeout(() => {
+      connection
+        .invoke("BroadcastTimerSync", lobbyId, remainingTime)
+        .catch((err) => console.error("Error broadcasting timer sync:", err));
+    }, 50);
+  }
+
+  const bonusTimeStyle = document.createElement("style");
+  bonusTimeStyle.textContent = `
+  #timer.time-bonus::before {
+    animation: flash-green 0.5s;
+  }
+  
+  @keyframes flash-green {
+    0% { background-color: #2ecc71; }
+    50% { background-color: #27ae60; }
+    100% { background-color: #2ecc71; }
+  }
+`;
+  document.head.appendChild(bonusTimeStyle);
 
   function pauseTimer() {
     clearInterval(timerInterval);
