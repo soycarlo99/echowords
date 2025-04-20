@@ -4,14 +4,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Welcome</title>
     <link rel="stylesheet" href="startpage.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js" defer></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"
+      defer
+    ></script>
     <script src="darkmode.JS" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" defer></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"
+      defer
+    ></script>
     <script src="usernameStartpage.js" defer></script>
-    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
-    <link rel="manifest" href="favicon/site.webmanifest">
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="favicon/apple-touch-icon.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="favicon/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="favicon/favicon-16x16.png"
+    />
+    <link rel="manifest" href="favicon/site.webmanifest" />
+    <script
+      async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8760946582975350"
+      crossorigin="anonymous"
+    ></script>
   </head>
   <body>
     <nav class="nav">
@@ -31,12 +56,12 @@
           You need to pick a player name before you can enter or create a lobby
         </h3>
         <input
-        class="playerName"
-        type="text"
-        maxlength="20"
-        minlength="3"
-        id="playerNameInput"
-        placeholder="Enter your name"
+          class="playerName"
+          type="text"
+          maxlength="20"
+          minlength="3"
+          id="playerNameInput"
+          placeholder="Enter your name"
         />
         <button class="button idxacpt" id="acceptButton">Accept</button>
         <div></div>
@@ -47,30 +72,30 @@
     </main>
     <script>
       document.addEventListener("DOMContentLoaded", async () => {
-          const connection = new signalR.HubConnectionBuilder()
-              .withUrl("/gameHub")
-              .withAutomaticReconnect([0, 2000, 5000, 10000])
-              .build();
+        const connection = new signalR.HubConnectionBuilder()
+          .withUrl("/gameHub")
+          .withAutomaticReconnect([0, 2000, 5000, 10000])
+          .build();
 
-          connection.onreconnecting((error) => {
-              console.log('Reconnecting to hub...', error);
-          });
+        connection.onreconnecting((error) => {
+          console.log("Reconnecting to hub...", error);
+        });
 
-          connection.onreconnected((connectionId) => {
-              console.log('Reconnected to hub.', connectionId);
-          });
+        connection.onreconnected((connectionId) => {
+          console.log("Reconnected to hub.", connectionId);
+        });
 
-          connection.onclose((error) => {
-              console.log('Connection closed.', error);
-          });
+        connection.onclose((error) => {
+          console.log("Connection closed.", error);
+        });
 
-          try {
-              await connection.start();
-              console.log("Connected to SignalR hub");
-          } catch (error) {
-              console.error("Error starting SignalR connection:", error);
-          }
+        try {
+          await connection.start();
+          console.log("Connected to SignalR hub");
+        } catch (error) {
+          console.error("Error starting SignalR connection:", error);
+        }
       });
-  </script>
+    </script>
   </body>
 </html>
