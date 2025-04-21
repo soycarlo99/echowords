@@ -13,7 +13,7 @@ public class Actions
         _hubContext = hubContext;
         db = dataSource;
 
-        //app.MapGet("/test-word/{word}", TestWord);
+        ///app.MapGet("/test-word/{word}", TestWord);
 
         app.MapPost(
             "/new-word",
