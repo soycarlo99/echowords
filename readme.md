@@ -2,7 +2,7 @@
 
 **[Play now at echowords.xyz!](https://echowords.xyz)**
 
-EchoWords is a multiplayer word chain game inspired by Shiritori, with a memory twist! Challenge your friends to remember words while building chains where each new word starts with the last letter of the previous word.
+EchoWords is a multiplayer word chain game inspired by Shiritori, with a memory twist! Challenge your friends to remember words while building chains where each new word starts with the last letter of the previous word. 
 
 ![EchoWords Game Screenshot](https://github.com/soycarlo99/echowords/blob/main/wwwroot/photos/echowords-logo.png?raw=true)
 
