@@ -283,9 +283,6 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       if (isValidNewWord(enteredWord)) {
         submitNewWord(enteredWord, input, index);
-        if (gameState.wordList.length > 1) {
-          restartClock();
-        }
       } else {
         showInvalidWordAnimation(input, index);
       }
@@ -395,9 +392,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         clearInterval(timerInterval);
         startTimerWithoutBroadcast();
+      } else {
+        // For first word, resume the timer
+        resumeTimer();
       }
-
-      resumeTimer();
     }, 1700);
   }
 
@@ -821,42 +819,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 50);
   }
 
-  function updateUI() {
-    console.log(
-      "updateUI called, wordList length:",
-      gameState.wordList.length,
-      "previous length:",
-      previousWordListLength,
-    );
-
-    if (gameState.wordList.length === 1 && previousWordListLength === 0) {
-      console.log("Broadcasting game start");
-      connection
-        .invoke("BroadcastGameStart", lobbyId)
-        .catch((err) => console.error("Error broadcasting game start:", err));
-
-      updateTimer();
-      setTimeout(() => {
-        renderWordBoxes();
-        highlightCurrentPlayer();
-        updateScore();
-      }, 3100);
-    } else if (gameState.wordList.length > previousWordListLength) {
-      setTimeout(() => {
-        renderWordBoxes();
-        highlightCurrentPlayer();
-        updateScore();
-        updateTimer();
-      }, 1700);
-    } else {
-      renderWordBoxes();
-      highlightCurrentPlayer();
-      updateScore();
-      updateTimer();
-    }
-
-    previousWordListLength = gameState.wordList.length;
-  }
 
   function restartClock() {
     clearInterval(timerInterval);
@@ -882,13 +844,6 @@ document.addEventListener("DOMContentLoaded", () => {
     broadcastTimerSync(gameState.remainingSeconds);
   }
 
-  function broadcastTimerSync(remainingTime) {
-    setTimeout(() => {
-      connection
-        .invoke("BroadcastTimerSync", lobbyId, remainingTime)
-        .catch((err) => console.error("Error broadcasting timer sync:", err));
-    }, 50);
-  }
 
   const bonusTimeStyle = document.createElement("style");
   bonusTimeStyle.textContent = `
