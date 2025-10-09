@@ -1,29 +1,36 @@
 document.addEventListener("DOMContentLoaded", () => {
   const lobbyId = new URLSearchParams(window.location.search).get("roomId");
+  const isSoloMode = !lobbyId;
 
-  const connection = new signalR.HubConnectionBuilder()
-    .withUrl("/gameHub", {
-      skipNegotiation: true,
-      transport: signalR.HttpTransportType.WebSockets,
-      headers: {
-        "X-Forwarded-Proto": "https",
-      },
-    })
-    //..withAutomaticReconnect([0, 2000, 5000, 10000, 20000])
-    .withAutomaticReconnect()
-    .configureLogging(signalR.LogLevel.Information)
-    .configureLogging(signalR.LogLevel.Debug)
-    .build();
+  let connection;
 
-  connection
-    .start()
-    .then(() => {
-      console.log("Connected to SignalR hub.");
-      connection
-        .invoke("JoinLobby", lobbyId)
-        .catch((err) => console.error("Error joining lobby:", err));
-    })
-    .catch((err) => console.error("SignalR Connection Error:", err));
+  if (!isSoloMode) {
+    connection = new signalR.HubConnectionBuilder()
+      .withUrl("/gameHub", {
+        skipNegotiation: true,
+        transport: signalR.HttpTransportType.WebSockets,
+        headers: {
+          "X-Forwarded-Proto": "https",
+        },
+      })
+      //..withAutomaticReconnect([0, 2000, 5000, 10000, 20000])
+      .withAutomaticReconnect()
+      .configureLogging(signalR.LogLevel.Information)
+      .configureLogging(signalR.LogLevel.Debug)
+      .build();
+
+    connection
+      .start()
+      .then(() => {
+        console.log("Connected to SignalR hub.");
+        connection
+          .invoke("JoinLobby", lobbyId)
+          .catch((err) => console.error("Error joining lobby:", err));
+      })
+      .catch((err) => console.error("SignalR Connection Error:", err));
+  } else {
+    console.log("Solo mode - SignalR disabled");
+  }
 
   // -------------------------------------------------------------------------
   // 2. GLOBAL GAME STATE & VARIABLES (Client-Side)
@@ -55,60 +62,63 @@ document.addEventListener("DOMContentLoaded", () => {
   // -------------------------------------------------------------------------
   // 4. SIGNALR SERVER -> CLIENT HANDLERS (Server-Side -> Client)
   // -------------------------------------------------------------------------
-  connection.on("ReceiveGameState", (newState) => {
-    const oldLength = gameState.wordList.length;
-    gameState = { ...gameState, ...newState };
-    previousWordListLength = oldLength;
-    updateUI();
-  });
+  if (!isSoloMode) {
+    connection.on("ReceiveGameState", (newState) => {
+      const oldLength = gameState.wordList.length;
+      gameState = { ...gameState, ...newState };
+      previousWordListLength = oldLength;
+      updateUI();
+    });
 
-  connection.on("ReceiveTimerSync", (remainingTime) => {
-    gameState.remainingSeconds = remainingTime;
-    clearInterval(timerInterval);
-    startTimerWithoutBroadcast();
-  });
+    connection.on("ReceiveTimerSync", (remainingTime) => {
+      gameState.remainingSeconds = remainingTime;
+      clearInterval(timerInterval);
+      startTimerWithoutBroadcast();
+    });
 
-  connection.on("ReceiveUserInput", (index, input) => {
-    const inputs = document.querySelectorAll(".wordInput");
-    if (inputs[index]) {
-      inputs[index].value = input;
-      updateInputSize(inputs[index]);
-    }
-  });
+    connection.on("ReceiveUserInput", (index, input) => {
+      const inputs = document.querySelectorAll(".wordInput");
+      if (inputs[index]) {
+        inputs[index].value = input;
+        updateInputSize(inputs[index]);
+      }
+    });
 
-  connection.on("ReceiveAnimation", (index, animationType) => {
-    const inputs = document.querySelectorAll(".wordInput");
-    if (inputs[index]) {
-      inputs[index].classList.add(animationType);
-    }
-  });
+    connection.on("ReceiveAnimation", (index, animationType) => {
+      const inputs = document.querySelectorAll(".wordInput");
+      if (inputs[index]) {
+        inputs[index].classList.add(animationType);
+      }
+    });
 
-  connection.on("ReceiveTimerStart", (initialTime) => {
-    gameState.remainingSeconds = initialTime;
-    clearInterval(timerInterval);
-    startTimerWithoutBroadcast();
-  });
+    connection.on("ReceiveTimerStart", (initialTime) => {
+      gameState.remainingSeconds = initialTime;
+      clearInterval(timerInterval);
+      startTimerWithoutBroadcast();
+    });
 
-  connection.on("ReceiveGameStart", () => {
-    console.log("Game start received");
-    startGameCountdown();
-  });
+    connection.on("ReceiveGameStart", () => {
+      console.log("Game start received");
+      startGameCountdown();
+    });
 
-  connection.on("ReceiveTimerPause", () => {
-    clearInterval(timerInterval);
-    isInCountdown = true;
-  });
+    connection.on("ReceiveTimerPause", () => {
+      clearInterval(timerInterval);
+      isInCountdown = true;
+    });
 
-  connection.on("ReceiveTimerResume", (remainingTime) => {
-    gameState.remainingSeconds = remainingTime;
-    isInCountdown = false;
-    startTimerWithoutBroadcast();
-  });
+    connection.on("ReceiveTimerResume", (remainingTime) => {
+      gameState.remainingSeconds = remainingTime;
+      isInCountdown = false;
+      startTimerWithoutBroadcast();
+    });
+  }
 
   // -------------------------------------------------------------------------
   // 5. SIGNALR CLIENT -> SERVER INVOCATIONS (Server-Side Calls)
   // -------------------------------------------------------------------------
   function broadcastGameState() {
+    if (isSoloMode) return;
     const gameStateWithoutTimer = { ...gameState };
     delete gameStateWithoutTimer.remainingSeconds;
     connection
@@ -117,24 +127,28 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function broadcastUserInput(index, input) {
+    if (isSoloMode) return;
     connection
       .invoke("BroadcastUserInput", lobbyId, index, input)
       .catch((err) => console.error("Error broadcasting user input:", err));
   }
 
   function broadcastAnimation(index, animationType) {
+    if (isSoloMode) return;
     connection
       .invoke("BroadcastAnimation", lobbyId, index, animationType)
       .catch((err) => console.error("Error broadcasting animation:", err));
   }
 
   function broadcastTimerSync(remainingTime) {
+    if (isSoloMode) return;
     connection
       .invoke("BroadcastTimerSync", lobbyId, remainingTime)
       .catch((err) => console.error("Error broadcasting timer sync:", err));
   }
 
   function broadcastTimerStart(initialTime) {
+    if (isSoloMode) return;
     connection
       .invoke("BroadcastTimerStart", lobbyId, initialTime)
       .catch((err) => console.error("Error broadcasting timer start:", err));
@@ -154,9 +168,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (gameState.wordList.length === 1 && previousWordListLength === 0) {
       console.log("Broadcasting game start");
-      connection
-        .invoke("BroadcastGameStart", lobbyId)
-        .catch((err) => console.error("Error broadcasting game start:", err));
+      if (!isSoloMode) {
+        connection
+          .invoke("BroadcastGameStart", lobbyId)
+          .catch((err) => console.error("Error broadcasting game start:", err));
+      }
     }
 
     if (gameState.wordList.length === 1) {
@@ -862,17 +878,21 @@ document.addEventListener("DOMContentLoaded", () => {
   function pauseTimer() {
     clearInterval(timerInterval);
     isInCountdown = true;
-    connection
-      .invoke("BroadcastTimerPause", lobbyId)
-      .catch((err) => console.error("Error pausing timer:", err));
+    if (!isSoloMode) {
+      connection
+        .invoke("BroadcastTimerPause", lobbyId)
+        .catch((err) => console.error("Error pausing timer:", err));
+    }
   }
 
   function resumeTimer() {
     isInCountdown = false;
     startTimerWithoutBroadcast();
-    connection
-      .invoke("BroadcastTimerResume", lobbyId, gameState.remainingSeconds)
-      .catch((err) => console.error("Error resuming timer:", err));
+    if (!isSoloMode) {
+      connection
+        .invoke("BroadcastTimerResume", lobbyId, gameState.remainingSeconds)
+        .catch((err) => console.error("Error resuming timer:", err));
+    }
   }
 
   // -------------------------------------------------------------------------
@@ -938,18 +958,20 @@ document.addEventListener("DOMContentLoaded", () => {
   }, 500);
   updateUI();
 
-  connection.onreconnecting((error) => {
-    console.log("Reconnecting to hub...", error);
-  });
+  if (!isSoloMode) {
+    connection.onreconnecting((error) => {
+      console.log("Reconnecting to hub...", error);
+    });
 
-  connection.onreconnected((connectionId) => {
-    console.log("Reconnected to hub.", connectionId);
-    const urlParams = new URLSearchParams(window.location.search);
-    const lobbyId = urlParams.get("roomId");
-    if (lobbyId) {
-      connection.invoke("JoinLobby", lobbyId);
-    }
-  });
+    connection.onreconnected((connectionId) => {
+      console.log("Reconnected to hub.", connectionId);
+      const urlParams = new URLSearchParams(window.location.search);
+      const lobbyId = urlParams.get("roomId");
+      if (lobbyId) {
+        connection.invoke("JoinLobby", lobbyId);
+      }
+    });
+  }
 
   // -------------------------------------------------------------------------
   // 14. Notification handeling

@@ -1,10 +1,10 @@
 document.addEventListener("DOMContentLoaded", async () => {
   const urlParams = new URLSearchParams(window.location.search);
   const lobbyId = urlParams.get("roomId");
+  const isSoloMode = !lobbyId;
 
-  if (!lobbyId) {
-    console.error("Lobby ID not found in URL.");
-    return;
+  if (isSoloMode) {
+    console.log("Solo mode detected");
   }
 
   function addPlayerCardLobby(username, playerIndex, avatarSeed) {
@@ -42,7 +42,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       const img = card.querySelector('img[alt="Avatar"]');
       if (img) {
         img.src = newAvatarUrl;
-        await connection.invoke("UpdateAvatar", lobbyId, username, randomSeed);
+        if (!isSoloMode && typeof connection !== 'undefined') {
+          await connection.invoke("UpdateAvatar", lobbyId, username, randomSeed);
+        }
       }
     });
   }
@@ -109,12 +111,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  if (document.querySelector(".cardHolder")) {
-    await populatePlayersLobby(lobbyId);
-  }
+  if (isSoloMode) {
+    // Create a solo player for solo mode
+    const username = localStorage.getItem("username") || "Solo Player";
+    const avatarSeed = localStorage.getItem("avatarSeed") || username;
 
-  if (document.querySelector(".grid-child-players")) {
-    await populatePlayersGame(lobbyId);
+    if (document.querySelector(".grid-child-players")) {
+      addPlayerCardGame(username, 0, avatarSeed);
+    }
+  } else {
+    // Multiplayer mode - fetch players from server
+    if (document.querySelector(".cardHolder")) {
+      await populatePlayersLobby(lobbyId);
+    }
+
+    if (document.querySelector(".grid-child-players")) {
+      await populatePlayersGame(lobbyId);
+    }
   }
 
   const randomizeBtn = document.getElementById("randomizeAvatars");
@@ -129,57 +142,61 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  let connection = new signalR.HubConnectionBuilder()
-    .withUrl("/gameHub", {
-      skipNegotiation: true,
-      transport: signalR.HttpTransportType.WebSockets,
-      headers: {
-        "X-Forwarded-Proto": "https",
-      },
-    })
-    .withAutomaticReconnect()
-    .configureLogging(signalR.LogLevel.Debug)
-    .build();
+  if (!isSoloMode) {
+    let connection = new signalR.HubConnectionBuilder()
+      .withUrl("/gameHub", {
+        skipNegotiation: true,
+        transport: signalR.HttpTransportType.WebSockets,
+        headers: {
+          "X-Forwarded-Proto": "https",
+        },
+      })
+      .withAutomaticReconnect()
+      .configureLogging(signalR.LogLevel.Debug)
+      .build();
 
-  connection.on("PlayerJoined", (player) => {
-    console.log("A new player joined:", player);
-    if (document.querySelector(".cardHolder")) {
-      addPlayerCardLobby(
-        player.username,
-        document.querySelectorAll(".cardHolder .card").length,
-        player.avatarSeed,
-      );
-    }
-  });
-
-  connection.on("AvatarUpdated", (username, newSeed) => {
-    console.log("Avatar updated for:", username, "with seed:", newSeed);
-    const cards = document.querySelectorAll(".card");
-    cards.forEach((card) => {
-      const usernameElement = card.querySelector("h4");
-      if (usernameElement?.textContent === username) {
-        const img = card.querySelector('img[alt="Avatar"]');
-        if (img) {
-          img.src = `https://api.dicebear.com/9.x/open-peeps/svg?seed=${encodeURIComponent(newSeed)}`;
-        }
+    connection.on("PlayerJoined", (player) => {
+      console.log("A new player joined:", player);
+      if (document.querySelector(".cardHolder")) {
+        addPlayerCardLobby(
+          player.username,
+          document.querySelectorAll(".cardHolder .card").length,
+          player.avatarSeed,
+        );
       }
     });
-  });
 
-  async function initializeSignalR() {
-    try {
-      await connection.start();
-      console.log("Connected to SignalR for real-time updates");
-      const urlParams = new URLSearchParams(window.location.search);
-      const lobbyId = urlParams.get("roomId");
-      if (lobbyId) {
-        await connection.invoke("JoinLobby", lobbyId);
+    connection.on("AvatarUpdated", (username, newSeed) => {
+      console.log("Avatar updated for:", username, "with seed:", newSeed);
+      const cards = document.querySelectorAll(".card");
+      cards.forEach((card) => {
+        const usernameElement = card.querySelector("h4");
+        if (usernameElement?.textContent === username) {
+          const img = card.querySelector('img[alt="Avatar"]');
+          if (img) {
+            img.src = `https://api.dicebear.com/9.x/open-peeps/svg?seed=${encodeURIComponent(newSeed)}`;
+          }
+        }
+      });
+    });
+
+    async function initializeSignalR() {
+      try {
+        await connection.start();
+        console.log("Connected to SignalR for real-time updates");
+        const urlParams = new URLSearchParams(window.location.search);
+        const lobbyId = urlParams.get("roomId");
+        if (lobbyId) {
+          await connection.invoke("JoinLobby", lobbyId);
+        }
+      } catch (err) {
+        console.error(err);
+        setTimeout(initializeSignalR, 5000);
       }
-    } catch (err) {
-      console.error(err);
-      setTimeout(initializeSignalR, 5000);
     }
-  }
 
-  initializeSignalR();
+    initializeSignalR();
+  } else {
+    console.log("Solo mode - SignalR disabled in addCard.js");
+  }
 });
