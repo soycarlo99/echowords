@@ -55,7 +55,7 @@ test.describe("Timer Reset After Each Round", () => {
     await page.addInitScript(() => {
       localStorage.setItem("gameDifficulty", "medium");
     });
-    await page.goto("http:
+    await page.goto("http://localhost:5000");
 
     
     await page.getByRole("textbox", { name: "Enter your name" }).fill("test");

@@ -93,6 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     connection.on("ReceiveTimerStart", (initialTime) => {
       gameState.remainingSeconds = initialTime;
+      isInCountdown = false;
       clearInterval(timerInterval);
       startTimerWithoutBroadcast();
     });
@@ -183,14 +184,12 @@ document.addEventListener("DOMContentLoaded", () => {
         updateScore();
       }, 3100);
     } else if (gameState.wordList.length > previousWordListLength) {
-      //updateTimer();
       setTimeout(() => {
         renderWordBoxes();
         highlightCurrentPlayer();
         updateScore();
         updateTimer();
       }, 1700);
-      restartClock(); //Added now
     } else {
       renderWordBoxes();
       highlightCurrentPlayer();
@@ -402,16 +401,10 @@ document.addEventListener("DOMContentLoaded", () => {
       updateUI();
       broadcastGameState();
 
-      if (gameState.wordList.length > 1) {
-        initializeGameSettings();
-        broadcastTimerStart(gameState.remainingSeconds);
-
-        clearInterval(timerInterval);
-        startTimerWithoutBroadcast();
-      } else {
-        // For first word, resume the timer
-        resumeTimer();
-      }
+      isInCountdown = false;
+      broadcastTimerStart(gameState.remainingSeconds);
+      clearInterval(timerInterval);
+      startTimerWithoutBroadcast();
     }, 1700);
   }
 
