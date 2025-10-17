@@ -106,7 +106,11 @@ dist-ssr
 *.ntvs*
 *.njsproj
 *.sw?
-CLAUDE.md
 
+# Claude realted md
+CLAUDE.md
+API_DOCUMENTATION.md
+ARCHITECTURE.md
+DEVELOPER_GUIDE.md
 
 
