@@ -190,7 +190,10 @@ document.addEventListener("DOMContentLoaded", () => {
         updateScore();
         updateTimer();
       }, 1700);
-      restartClock(); //Added now
+      // Only restart clock for subsequent words (not the first word)
+      if (gameState.wordList.length > 1) {
+        restartClock();
+      }
     } else {
       renderWordBoxes();
       highlightCurrentPlayer();
@@ -401,17 +404,6 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
       updateUI();
       broadcastGameState();
-
-      if (gameState.wordList.length > 1) {
-        initializeGameSettings();
-        broadcastTimerStart(gameState.remainingSeconds);
-
-        clearInterval(timerInterval);
-        startTimerWithoutBroadcast();
-      } else {
-        // For first word, resume the timer
-        resumeTimer();
-      }
     }, 1700);
   }
 
