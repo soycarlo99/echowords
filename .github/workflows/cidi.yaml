@@ -25,7 +25,7 @@ jobs:
             git pull
             # npm ci
             dotnet restore
-            dotnet build
+            dotnet publish -c Release --runtime linux-x64 --self-contained false -o ./publish
             pm2 stop echowords
             pm2 delete echowords
             export ECHO_PG_PORT="${{ secrets.PG_PORT }}"
@@ -33,4 +33,4 @@ jobs:
             export ECHO_PG_USER="${{ secrets.PG_USER }}"
             export ECHO_PG_PASSWORD="${{ secrets.PG_PASSWORD }}"
             export ECHO_DB_NAME="${{ secrets.ECHO_DB_NAME }}"
-            pm2 start "dotnet run --runtime linux-x64" --name echowords
+            pm2 start "./publish/Wordapp" --name echowords
