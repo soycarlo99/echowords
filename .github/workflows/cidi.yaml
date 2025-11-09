@@ -33,4 +33,5 @@ jobs:
             export ECHO_PG_USER="${{ secrets.PG_USER }}"
             export ECHO_PG_PASSWORD="${{ secrets.PG_PASSWORD }}"
             export ECHO_DB_NAME="${{ secrets.ECHO_DB_NAME }}"
+            export ASPNETCORE_URLS="http://localhost:5185"
             pm2 start "./publish/Wordapp" --name echowords
